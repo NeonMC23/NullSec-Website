@@ -26,7 +26,7 @@ NullSec-Website/
 ├── articles.html           # Article listing with filters & sorting
 ├── resources.html          # Software resources organised by category
 ├── about.html              # Mission, values, community
-├── subscribe.html          # Newsletter + Discord invite
+
 │
 ├── articles/               # All articles (one HTML file per article)
 │   ├── privacy-in-europe.html

@@ -40,7 +40,7 @@
     grid.innerHTML = articles
       .map(
         (a) => `
-        <a href="${a.url}" class="article-card fade-in">
+        <a href="${a.url}" class="article-card">
           <img
             src="${a.cover || 'assets/images/placeholder.svg'}"
             alt="${Utils.sanitize(a.title)}"
