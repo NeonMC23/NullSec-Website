@@ -1,11 +1,4 @@
-# Cloudflare Pages redirects
-# https://developers.cloudflare.com/pages/platform/redirects
-
-# Enforce HTTPS
-http://neonmc23.github.io/NullSec-Website/* https://neonmc23.github.io/NullSec-Website/:splat 301
-
-# WWW redirect
-www.neonmc23.github.io/NullSec-Website/* https://neonmc23.github.io/NullSec-Website/:splat 301
-
-# Root
-/ /index.html 200
+# GitHub Pages — no redirects needed normally
+# The following ensures clean navigation
+/articles/* /NullSec-Website/articles/:splat 200
+/ NullSec-Website/index.html 200

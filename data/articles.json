@@ -5,8 +5,8 @@
     "category": "Privacy",
     "date": "2026-07-27",
     "readingTime": "12 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/privacy-in-europe.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/privacy-in-europe.html",
     "featured": true
   },
   {
@@ -15,8 +15,8 @@
     "category": "Cybersecurity",
     "date": "2026-07-20",
     "readingTime": "15 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/signal-vs-whatsapp.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/signal-vs-whatsapp.html",
     "featured": false
   },
   {
@@ -25,8 +25,8 @@
     "category": "Privacy",
     "date": "2026-07-13",
     "readingTime": "10 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/metadata.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/metadata.html",
     "featured": false
   },
   {
@@ -35,8 +35,8 @@
     "category": "Self Hosting",
     "date": "2026-07-06",
     "readingTime": "20 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/self-hosting-guide.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/self-hosting-guide.html",
     "featured": false
   },
   {
@@ -45,8 +45,8 @@
     "category": "Linux",
     "date": "2026-06-28",
     "readingTime": "8 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/linux-digital-sovereignty.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/linux-digital-sovereignty.html",
     "featured": false
   },
   {
@@ -55,8 +55,8 @@
     "category": "Artificial Intelligence",
     "date": "2026-06-21",
     "readingTime": "14 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/local-llm-ollama.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/local-llm-ollama.html",
     "featured": false
   },
   {
@@ -65,8 +65,8 @@
     "category": "Digital Rights",
     "date": "2026-06-14",
     "readingTime": "18 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/digital-rights-2026.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/digital-rights-2026.html",
     "featured": false
   },
   {
@@ -75,8 +75,8 @@
     "category": "Cybersecurity",
     "date": "2026-06-07",
     "readingTime": "11 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/end-to-end-encryption.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/end-to-end-encryption.html",
     "featured": false
   },
   {
@@ -85,8 +85,8 @@
     "category": "Open Source",
     "date": "2026-05-31",
     "readingTime": "9 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/open-source-licenses.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/open-source-licenses.html",
     "featured": false
   },
   {
@@ -95,8 +95,8 @@
     "category": "Self Hosting",
     "date": "2026-05-24",
     "readingTime": "16 min",
-    "cover": "/assets/images/placeholder.svg",
-    "url": "/articles/privacy-home-network.html",
+    "cover": "assets/images/placeholder.svg",
+    "url": "articles/privacy-home-network.html",
     "featured": false
   }
 ]

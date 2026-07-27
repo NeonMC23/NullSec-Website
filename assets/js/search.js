@@ -13,7 +13,7 @@
   /** Fetch articles.json and initialise Fuse. */
   async function loadSearchIndex() {
     try {
-      const res = await fetch('/data/articles.json');
+      const res = await fetch('data/articles.json');
       articlesData = await res.json();
       fuseInstance = new Fuse(articlesData, {
         keys: [

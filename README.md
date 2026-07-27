@@ -52,8 +52,7 @@ NullSec-Website/
 │   └── icons/              # Favicon SVG
 │
 ├── sitemap.xml
-├── robots.txt
-└── _redirects              # Règles de redirection Cloudflare Pages
+└── robots.txt
 ```
 
 ### ⚡ Stack technique
@@ -93,8 +92,8 @@ NullSec-Website/
      "category": "Privacy",
      "date": "2026-07-27",
      "readingTime": "10 min",
-     "cover": "/assets/images/placeholder.svg",
-     "url": "/articles/mon-nouvel-article.html",
+     "cover": "assets/images/placeholder.svg",
+     "url": "articles/mon-nouvel-article.html",
      "featured": false
    }
    ```
@@ -230,8 +229,6 @@ npx http-server .
 
 Ouvrir `http://localhost:8000` dans le navigateur.
 
-> ⚠️ **Important :** Le site utilise une balise `<base href="/NullSec-Website/">`. En local, remplacez-la par `<base href="/">` ou supprimez-la pour que les chemins fonctionnent.  
-> *Alternative :* servez le site à la racine d'un serveur local.
 
 ---
 
@@ -243,7 +240,7 @@ Ce projet est distribué sous licence MIT. Voir le fichier `LICENSE` pour plus d
 
 ## 🤝 Contribuer
 
-Les contributions sont les bienvenues ! Rejoignez notre [Discord](https://discord.gg/nullsec) pour discuter.
+Les contributions sont les bienvenues ! Rejoignez notre [Discord](https://discord.com/invite/uTeCwQQtn) pour discuter.
 
 1. Forkez le projet
 2. Créez une branche (`git checkout -b feature/ma-feature`)

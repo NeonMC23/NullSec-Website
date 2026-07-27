@@ -14,7 +14,7 @@
     if (!grid) return; // Not on the articles page
 
     try {
-      const res = await fetch('/data/articles.json');
+      const res = await fetch('data/articles.json');
       const articles = await res.json();
       renderArticles(articles, grid);
       setupFilters(articles, grid);
@@ -42,11 +42,11 @@
         (a) => `
         <a href="${a.url}" class="article-card fade-in">
           <img
-            src="${a.cover || '/assets/images/placeholder.webp'}"
+            src="${a.cover || 'assets/images/placeholder.svg'}"
             alt="${Utils.sanitize(a.title)}"
             class="article-card-cover"
             loading="lazy"
-            onerror="this.src='/assets/images/placeholder.webp'"
+            onerror="this.src='assets/images/placeholder.svg'"
           />
           <div class="article-card-body">
             <span class="article-card-category">${Utils.sanitize(a.category)}</span>
