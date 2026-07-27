@@ -1,0 +1,102 @@
+[
+  {
+    "title": "Privacy in Europe",
+    "description": "How the European Union entered the debate over digital surveillance and what the Chat Control proposal means for encrypted communications.",
+    "category": "Privacy",
+    "date": "2026-07-27",
+    "readingTime": "12 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/privacy-in-europe.html",
+    "featured": true
+  },
+  {
+    "title": "Signal vs WhatsApp: A Technical Comparison",
+    "description": "An in-depth technical comparison of Signal and WhatsApp covering encryption protocols, metadata, ownership, and trust models.",
+    "category": "Cybersecurity",
+    "date": "2026-07-20",
+    "readingTime": "15 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/signal-vs-whatsapp.html",
+    "featured": false
+  },
+  {
+    "title": "Metadata: The Silent Privacy Threat",
+    "description": "Why metadata is more revealing than content, how it is collected, and what you can do to protect yours.",
+    "category": "Privacy",
+    "date": "2026-07-13",
+    "readingTime": "10 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/metadata.html",
+    "featured": false
+  },
+  {
+    "title": "The Complete Self-Hosting Guide for 2026",
+    "description": "Everything you need to know to take back control of your data by self-hosting your own services at home.",
+    "category": "Self Hosting",
+    "date": "2026-07-06",
+    "readingTime": "20 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/self-hosting-guide.html",
+    "featured": false
+  },
+  {
+    "title": "Why Linux Matters for Digital Sovereignty",
+    "description": "An exploration of how Linux empowers individuals and organisations to maintain control over their computing infrastructure.",
+    "category": "Linux",
+    "date": "2026-06-28",
+    "readingTime": "8 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/linux-digital-sovereignty.html",
+    "featured": false
+  },
+  {
+    "title": "Running LLMs Locally with Ollama",
+    "description": "A practical guide to running large language models on your own hardware. No cloud, no tracking, full privacy.",
+    "category": "Artificial Intelligence",
+    "date": "2026-06-21",
+    "readingTime": "14 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/local-llm-ollama.html",
+    "featured": false
+  },
+  {
+    "title": "The State of Digital Rights in 2026",
+    "description": "A comprehensive overview of digital rights legislation, surveillance laws, and privacy protections worldwide.",
+    "category": "Digital Rights",
+    "date": "2026-06-14",
+    "readingTime": "18 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/digital-rights-2026.html",
+    "featured": false
+  },
+  {
+    "title": "Understanding End-to-End Encryption",
+    "description": "How E2EE works, why it matters, and why it is under attack by governments around the world.",
+    "category": "Cybersecurity",
+    "date": "2026-06-07",
+    "readingTime": "11 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/end-to-end-encryption.html",
+    "featured": false
+  },
+  {
+    "title": "Open Source Licenses Explained",
+    "description": "A clear guide to understanding GPL, MIT, Apache, BSD, and other open source licenses for developers and users.",
+    "category": "Open Source",
+    "date": "2026-05-31",
+    "readingTime": "9 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/open-source-licenses.html",
+    "featured": false
+  },
+  {
+    "title": "Building a Privacy-First Home Network",
+    "description": "Step-by-step guide to securing your home network with Pi-hole, VLANs, VPNs, and firewall rules.",
+    "category": "Self Hosting",
+    "date": "2026-05-24",
+    "readingTime": "16 min",
+    "cover": "/assets/images/placeholder.svg",
+    "url": "/articles/privacy-home-network.html",
+    "featured": false
+  }
+]
