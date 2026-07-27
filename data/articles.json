@@ -5,7 +5,7 @@
     "category": "Cybersecurity",
     "date": "2026-07-27",
     "readingTime": "12 min",
-    "cover": "assets/images/articles/cyber-digital.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/nis2-directive.html",
     "featured": false
   },
@@ -15,7 +15,7 @@
     "category": "Digital Rights",
     "date": "2026-07-27",
     "readingTime": "13 min",
-    "cover": "assets/images/articles/blockchain-abstract.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/digital-services-act.html",
     "featured": false
   },
@@ -25,7 +25,7 @@
     "category": "Artificial Intelligence",
     "date": "2026-07-27",
     "readingTime": "15 min",
-    "cover": "assets/images/articles/cyber-digital.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/eu-ai-act.html",
     "featured": true
   },
@@ -35,7 +35,7 @@
     "category": "Digital Rights",
     "date": "2026-07-27",
     "readingTime": "16 min",
-    "cover": "assets/images/articles/cyber-map.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/chat-control.html",
     "featured": false
   },
@@ -45,7 +45,7 @@
     "category": "Privacy",
     "date": "2026-07-27",
     "readingTime": "14 min",
-    "cover": "assets/images/articles/security-padlock.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/gdpr-at-8.html",
     "featured": false
   },
@@ -55,7 +55,7 @@
     "category": "Privacy",
     "date": "2026-07-27",
     "readingTime": "12 min",
-    "cover": "assets/images/articles/cyber-map.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/privacy-in-europe.html",
     "featured": false
   },
@@ -65,7 +65,7 @@
     "category": "Cybersecurity",
     "date": "2026-07-27",
     "readingTime": "15 min",
-    "cover": "assets/images/articles/security-padlock.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/signal-vs-whatsapp.html",
     "featured": false
   },
@@ -75,7 +75,7 @@
     "category": "Privacy",
     "date": "2026-07-27",
     "readingTime": "10 min",
-    "cover": "assets/images/articles/security-padlock.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/metadata.html",
     "featured": false
   },
@@ -85,7 +85,7 @@
     "category": "Self Hosting",
     "date": "2026-07-27",
     "readingTime": "20 min",
-    "cover": "assets/images/articles/servers-row.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/self-hosting-guide.html",
     "featured": false
   },
@@ -95,7 +95,7 @@
     "category": "Linux",
     "date": "2026-07-27",
     "readingTime": "8 min",
-    "cover": "assets/images/articles/servers-row.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/linux-digital-sovereignty.html",
     "featured": false
   },
@@ -105,7 +105,7 @@
     "category": "Artificial Intelligence",
     "date": "2026-07-27",
     "readingTime": "14 min",
-    "cover": "assets/images/articles/cyber-digital.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/local-llm-ollama.html",
     "featured": false
   },
@@ -115,7 +115,7 @@
     "category": "Digital Rights",
     "date": "2026-07-27",
     "readingTime": "18 min",
-    "cover": "assets/images/articles/blockchain-abstract.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/digital-rights-2026.html",
     "featured": false
   },
@@ -125,7 +125,7 @@
     "category": "Cybersecurity",
     "date": "2026-07-27",
     "readingTime": "11 min",
-    "cover": "assets/images/articles/security-padlock.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/end-to-end-encryption.html",
     "featured": false
   },
@@ -135,7 +135,7 @@
     "category": "Open Source",
     "date": "2026-07-27",
     "readingTime": "9 min",
-    "cover": "assets/images/articles/blockchain-abstract.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/open-source-licenses.html",
     "featured": false
   },
@@ -145,7 +145,7 @@
     "category": "Self Hosting",
     "date": "2026-07-27",
     "readingTime": "16 min",
-    "cover": "assets/images/articles/servers-row.jpg",
+    "cover": "assets/images/placeholder.svg",
     "url": "articles/privacy-home-network.html",
     "featured": false
   }
