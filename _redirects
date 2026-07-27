@@ -2,10 +2,10 @@
 # https://developers.cloudflare.com/pages/platform/redirects
 
 # Enforce HTTPS
-http://nullsec.xyz/* https://nullsec.xyz/:splat 301
+http://neonmc23.github.io/NullSec-Website/* https://neonmc23.github.io/NullSec-Website/:splat 301
 
 # WWW redirect
-www.nullsec.xyz/* https://nullsec.xyz/:splat 301
+www.neonmc23.github.io/NullSec-Website/* https://neonmc23.github.io/NullSec-Website/:splat 301
 
 # Root
 / /index.html 200
