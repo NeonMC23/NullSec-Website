@@ -3,15 +3,15 @@
 [![Site Status](https://img.shields.io/badge/status-live-success)](https://neonmc23.github.io/NullSec-Website/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Le site officiel de **Nullsec**, une communauté dédiée à la **vie privée**, la **cybersécurité**, les **droits numériques**, **Linux**, l'**open source**, l'**intelligence artificielle**, le **self-hosting** et la **technologie**.
+The official website for **Nullsec**, a community focused on **privacy**, **cybersecurity**, **digital rights**, **Linux**, **open source**, **artificial intelligence**, **self-hosting**, and **technology**.
 
-> 🌐 **Site en ligne :** [https://neonmc23.github.io/NullSec-Website/](https://neonmc23.github.io/NullSec-Website/)
+> 🌐 **Live site :** [https://neonmc23.github.io/NullSec-Website/](https://neonmc23.github.io/NullSec-Website/)
 
 ---
 
-## ✨ Aperçu
+## ✨ Overview
 
-Nullsec se présente comme une **plateforme de documentation professionnelle** — pas un blog. L'accent est mis sur la lisibilité, un design minimaliste et élégant, et une architecture entièrement statique.
+Nullsec is designed as a **professional documentation platform** — not a blog. Emphasis is on readability, a clean and elegant minimal design, and a fully static architecture.
 
 **Inspirations :** Signal.org, Apple Security Research, Vercel, GitHub Docs, MDN Web Docs.
 
@@ -22,235 +22,236 @@ Nullsec se présente comme une **plateforme de documentation professionnelle** �
 ```
 NullSec-Website/
 │
-├── index.html              # Accueil — hero, article à la une, derniers articles
-├── articles.html           # Liste des articles — filtres & tri
-├── resources.html          # Ressources logicielles organisées par catégorie
-├── about.html              # Mission, valeurs, communauté
-├── subscribe.html          # Newsletter + invitation Discord
+├── index.html              # Home — hero, featured article, latest articles
+├── articles.html           # Article listing with filters & sorting
+├── resources.html          # Software resources organised by category
+├── about.html              # Mission, values, community
+├── subscribe.html          # Newsletter + Discord invite
 │
-├── articles/               # Tous les articles (un fichier HTML par article)
+├── articles/               # All articles (one HTML file per article)
 │   ├── privacy-in-europe.html
 │   ├── signal-vs-whatsapp.html
 │   ├── metadata.html
 │   └── ...
 │
 ├── data/
-│   └── articles.json       # Métadonnées uniquement (pas de contenu)
+│   └── articles.json       # Metadata only (no content)
 │
 ├── assets/
 │   ├── css/
-│   │   └── style.css       # Design system complet
+│   │   └── style.css       # Complete design system
 │   ├── js/
-│   │   ├── utils.js        # Fonctions utilitaires partagées
-│   │   ├── theme.js        # Gestion du thème sombre/clair
-│   │   ├── navigation.js   # Navigation sticky + menu mobile
-│   │   ├── search.js       # Recherche locale avec Fuse.js
-│   │   ├── articles.js     # Chargement dynamique des articles
-│   │   ├── animations.js   # Animations, barre de progression, partage
-│   │   └── fuse.min.js     # Moteur de recherche floue (v7.0.0)
-│   ├── images/             # Images SVG statiques
-│   └── icons/              # Favicon SVG
+│   │   ├── utils.js        # Shared utility functions
+│   │   ├── theme.js        # Dark/light theme management
+│   │   ├── navigation.js   # Sticky nav + mobile hamburger menu
+│   │   ├── search.js       # Local search with Fuse.js
+│   │   ├── articles.js     # Dynamic article card loading
+│   │   ├── animations.js   # Animations, progress bar, share button
+│   │   └── fuse.min.js     # Fuzzy search engine (v7.0.0)
+│   ├── images/             # Static SVG images
+│   └── icons/              # SVG favicon
 │
 ├── sitemap.xml
 └── robots.txt
 ```
 
-### ⚡ Stack technique
+### ⚡ Tech Stack
 
-| Technologie | Utilisation |
-|-------------|-------------|
-| **HTML5** | Structure sémantique |
+| Technology | Usage |
+|------------|-------|
+| **HTML5** | Semantic structure |
 | **CSS3** | Design system (variables, grid, flexbox) |
-| **JavaScript** | Modules vanilla ES6 |
-| **Fuse.js v7** | Recherche floue côté client |
+| **JavaScript** | Vanilla ES6 modules |
+| **Fuse.js v7** | Client-side fuzzy search |
 
-### Contraintes respectées
+### Constraints met
 
-- ✅ 100 % **statique** — pas de backend, pas de base de données
-- ✅ Fonctionne sur **Cloudflare Pages** et **GitHub Pages**
-- ✅ **Aucun build step** — on uploade les fichiers, ça marche
-- ✅ Pas de React, Vue, Angular, Svelte, Node.js, PHP ou CMS
+- ✅ **100% static** — no backend, no database
+- ✅ Works on **Cloudflare Pages** and **GitHub Pages**
+- ✅ **No build step** — upload files and it works
+- ✅ No React, Vue, Angular, Svelte, Node.js, PHP, or CMS
 
 ---
 
-## 🚀 Ajouter un article (≈ 1 minute)
+## 🚀 Publishing an Article (~1 minute)
 
-1. **Créer un fichier HTML** dans `articles/`
+1. **Create an HTML file** in `articles/`
 
    ```bash
-   cp articles/template.html articles/mon-nouvel-article.html
+   cp articles/template.html articles/my-new-article.html
    ```
 
-   Modifiez le contenu, le titre, la description, les métadonnées SEO (OpenGraph, Twitter Cards, JSON-LD) et le contenu de l'article.
+   Edit the content, title, description, SEO metadata (OpenGraph, Twitter Cards, JSON-LD), and article body.
 
-2. **Ajouter une entrée** dans `data/articles.json`
+2. **Add an entry** to `data/articles.json`
 
    ```json
    {
-     "title": "Mon Nouvel Article",
-     "description": "Une brève description de l'article.",
+     "title": "My New Article",
+     "description": "A brief description of the article.",
      "category": "Privacy",
      "date": "2026-07-27",
      "readingTime": "10 min",
      "cover": "assets/images/placeholder.svg",
-     "url": "articles/mon-nouvel-article.html",
+     "url": "articles/my-new-article.html",
      "featured": false
    }
    ```
 
-3. **Déployer** sur GitHub Pages
+3. **Deploy** to GitHub Pages
 
    ```bash
    git add .
-   git commit -m "Ajout article : Mon Nouvel Article"
+   git commit -m "Add article: My New Article"
    git push
    ```
 
-### Ce qui se met à jour automatiquement
+### What updates automatically
 
-- ✅ La grille des articles sur `articles.html`
-- ✅ Les filtres par catégorie
-- ✅ Les tris (plus récent, plus ancien, catégorie)
-- ✅ La page d'accueil (articles récents)
-- ✅ L'article à la une (si `featured: true`)
-- ✅ Les compteurs de catégories
-- ✅ L'index de recherche (Fuse.js)
+- ✅ The article grid on `articles.html`
+- ✅ Category filters
+- ✅ Sort options (newest, oldest, category)
+- ✅ Home page (recent articles)
+- ✅ Featured article (if `featured: true`)
+- ✅ Category counters
+- ✅ Search index (Fuse.js)
 
 ---
 
 ## 🎨 Design System
 
-### Palette
+### Color Palette
 
-| Rôle | Couleur (dark) | Usage |
-|------|---------------|-------|
-| Fond | `#0B0B0F` | Arrière-plan principal |
-| Cartes | `#17171D` | Éléments de surface |
-| Accent | `#FF4FA3` | Actions, liens, mise en avant |
-| Bordures | `#2A2A35` | Séparateurs |
-| Texte | `#F5F5F7` | Contenu principal |
-| Secondaire | `#9CA3AF` | Texte atténué |
+| Role | Color (dark) | Usage |
+|------|-------------|-------|
+| Background | `#0B0B0F` | Main background |
+| Cards | `#17171D` | Surface elements |
+| Accent | `#FF4FA3` | Actions, links, highlights |
+| Borders | `#2A2A35` | Separators |
+| Text | `#F5F5F7` | Primary content |
+| Muted | `#9CA3AF` | Secondary text |
 
-### Typographie
+### Typography
 
-- **Titres :** Space Grotesk (Google Fonts)
-- **Corps :** Inter (Google Fonts)
-- **Code :** JetBrains Mono (Google Fonts)
+- **Headings:** Space Grotesk (Google Fonts)
+- **Body:** Inter (Google Fonts)
+- **Code:** JetBrains Mono (Google Fonts)
 
-### Principes
+### Principles
 
-- ✨ Design minimal, premium, technique
-- 🎯 Beaucoup d'espace blanc
-- 🔄 Coins arrondis, bordures subtiles
-- 🌙 Dark mode par défaut, light mode optionnel
+- ✨ Minimal, premium, technical design
+- 🎯 Generous whitespace
+- 🔄 Rounded corners, subtle borders
+- 🌙 Dark mode by default, light mode optional
 - 📱 Responsive (mobile-first)
-- ♿ Accessible (ARIA, navigation clavier)
-- 🚫 Pas de glassmorphism ni de dégradés excessifs
+- ♿ Accessible (ARIA, keyboard navigation)
+- 🚫 No glassmorphism or excessive gradients
 
 ---
 
-## 🔍 Fonctionnalités
+## 🔍 Features
 
 ### Navigation
-- Barre sticky avec effet de flou
-- Menu hamburger sur mobile
-- Lien actif mis en évidence
+- Sticky navbar with blur effect
+- Hamburger menu on mobile
+- Active link highlighting
 
-### Recherche
-- Raccourci clavier : `Ctrl + K`
-- Recherche floue via Fuse.js
-- Recherche dans les titres, descriptions et catégories
-- Résultats en temps réel
+### Search
+- Keyboard shortcut: `Ctrl + K`
+- Fuzzy search via Fuse.js
+- Searches titles, descriptions, and categories
+- Real-time results
 
 ### Articles
-- Barre de progression de lecture
-- Bouton retour en haut
-- Bouton de partage (copie l'URL)
-- Navigation article précédent/suivant
-- Références en fin d'article
-- Animations au défilement (intersection observer)
-- Images optimisées avec chargement paresseux
+- Reading progress bar
+- Back to top button
+- Share button (copies URL)
+- Previous / Next article navigation
+- References section at the end
+- Scroll-triggered animations (intersection observer)
+- Lazy-loaded images
 
-### Thème
-- Dark mode par défaut
-- Bascule clair/sombre
-- Préférence persistée dans `localStorage`
-- Respecte `prefers-reduced-motion`
+### Theme
+- Dark mode by default
+- Toggle between dark and light
+- Preference stored in `localStorage`
+- Respects `prefers-reduced-motion`
 
 ---
 
 ## 📈 SEO
 
-Chaque article inclut :
+Every article includes:
 
-- ✅ Titre unique et pertinent
+- ✅ Unique, descriptive title
 - ✅ Meta description
 - ✅ Open Graph (Facebook, LinkedIn)
 - ✅ Twitter Cards
-- ✅ URL canonique
+- ✅ Canonical URL
 - ✅ JSON-LD (Article schema.org)
-- ✅ HTML sémantique (article, nav, header, footer)
-- ✅ Texte alternatif sur les images
-- ✅ `sitemap.xml` complet
+- ✅ Semantic HTML (article, nav, header, footer)
+- ✅ Alt text on images
+- ✅ Complete `sitemap.xml`
 - ✅ `robots.txt`
 
 ---
 
-## 🗺️ Roadmap / Extensions futures
+## 🗺️ Future Roadmap
 
-L'architecture est conçue pour supporter sans réécriture :
+The architecture is designed to support the following without a rewrite:
 
-- [ ] **Pages catégories** — pages dédiées par thématique
-- [ ] **Multilingue** — EN / FR (via attribut `lang` et fichiers séparés)
-- [ ] **Outils interactifs** — calculateurs, vérificateurs
-- [ ] **Téléchargements** — ressources PDF, guides
-- [ ] **Page News** — actualités et annonces
-- [ ] **Tutoriels** — guides pas à pas
-- [ ] **Fils RSS** — pour les lecteurs de flux
-- [ ] **Mode hors-ligne** — via Service Worker
+- [ ] **Category pages** — dedicated pages per topic
+- [ ] **Multilingual** — EN / FR support (via `lang` attribute and separate files)
+- [ ] **Interactive tools** — calculators, checkers
+- [ ] **Downloads** — PDF resources, guides
+- [ ] **News page** — updates and announcements
+- [ ] **Tutorials** — step-by-step guides
+- [ ] **RSS feeds** — for feed readers
+- [ ] **Offline mode** — via Service Worker
 
 ---
 
-## 🛠️ Développement local
+## 🛠️ Local Development
 
 ```bash
-# Cloner le dépôt
+# Clone the repository
 git clone https://github.com/neonmc23/NullSec-Website.git
 
-# Se déplacer dans le dossier
+# Navigate to the project
 cd NullSec-Website
 
-# Lancer un serveur local (Python)
+# Start a local server (Python)
 python3 -m http.server 8000
 
-# Ou avec Node.js (http-server)
+# Or with Node.js (http-server)
 npx http-server .
 ```
 
-Ouvrir `http://localhost:8000` dans le navigateur.
+Open `http://localhost:8000` in your browser.
 
-
----
-
-## 📄 Licence
-
-Ce projet est distribué sous licence MIT. Voir le fichier `LICENSE` pour plus d'informations.
+> 💡 The site uses **relative paths** compatible with GitHub Pages. When running locally, serve the folder at the root of your HTTP server (`/`) and everything will work without any additional configuration.
 
 ---
 
-## 🤝 Contribuer
+## 📄 License
 
-Les contributions sont les bienvenues ! Rejoignez notre [Discord](https://discord.com/invite/uTeCwQQtn) pour discuter.
+This project is distributed under the MIT license. See the `LICENSE` file for more information.
 
-1. Forkez le projet
-2. Créez une branche (`git checkout -b feature/ma-feature`)
-3. Committez (`git commit -m 'Ajout feature'`)
-4. Pushez (`git push origin feature/ma-feature`)
-5. Ouvrez une Pull Request
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Join our [Discord](https://discord.com/invite/uTeCwQQtn) to discuss.
+
+1. Fork the project
+2. Create a branch (`git checkout -b feature/my-feature`)
+3. Commit (`git commit -m 'Add feature'`)
+4. Push (`git push origin feature/my-feature`)
+5. Open a Pull Request
 
 ---
 
 <div align="center">
-  <strong>🌐 <a href="https://neonmc23.github.io/NullSec-Website/">Voir le site en ligne</a></strong><br>
+  <strong>🌐 <a href="https://neonmc23.github.io/NullSec-Website/">View the live site</a></strong><br>
   <em>Privacy isn't optional.</em>
 </div>
