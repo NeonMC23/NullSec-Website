@@ -1,5 +1,5 @@
 /**
- * Nullsec — Animation Manager
+ * NullSec — Animation Manager
  * Handles Intersection Observer fade-in animations,
  * reading progress bar, back-to-top button, and smooth scroll.
  */

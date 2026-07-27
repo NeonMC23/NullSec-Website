@@ -1,5 +1,5 @@
 /**
- * Nullsec — Utility Functions
+ * NullSec — Utility Functions
  * Shared helpers used across modules.
  */
 
@@ -77,3 +77,19 @@ const Utils = {
     return el.innerHTML;
   },
 };
+
+/**
+ * Console easter egg — branded welcome message.
+ */
+(function () {
+  const styles = [
+    'color: #FF4FA3; font-size: 20px; font-weight: bold;',
+    'color: #F5F5F7; font-size: 14px;',
+    'color: #9CA3AF; font-size: 12px;',
+  ];
+  console.log('%c NullSec %c Privacy. Security. Digital Rights. %c https://neonmc23.github.io/NullSec-Website/ ', styles[0], styles[1], styles[2]);
+  console.log('%c  ___   _   _   _    ___   ___  ', 'color: #FF4FA3');
+  console.log('%c | _ \\ | \\ | | /_\\  / __| |_ _| ', 'color: #FF4FA3');
+  console.log('%c |  _/ | .` |/ _ \\ \\__ \\  | |  ', 'color: #FF4FA3');
+  console.log('%c |_|   |_|\\_/_/ \\_\\|___/ |___| ', 'color: #FF4FA3');
+})();

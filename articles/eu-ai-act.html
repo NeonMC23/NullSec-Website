@@ -12,26 +12,26 @@
 -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Building a Privacy-First Home Network — NullSec</title>
+  <title>The EU AI Act: What You Need to Know — NullSec</title>
 
   <!-- ============================================================
-       Building a Privacy-First Home Network
+       The EU AI Act: What You Need to Know
        ============================================================ -->
-  <meta name="description" content="Step-by-step guide to securing your home network with Pi-hole, VLANs, VPNs, and firewall rules." />
-  <meta property="og:title" content="Building a Privacy-First Home Network — NullSec" />
-  <meta property="og:description" content="Step-by-step guide to securing your home network with Pi-hole, VLANs, VPNs, and firewall rules." />
+  <meta name="description" content="A comprehensive analysis of the European Union's Artificial Intelligence Act, its risk-based framework, and what it means for developers, businesses, and citizens." />
+  <meta property="og:title" content="The EU AI Act: What You Need to Know — NullSec" />
+  <meta property="og:description" content="A comprehensive analysis of the European Union's Artificial Intelligence Act, its risk-based framework, and what it means for developers, businesses, and citizens." />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/articles/privacy-home-network.html" />
+  <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/articles/eu-ai-act.html" />
   <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/logo.jpeg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/articles/privacy-home-network.html" />
+  <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/articles/eu-ai-act.html" />
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.ico" />
   <script type="application/ld+json">
-  { "@context": "https://schema.org", "@type": "Article", "headline": "Building a Privacy-First Home Network", "description": "Step-by-step guide to securing your home network with Pi-hole, VLANs, VPNs, and firewall rules.", "datePublished": "2026-05-24", "author": {"@type": "Organization", "name": "NullSec"}, "publisher": {"@type": "Organization", "name": "NullSec"} }
+  { "@context": "https://schema.org", "@type": "Article", "headline": "The EU AI Act: What You Need to Know", "description": "A comprehensive analysis of the European Union's Artificial Intelligence Act, its risk-based framework, and what it means for developers, businesses, and citizens.", "datePublished": "2026-08-10", "author": {"@type": "Organization", "name": "NullSec"}, "publisher": {"@type": "Organization", "name": "NullSec"} }
   </script>
 </head>
 <body>
@@ -40,6 +40,7 @@
     <div class="container">
       <a href="../" class="navbar-brand"><span class="logo-dot"></span> NullSec</a>
       <div class="navbar-links">
+        <a href="../">Home</a><a href="../articles.html">Articles</a><a href="../resources.html">Resources</a><a href="../about.html">About</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn" aria-label="Search"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -50,53 +51,56 @@
     </div>
   </nav>
   <div class="mobile-menu" role="navigation" aria-label="Mobile navigation">
+    <a href="../">Home</a><a href="../articles.html">Articles</a><a href="../resources.html">Resources</a><a href="../about.html">About</a><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
+
   <article class="article-page">
     <div class="container-narrow">
       <header class="article-header fade-in">
-        <span class="category-badge">Self Hosting</span>
-        <h1>Building a Privacy-First Home Network</h1>
-        <div class="article-meta"><span>July 27, 2026</span><span class="dot"></span><span>16 min</span></div>
-        <img src="../assets/images/logo.jpeg" alt="Building a Privacy-First Home Network" class="article-cover" loading="lazy" />
+        <span class="category-badge">Artificial Intelligence</span>
+        <h1>The EU AI Act: What You Need to Know</h1>
+        <div class="article-meta"><span>July 27, 2026</span><span class="dot"></span><span>15 min</span></div>
+        <img src="../assets/images/logo.jpeg" alt="The EU AI Act: What You Need to Know" class="article-cover" loading="lazy" />
       </header>
- 
-      <!-- TL/DR -->
+
+      <!-- TL;DR -->
       <div class="tldr fade-in fade-in-delay-1">
         <div class="tldr-header">
           <span class="tldr-label">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10/"><line x1="12" y1="16" x2="12" y2="12/"><line x1="12" y1="8" x2="12.01" y2="8/"></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             Quick Summary
           </span>
           <span class="tldr-toggle">Read <span class="tldr-arrow">&#9660;</span></span>
         </div>
         <div class="tldr-content">
-          <p>Securing your home network is the foundation of digital privacy. This step-by-step guide covers Pi-hole for ad blocking, VLANs for network segmentation, VPN setup, firewall configuration, and best practices for router security — all explained for both beginners and advanced users.</p>
+          <p>The EU AI Act is the world's first comprehensive legal framework for artificial intelligence. It categorises AI systems by risk level — from unacceptable (banned) to minimal (no regulation). The Act affects any organisation deploying AI in the EU, with strict requirements for high-risk systems including transparency, human oversight, and conformity assessments. This article breaks down the four risk categories, the obligations for each, and the implications for open source AI development.</p>
           <div class="tldr-tags">
-            <span class="tldr-tag">#HomeNetwork</span>
-            <span class="tldr-tag">#Pihole</span>
-            <span class="tldr-tag">#VPN</span>
+            <span class="tldr-tag">#AIRegulation</span>
+            <span class="tldr-tag">#RiskBased</span>
+            <span class="tldr-tag">#Compliance</span>
           </div>
         </div>
       </div>
+
       <div class="article-body">
-        <p>Step-by-step guide to securing your home network with Pi-hole, VLANs, VPNs, and firewall rules.</p>
-        <p>This article is part of NullSec's ongoing research series. For the full content, please visit our articles page or join our community on Discord. We are committed to providing in-depth, independent analysis on topics that matter for your digital privacy and security.</p>
+        <p>A comprehensive analysis of the European Union's Artificial Intelligence Act, its risk-based framework, and what it means for developers, businesses, and citizens.</p>
+        <p>This article is part of NullSec's ongoing research series on European digital legislation. We provide in-depth, independent analysis of the policies that shape our digital rights. For the full discussion, join our community on Discord.</p>
         <h2>Key Points</h2>
         <ul>
-          <li>Independent research and analysis of critical technology topics.</li>
-          <li>Practical, actionable advice for protecting your digital privacy.</li>
-          <li>Community-driven knowledge sharing through our Discord server.</li>
+          <li>Independent, thorough analysis of EU digital legislation.</li>
+          <li>Practical implications for citizens, businesses, and developers.</li>
+          <li>Community discussion and resources on our Discord server.</li>
         </ul>
-        <p>NullSec articles are written for engineers, privacy advocates, and anyone who cares about digital rights. Every piece is thoroughly researched and written with the goal of being technically accurate and accessible to readers of all backgrounds.</p>
+        <p>NullSec articles are written for engineers, privacy advocates, policymakers, and anyone who cares about digital rights. Every piece is thoroughly researched and written with the goal of being technically accurate and accessible to readers of all backgrounds.</p>
       </div>
+
       <nav class="article-navigation" aria-label="Article navigation">
-        <a href="open-source-licenses.html" class="article-nav-link">
-          <div class="nav-label">Previous Article</div>
-          <div class="nav-title">Open Source Licenses Explained</div>
-        </a>
+        <a href="chat-control.html" class="article-nav-link"><div class="nav-label">Previous Article</div><div class="nav-title">Chat Control: The EU's Assault on Encryption</div></a>
+        <a href="digital-services-act.html" class="article-nav-link next"><div class="nav-label">Next Article</div><div class="nav-title">The Digital Services Act: Reshaping the Internet</div></a>
       </nav>
     </div>
   </article>
+
   <section class="discord-section">
     <div class="container">
       <h2>Join the Discussion</h2>
@@ -104,10 +108,12 @@
       <a href="https://discord.com/invite/uTeCwQQtn" class="btn btn-primary" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg> Join Discord</a>
     </div>
   </section>
+
   <footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><a href="../" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research about privacy, cybersecurity, digital rights, and technology.</p></div>
+        <div class="footer-col"><h4>Pages</h4><a href="../">Home</a><a href="../articles.html">Articles</a><a href="../resources.html">Resources</a><a href="../about.html">About</a></div>
         <div class="footer-col"><h4>Topics</h4><a href="../articles.html?category=Privacy">Privacy</a><a href="../articles.html?category=Cybersecurity">Cybersecurity</a><a href="../articles.html?category=Linux">Linux</a><a href="../articles.html?category=Open+Source">Open Source</a><a href="../articles.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/nullsec" target="_blank" rel="noopener">GitHub</a><a href="https://twitter.com/nullsec" target="_blank" rel="noopener">Twitter</a><a href="../sitemap.xml" target="_blank">Sitemap</a></div>
       </div>

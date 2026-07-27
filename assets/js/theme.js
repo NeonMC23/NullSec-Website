@@ -1,5 +1,5 @@
 /**
- * Nullsec — Theme Manager
+ * NullSec — Theme Manager
  * Handles dark/light mode toggle with localStorage persistence.
  * Dark mode is the default.
  */

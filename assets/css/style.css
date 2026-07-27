@@ -1,5 +1,5 @@
 /* ============================================================
-   Nullsec — Main Stylesheet
+   NullSec — Main Stylesheet
    Design: Minimal, premium, technical, elegant
    Fonts:  Space Grotesk (headings), Inter (body), JetBrains Mono (code)
    ============================================================ */
@@ -1420,4 +1420,160 @@ code:not(pre code) {
   .navbar, .reading-progress, .back-to-top, .share-btn,
   .discord-section, .footer { display: none; }
   .article-page { padding-top: 20px; }
+}
+
+/* ============================================================
+   TL;DR / Quick Summary
+   ============================================================ */
+.tldr {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 0 0 32px 0;
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+.tldr:hover {
+  border-color: var(--accent);
+}
+
+.tldr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+
+.tldr-header .tldr-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.tldr-header .tldr-label svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.tldr-header .tldr-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  transition: color var(--transition);
+}
+
+.tldr-header:hover .tldr-toggle {
+  color: var(--text-muted);
+}
+
+.tldr-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  padding: 0 20px;
+}
+
+.tldr.open .tldr-content {
+  max-height: 600px;
+  padding: 0 20px 18px;
+}
+
+.tldr-content p {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.tldr-content p:last-child {
+  margin-bottom: 0;
+}
+
+.tldr-content .tldr-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tldr-content .tldr-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: 100px;
+}
+
+.tldr-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.tldr.open .tldr-arrow {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .tldr-header {
+    padding: 12px 16px;
+  }
+  .tldr-content {
+    padding: 0 16px;
+  }
+  .tldr.open .tldr-content {
+    padding: 0 16px 14px;
+  }
+}
+
+/* ============================================================
+   ASCII Banner (Homepage Hero)
+   ============================================================ */
+.ascii-banner {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.ascii-banner pre {
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  line-height: 1.2;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .ascii-banner pre {
+    font-size: 0.35rem;
+    line-height: 1.1;
+  }
+}
+
+@media (max-width: 480px) {
+  .ascii-banner pre {
+    font-size: 0.25rem;
+  }
 }

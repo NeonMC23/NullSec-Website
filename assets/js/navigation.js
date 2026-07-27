@@ -1,5 +1,5 @@
 /**
- * Nullsec — Navigation Manager
+ * NullSec — Navigation Manager
  * Handles mobile hamburger menu, active link highlighting,
  * and sticky navbar behaviour.
  */

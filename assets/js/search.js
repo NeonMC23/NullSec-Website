@@ -1,5 +1,5 @@
 /**
- * Nullsec — Search Module
+ * NullSec — Search Module
  * Local full-text search over articles using Fuse.js.
  * Triggered by CTRL+K or clicking the search button.
  */

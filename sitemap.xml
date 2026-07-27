@@ -2,19 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- Home -->
   <url>
-    <loc>https://neonmc23.github.io/NullSec-Website/</loc>
+    <loc>https://neonmc23.github.io/NullSec-Website</loc>
     <lastmod>2026-07-27</lastmod>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Main pages -->
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles.html</loc>
     <lastmod>2026-07-27</lastmod>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
@@ -33,8 +31,40 @@
   </url>
 
   <url>
+    <loc>https://neonmc23.github.io/NullSec-Website/articles/nis2-directive.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
-  <!-- Articles -->
+  <url>
+    <loc>https://neonmc23.github.io/NullSec-Website/articles/digital-services-act.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://neonmc23.github.io/NullSec-Website/articles/eu-ai-act.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://neonmc23.github.io/NullSec-Website/articles/chat-control.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://neonmc23.github.io/NullSec-Website/articles/gdpr-at-8.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/privacy-in-europe.html</loc>
     <lastmod>2026-07-27</lastmod>
@@ -44,63 +74,63 @@
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/signal-vs-whatsapp.html</loc>
-    <lastmod>2026-07-20</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/metadata.html</loc>
-    <lastmod>2026-07-13</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/self-hosting-guide.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/linux-digital-sovereignty.html</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/local-llm-ollama.html</loc>
-    <lastmod>2026-06-21</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/digital-rights-2026.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/end-to-end-encryption.html</loc>
-    <lastmod>2026-06-07</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/open-source-licenses.html</loc>
-    <lastmod>2026-05-31</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://neonmc23.github.io/NullSec-Website/articles/privacy-home-network.html</loc>
-    <lastmod>2026-05-24</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

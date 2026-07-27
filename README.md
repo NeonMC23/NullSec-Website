@@ -1,9 +1,9 @@
-# Nullsec Website
+# NullSec Website
 
 [![Site Status](https://img.shields.io/badge/status-live-success)](https://neonmc23.github.io/NullSec-Website/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-The official website for **Nullsec**, a community focused on **privacy**, **cybersecurity**, **digital rights**, **Linux**, **open source**, **artificial intelligence**, **self-hosting**, and **technology**.
+The official website for **NullSec**, a community focused on **privacy**, **cybersecurity**, **digital rights**, **Linux**, **open source**, **artificial intelligence**, **self-hosting**, and **technology**.
 
 > 🌐 **Live site :** [https://neonmc23.github.io/NullSec-Website/](https://neonmc23.github.io/NullSec-Website/)
 
@@ -11,7 +11,7 @@ The official website for **Nullsec**, a community focused on **privacy**, **cybe
 
 ## ✨ Overview
 
-Nullsec is designed as a **professional documentation platform** — not a blog. Emphasis is on readability, a clean and elegant minimal design, and a fully static architecture.
+NullSec is designed as a **professional documentation platform** — not a blog. Emphasis is on readability, a clean and elegant minimal design, and a fully static architecture.
 
 **Inspirations :** Signal.org, Apple Security Research, Vercel, GitHub Docs, MDN Web Docs.
 

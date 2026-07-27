@@ -1,31 +1,44 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+<!--
+     _   __  __    _    ___   ____  
+    | \ /  \/  \  / \  / _ \ / ___| 
+    |  _| |\/| | / _ \| | | |\___ \ 
+    | |  | |  | |/ ___ \ |_| | ___) |
+    |_|  |_|  |_/_/   \_\___/ |____/ 
+                                      
+  === NullSec — Privacy. Security. Digital Rights. ===
+-->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Open Source Licenses Explained — Nullsec</title>
+  <title>Open Source Licenses Explained — NullSec</title>
+
+  <!-- ============================================================
+       Open Source Licenses Explained
+       ============================================================ -->
   <meta name="description" content="A clear guide to understanding GPL, MIT, Apache, BSD, and other open source licenses." />
-  <meta property="og:title" content="Open Source Licenses Explained — Nullsec" />
+  <meta property="og:title" content="Open Source Licenses Explained — NullSec" />
   <meta property="og:description" content="A clear guide to understanding GPL, MIT, Apache, BSD, and other open source licenses." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/articles/open-source-licenses.html" />
-  <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/placeholder.svg" />
+  <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/logo.jpeg" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/articles/open-source-licenses.html" />
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="../assets/css/style.css" />
-  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.ico" />
   <script type="application/ld+json">
-  { "@context": "https://schema.org", "@type": "Article", "headline": "Open Source Licenses Explained", "description": "A clear guide to understanding GPL, MIT, Apache, BSD, and other open source licenses.", "datePublished": "2026-05-31", "author": {"@type": "Organization", "name": "Nullsec"}, "publisher": {"@type": "Organization", "name": "Nullsec"} }
+  { "@context": "https://schema.org", "@type": "Article", "headline": "Open Source Licenses Explained", "description": "A clear guide to understanding GPL, MIT, Apache, BSD, and other open source licenses.", "datePublished": "2026-05-31", "author": {"@type": "Organization", "name": "NullSec"}, "publisher": {"@type": "Organization", "name": "NullSec"} }
   </script>
 </head>
 <body>
   <div class="reading-progress" id="reading-progress"></div>
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="container">
-      <a href="../" class="navbar-brand"><span class="logo-dot"></span> Nullsec</a>
+      <a href="../" class="navbar-brand"><span class="logo-dot"></span> NullSec</a>
       <div class="navbar-links">
       </div>
       <div class="navbar-actions">
@@ -43,19 +56,38 @@
       <header class="article-header fade-in">
         <span class="category-badge">Open Source</span>
         <h1>Open Source Licenses Explained</h1>
-        <div class="article-meta"><span>May 31, 2026</span><span class="dot"></span><span>9 min</span></div>
-        <img src="../assets/images/placeholder.svg" alt="Open Source Licenses Explained" class="article-cover" loading="lazy" />
+        <div class="article-meta"><span>July 27, 2026</span><span class="dot"></span><span>9 min</span></div>
+        <img src="../assets/images/logo.jpeg" alt="Open Source Licenses Explained" class="article-cover" loading="lazy" />
       </header>
-      <div class="article-body fade-in fade-in-delay-1">
+ 
+      <!-- TL/DR -->
+      <div class="tldr fade-in fade-in-delay-1">
+        <div class="tldr-header">
+          <span class="tldr-label">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10/"><line x1="12" y1="16" x2="12" y2="12/"><line x1="12" y1="8" x2="12.01" y2="8/"></svg>
+            Quick Summary
+          </span>
+          <span class="tldr-toggle">Read <span class="tldr-arrow">&#9660;</span></span>
+        </div>
+        <div class="tldr-content">
+          <p>Open source licenses determine how software can be used, modified, and distributed. This clear guide explains the key differences between permissive licenses (MIT, Apache 2.0, BSD), copyleft licenses (GPL, LGPL, AGPL), and how to choose the right one for your project.</p>
+          <div class="tldr-tags">
+            <span class="tldr-tag">#OpenSource</span>
+            <span class="tldr-tag">#Licensing</span>
+            <span class="tldr-tag">#GPL</span>
+          </div>
+        </div>
+      </div>
+      <div class="article-body">
         <p>A clear guide to understanding GPL, MIT, Apache, BSD, and other open source licenses.</p>
-        <p>This article is part of Nullsec's ongoing research series. For the full content, please visit our articles page or join our community on Discord. We are committed to providing in-depth, independent analysis on topics that matter for your digital privacy and security.</p>
+        <p>This article is part of NullSec's ongoing research series. For the full content, please visit our articles page or join our community on Discord. We are committed to providing in-depth, independent analysis on topics that matter for your digital privacy and security.</p>
         <h2>Key Points</h2>
         <ul>
           <li>Independent research and analysis of critical technology topics.</li>
           <li>Practical, actionable advice for protecting your digital privacy.</li>
           <li>Community-driven knowledge sharing through our Discord server.</li>
         </ul>
-        <p>Nullsec articles are written for engineers, privacy advocates, and anyone who cares about digital rights. Every piece is thoroughly researched and written with the goal of being technically accurate and accessible to readers of all backgrounds.</p>
+        <p>NullSec articles are written for engineers, privacy advocates, and anyone who cares about digital rights. Every piece is thoroughly researched and written with the goal of being technically accurate and accessible to readers of all backgrounds.</p>
       </div>
       <nav class="article-navigation" aria-label="Article navigation">
         <a href="end-to-end-encryption.html" class="article-nav-link"><div class="nav-label">Previous Article</div><div class="nav-title">Understanding End-to-End Encryption</div></a>
@@ -73,11 +105,11 @@
   <footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer-grid">
-        <div class="footer-brand"><a href="../" class="navbar-brand"><span class="logo-dot"></span> Nullsec</a><p>Independent research about privacy, cybersecurity, digital rights, and technology.</p></div>
+        <div class="footer-brand"><a href="../" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research about privacy, cybersecurity, digital rights, and technology.</p></div>
         <div class="footer-col"><h4>Topics</h4><a href="../articles.html?category=Privacy">Privacy</a><a href="../articles.html?category=Cybersecurity">Cybersecurity</a><a href="../articles.html?category=Linux">Linux</a><a href="../articles.html?category=Open+Source">Open Source</a><a href="../articles.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/nullsec" target="_blank" rel="noopener">GitHub</a><a href="https://twitter.com/nullsec" target="_blank" rel="noopener">Twitter</a><a href="../sitemap.xml" target="_blank">Sitemap</a></div>
       </div>
-      <div class="footer-bottom"><span>&copy; 2026 Nullsec. All rights reserved.</span><span>Privacy isn't optional.</span></div>
+      <div class="footer-bottom"><span>&copy; 2026 NullSec. All rights reserved.</span><span>Privacy isn't optional.</span></div>
     </div>
   </footer>
   <button class="back-to-top" id="back-to-top" aria-label="Back to top"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
@@ -96,6 +128,7 @@
   <script src="../assets/js/navigation.js"></script>
   <script src="../assets/js/fuse.min.js"></script>
   <script src="../assets/js/search.js"></script>
+  <script src="../assets/js/tldr.js"></script>
   <script src="../assets/js/animations.js"></script>
 </body>
 </html>

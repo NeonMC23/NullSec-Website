@@ -1,30 +1,37 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <!-- ============================================================
-       Nullsec — Home
-       ============================================================ -->
+<!--
+     _   __  __    _    ___   ____  
+    | \ /  \/  \  / \  / _ \ / ___| 
+    |  _| |\/| | / _ \| | | |\___ \ 
+    | |  | |  | |/ ___ \ |_| | ___) |
+    |_|  |_|  |_/_/   \_\___/ |____/ 
+                                      
+  === NullSec — Privacy. Security. Digital Rights. ===
+-->
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Primary Meta -->
-  <title>Nullsec — Privacy, Cybersecurity &amp; Digital Rights Research</title>
+  <title>NullSec — Privacy, Cybersecurity &amp; Digital Rights Research</title>
   <meta name="description" content="Independent research about privacy, cybersecurity, digital rights, Linux, open source, and self-hosting. Privacy isn't optional." />
   <meta name="keywords" content="privacy, cybersecurity, digital rights, linux, open source, self hosting, nullsec" />
-  <meta name="author" content="Nullsec" />
+  <meta name="author" content="NullSec" />
 
   <!-- OpenGraph -->
-  <meta property="og:title" content="Nullsec — Privacy, Cybersecurity &amp; Digital Rights Research" />
+  <meta property="og:title" content="NullSec — Privacy, Cybersecurity &amp; Digital Rights Research" />
   <meta property="og:description" content="Independent research about privacy, cybersecurity, digital rights, Linux, open source, and self-hosting." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/" />
-  <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/og-image.svg" />
+  <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/logo.jpeg" />
 
   <!-- Twitter Cards -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Nullsec — Privacy, Cybersecurity &amp; Digital Rights Research" />
+  <meta name="twitter:title" content="NullSec — Privacy, Cybersecurity &amp; Digital Rights Research" />
   <meta name="twitter:description" content="Independent research about privacy, cybersecurity, digital rights, Linux, open source, and self-hosting." />
-  <meta name="twitter:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/og-image.svg" />
+  <meta name="twitter:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/logo.jpeg" />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/" />
@@ -40,8 +47,8 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.ico" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
 </head>
 <body>
 
@@ -52,7 +59,7 @@
     <div class="container">
       <a href="./" class="navbar-brand">
         <span class="logo-dot"></span>
-        Nullsec
+        NullSec
       </a>
 
       <div class="navbar-links">
@@ -99,6 +106,13 @@
       <h1 class="fade-in">
         Privacy <span class="highlight">isn't optional.</span>
       </h1>
+      <div class="ascii-banner">
+        <pre>   _   __  __    _    ___   ____  
+  | \ /  \/  \  / \  / _ \ / ___| 
+  |  _| |\/| | / _ \| | | |\___ \ 
+  | |  | |  | |/ ___ \ |_| | ___) |
+  |_|  |_|  |_/_/   \_\___/ |____/ </pre>
+      </div>
       <p class="fade-in fade-in-delay-1">
         Independent research about privacy, cybersecurity, digital rights, 
         and the technologies that shape our digital world.
@@ -196,7 +210,7 @@
         <div class="footer-brand">
           <a href="./" class="navbar-brand">
             <span class="logo-dot"></span>
-            Nullsec
+            NullSec
           </a>
           <p>Independent research about privacy, cybersecurity, digital rights, and technology.</p>
         </div>
@@ -224,7 +238,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 Nullsec. All rights reserved.</span>
+        <span>&copy; 2026 NullSec. All rights reserved.</span>
         <span>Privacy isn't optional.</span>
       </div>
     </div>
@@ -275,7 +289,7 @@
           if (featuredContainer && featured) {
             featuredContainer.innerHTML =
               '<a href="' + featured.url + '" class="featured-article">' +
-                '<img src="' + (featured.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" onerror="this.src=\'assets/images/placeholder.svg\'" />' +
+                '<img src="' + (featured.cover || 'assets/images/logo.jpeg') + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" onerror="this.src=\'assets/images/logo.jpeg\'" />' +
                 '<div class="featured-article-body">' +
                   '<span class="badge">Featured</span>' +
                   '<h3>' + Utils.sanitize(featured.title) + '</h3>' +
@@ -297,7 +311,7 @@
           if (latestGrid) {
             latestGrid.innerHTML = latest.map(function (a) {
               return '<a href="' + a.url + '" class="article-card">' +
-                '<img src="' + (a.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(a.title) + '" class="article-card-cover" loading="lazy" onerror="this.src=\'assets/images/placeholder.svg\'" />' +
+                '<img src="' + (a.cover || 'assets/images/logo.jpeg') + '" alt="' + Utils.sanitize(a.title) + '" class="article-card-cover" loading="lazy" onerror="this.src=\'assets/images/logo.jpeg\'" />' +
                 '<div class="article-card-body">' +
                   '<span class="article-card-category">' + Utils.sanitize(a.category) + '</span>' +
                   '<h3 class="article-card-title">' + Utils.sanitize(a.title) + '</h3>' +

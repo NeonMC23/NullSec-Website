@@ -1,4 +1,4 @@
-# Nullsec — Robots.txt
+# NullSec — Robots.txt
 # https://neonmc23.github.io/NullSec-Website
 
 User-agent: *

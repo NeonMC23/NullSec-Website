@@ -1,5 +1,5 @@
 /**
- * Nullsec — Articles Module
+ * NullSec — Articles Module
  * Loads article metadata from /data/articles.json and renders
  * the article cards on the articles listing page.
  * Supports filtering by category and sorting.
