@@ -52,6 +52,7 @@
             <span class="article-card-category">${Utils.sanitize(a.category)}</span>
             <h3 class="article-card-title">${Utils.sanitize(a.title)}</h3>
             <p class="article-card-description">${Utils.sanitize(a.description)}</p>
+            ${a.status === 'in-progress' ? '<span class="status-badge status-badge--in-progress"><span class="dot"></span> In progress</span>' : ''}
             <div class="article-card-meta">
               <span>${Utils.formatDate(a.date)}</span>
               <span class="dot"></span>

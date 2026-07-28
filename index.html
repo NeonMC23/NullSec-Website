@@ -278,6 +278,7 @@
                 '<img src="' + (featured.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" onerror="this.src=\'assets/images/placeholder.svg\'" />' +
                 '<div class="featured-article-body">' +
                   '<span class="badge">Featured</span>' +
+                  (featured.status === 'in-progress' ? '<span class="status-badge status-badge--in-progress" style="margin-left:8px"><span class="dot"></span> In progress</span>' : '') +
                   '<h3>' + Utils.sanitize(featured.title) + '</h3>' +
                   '<p>' + Utils.sanitize(featured.description) + '</p>' +
                   '<span class="article-card-meta">' +
@@ -296,12 +297,17 @@
           const latestGrid = document.getElementById('latest-articles-grid');
           if (latestGrid) {
             latestGrid.innerHTML = latest.map(function (a) {
+              var badge = '';
+              if (a.status === 'in-progress') {
+                badge = '<span class="status-badge status-badge--in-progress"><span class="dot"></span> In progress</span>';
+              }
               return '<a href="' + a.url + '" class="article-card">' +
                 '<img src="' + (a.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(a.title) + '" class="article-card-cover" loading="lazy" onerror="this.src=\'assets/images/placeholder.svg\'" />' +
                 '<div class="article-card-body">' +
                   '<span class="article-card-category">' + Utils.sanitize(a.category) + '</span>' +
                   '<h3 class="article-card-title">' + Utils.sanitize(a.title) + '</h3>' +
                   '<p class="article-card-description">' + Utils.sanitize(a.description) + '</p>' +
+                  badge +
                   '<div class="article-card-meta">' +
                     '<span>' + Utils.formatDate(a.date) + '</span>' +
                     '<span class="dot"></span>' +

@@ -7,7 +7,8 @@
     "readingTime": "12 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/nis2-directive.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "The Digital Services Act: Reshaping the Internet",
@@ -17,7 +18,8 @@
     "readingTime": "13 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/digital-services-act.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "The EU AI Act: What You Need to Know",
@@ -27,7 +29,8 @@
     "readingTime": "15 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/eu-ai-act.html",
-    "featured": true
+    "featured": true,
+    "status": "in-progress"
   },
   {
     "title": "Chat Control: The EU's Assault on Encryption",
@@ -37,7 +40,8 @@
     "readingTime": "16 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/chat-control.html",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "title": "GDPR at 8: Successes, Failures, and the Future",
@@ -47,7 +51,8 @@
     "readingTime": "14 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/gdpr-at-8.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "Privacy in Europe",
@@ -57,7 +62,8 @@
     "readingTime": "12 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/privacy-in-europe.html",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "title": "Signal vs WhatsApp: A Technical Comparison",
@@ -67,7 +73,8 @@
     "readingTime": "15 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/signal-vs-whatsapp.html",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "title": "Metadata: The Silent Privacy Threat",
@@ -77,7 +84,8 @@
     "readingTime": "10 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/metadata.html",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "title": "The Complete Self-Hosting Guide for 2026",
@@ -87,7 +95,8 @@
     "readingTime": "20 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/self-hosting-guide.html",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "title": "Why Linux Matters for Digital Sovereignty",
@@ -97,7 +106,8 @@
     "readingTime": "8 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/linux-digital-sovereignty.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "Running LLMs Locally with Ollama",
@@ -107,7 +117,8 @@
     "readingTime": "14 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/local-llm-ollama.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "The State of Digital Rights in 2026",
@@ -117,7 +128,8 @@
     "readingTime": "18 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/digital-rights-2026.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "Understanding End-to-End Encryption",
@@ -127,7 +139,8 @@
     "readingTime": "11 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/end-to-end-encryption.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "Open Source Licenses Explained",
@@ -137,7 +150,8 @@
     "readingTime": "9 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/open-source-licenses.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   },
   {
     "title": "Building a Privacy-First Home Network",
@@ -147,6 +161,7 @@
     "readingTime": "16 min",
     "cover": "assets/images/placeholder.svg",
     "url": "articles/privacy-home-network.html",
-    "featured": false
+    "featured": false,
+    "status": "in-progress"
   }
 ]
