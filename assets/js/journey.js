@@ -8,6 +8,19 @@
   'use strict';
 
   var MISSIONS = [
+        // ========== WEEKLY COMMUNITY MISSION ==========
+    {
+      id: 'weekly-community',
+      stage: 0,
+      title: 'Invite 5 people to Discord',
+      desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.',
+      time: '~',
+      difficulty: 2,
+      impact: 5,
+      icon: '🤝',
+      mobileFriendly: 2,
+      guide: '<p>Share the Discord invite link: <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">discord.com/invite/uTeCwQQtn</a></p><p>Send it to friends, post it on social media, or share it in communities you are part of. Every new member makes NullSec stronger.</p>'
+    },
     // ========== STAGE 1: Getting Started (8 missions) ==========
     {
       id: 'enable-2fa',
@@ -539,7 +552,7 @@
 
   function renderAll() {
     var completed = getProgress();
-    var total = MISSIONS.filter(function (m) { return m.stage <= 4; }).length + 1; // +1 for weekly mission
+    var total = MISSIONS.filter(function (m) { return m.stage <= 4 || m.stage === 0; }).length;
     var communityTotal = MISSIONS.filter(function (m) { return m.stage === 99; }).length;
     var done = completed.length;
     var pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -555,26 +568,17 @@
         '<div class="progress-stats">' +
           '<div class="stat"><strong>' + done + '</strong><span class="stat-label">done</span></div>' +
           '<div class="stat-divider"></div>' +
-          '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && m.stage<=4;}) || id === 'weekly-community'; }).length)) + '</strong><span class="stat-label">left</span></div>' +
+          '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && (m.stage<=4 || m.stage===0);}); }).length)) + '</strong><span class="stat-label">left</span></div>' +
           '<div class="stat-divider"></div>' +
           '<div class="stat"><strong>' + total + '</strong><span class="stat-label">missions</span></div>' +
         '</div>';
     }
 
-        // Weekly mission on journey page — rendered as a normal mission card
+        // Weekly mission on journey page
     var weeklyGridEl = document.getElementById('weekly-mission-grid');
     if (weeklyGridEl) {
-      var weeklyMission = {
-        id: 'weekly-community',
-        title: 'Invite 5 people to Discord',
-        desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.',
-        time: '~',
-        difficulty: 2,
-        impact: 5,
-        icon: '🤝',
-        mobileFriendly: 2
-      };
-      weeklyGridEl.innerHTML = renderMission(weeklyMission);
+      var weeklyMission = MISSIONS.find(function(m) { return m.id === 'weekly-community'; });
+      if (weeklyMission) weeklyGridEl.innerHTML = renderMission(weeklyMission);
     }
 
     stages.forEach(function (stage) {
