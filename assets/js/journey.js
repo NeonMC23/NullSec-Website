@@ -567,23 +567,23 @@
         '</div>';
     }
 
-    // Weekly mission on journey page
-    var weeklyEl = document.getElementById('journey-weekly-mission');
-    if (weeklyEl) {
-      var weekMission = { title: 'Invite 5 people to Discord', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.', time: '~', difficulty: 2, impact: 5 };
-      var s = '';
-      for (var i = 0; i < weekMission.difficulty; i++) s += '\u2605';
-      for (var i = weekMission.difficulty; i < 5; i++) s += '\u2606';
-      var d = '<span style="display:inline-flex;gap:3px;">';
-      for (var i = 0; i < weekMission.impact; i++) d += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);"></span>';
-      for (var i = weekMission.impact; i < 5; i++) d += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);"></span>';
-      d += '</span>';
-      var wDone = isCompleted('weekly-community');
-      var completedClass = wDone ? ' completed' : '';
-      weeklyEl.innerHTML = '<div class="weekly-mission' + completedClass + '"><div><span class="badge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--accent-subtle);color:var(--accent);border-radius:100px;margin-bottom:12px;">Community Mission</span><h3 style="font-size:1.1rem;margin-bottom:6px;">' + weekMission.title + '</h3><p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:12px;">' + weekMission.desc + '</p><div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.8125rem;color:var(--text-dim);"><span>&#9200; ' + weekMission.time + '</span><span>Difficulty: ' + s + '</span><span>Impact: ' + d + '</span></div></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn ' + (wDone ? 'btn-secondary' : 'btn-primary') + '" onclick="toggleJourneyWeekly(this)">' + (wDone ? '\u2713 Completed' : 'Mark as done') + '</button></div></div>';
+        // Weekly mission on journey page — rendered as a normal mission card
+    var weeklyGridEl = document.getElementById('weekly-mission-grid');
+    if (weeklyGridEl) {
+      var weeklyMission = {
+        id: 'weekly-community',
+        title: 'Invite 5 people to Discord',
+        desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.',
+        time: '~',
+        difficulty: 2,
+        impact: 5,
+        icon: '🤝',
+        mobileFriendly: 2
+      };
+      weeklyGridEl.innerHTML = renderMission(weeklyMission);
     }
 
-    stages.forEach(function (stage) {
+    stages.forEachstages.forEach(function (stage) {
       var grid = document.querySelector('.missions-grid[data-stage="' + stage.num + '"]');
       if (!grid) return;
       var stageMissions = MISSIONS.filter(function (m) { return m.stage === stage.num; });
