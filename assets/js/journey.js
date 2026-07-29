@@ -577,7 +577,7 @@
       weeklyGridEl.innerHTML = renderMission(weeklyMission);
     }
 
-    stages.forEachstages.forEach(function (stage) {
+    stages.forEach(function (stage) {
       var grid = document.querySelector('.missions-grid[data-stage="' + stage.num + '"]');
       if (!grid) return;
       var stageMissions = MISSIONS.filter(function (m) { return m.stage === stage.num; });
