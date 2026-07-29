@@ -495,7 +495,10 @@
       impactDots += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (i < mission.impact ? 'var(--accent)' : 'var(--bg-elevated)') + ';border:' + (i < mission.impact ? 'none' : '1px solid var(--border)') + ';"></span>';
     }
     impactDots += '</span>';
-    var mobileTag = mission.mobileFriendly ? '<span class="tldr-tag">\uD83D\uDCF1 Mobile</span>' : '<span class="tldr-tag">\uD83D\uDCBB Desktop</span>';
+    var mobileTag = '';
+    if (mission.mobileFriendly === true) mobileTag = '<span class="tldr-tag">\uD83D\uDCF1 Mobile</span>';
+    else if (mission.mobileFriendly === false) mobileTag = '<span class="tldr-tag">\uD83D\uDCBB Desktop</span>';
+    else mobileTag = '<span class="tldr-tag">\uD83D\uDCF1 \uD83D\uDCBB All platforms</span>';
 
     Modal.open(
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">' +
@@ -532,9 +535,11 @@
       '<div class="mission-meta">' +
         '<span class="tag">&#9200; ' + m.time + '</span>' +
         '<span class="difficulty">' + renderStars(m.difficulty) + '</span>' +
-        '<span class="impact">Impact: ' + renderImpact(m.impact) + '</span>' +
-        (m.mobileFriendly ? '<span class="tag">&#128241;</span>' : '<span class="tag">&#128187;</span>') +
+        '<span class="impact">' + renderImpact(m.impact) + '</span>' +
       '</div>' +
+      (m.mobileFriendly === true ? '<div class="platform-badges"><span class="platform-badge">&#128241;</span></div>' : '') +
+      (m.mobileFriendly === false ? '<div class="platform-badges"><span class="platform-badge">&#128187;</span></div>' : '') +
+      (m.mobileFriendly !== true && m.mobileFriendly !== false ? '<div class="platform-badges"><span class="platform-badge">&#128241; &#128187;</span></div>' : '') +
     '</div>';
   }
 
@@ -554,16 +559,18 @@
           '<div class="progress-bar-track"><div class="progress-bar-fill" style="width:' + pct + '%"></div></div>' +
         '</div>' +
         '<div class="progress-stats">' +
-          '<div class="stat"><strong>' + done + '</strong> done</div>' +
-          '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && m.stage<=4;}); }).length)) + '</strong> left</div>' +
-          '<div class="stat"><strong>' + total + '</strong> missions</div>' +
+          '<div class="stat"><strong>' + done + '</strong><span class="stat-label">done</span></div>' +
+          '<div class="stat-divider"></div>' +
+          '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && m.stage<=4;}); }).length)) + '</strong><span class="stat-label">left</span></div>' +
+          '<div class="stat-divider"></div>' +
+          '<div class="stat"><strong>' + total + '</strong><span class="stat-label">missions</span></div>' +
         '</div>';
     }
 
     // Weekly mission on journey page
     var weeklyEl = document.getElementById('journey-weekly-mission');
     if (weeklyEl) {
-      var weekMission = { title: 'Invite 5 people to Discord', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.', time: 'varies', difficulty: 2, impact: 5 };
+      var weekMission = { title: 'Invite 5 people to Discord', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.', time: '~5 min', difficulty: 2, impact: 5 };
       var s = '';
       for (var i = 0; i < weekMission.difficulty; i++) s += '\u2605';
       for (var i = weekMission.difficulty; i < 5; i++) s += '\u2606';

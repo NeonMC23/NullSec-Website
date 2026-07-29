@@ -1456,3 +1456,98 @@
 .community-page .project-card {
   padding: 28px 32px;
 }
+
+/* Weekly mission buttons - same height */
+.weekly-mission .btn {
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weekly-mission .btn-secondary {
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  min-height: 40px;
+}
+
+/* Progress stats - horizontal layout */
+.progress-stats {
+  display: flex;
+  gap: 20px;
+  text-align: center;
+  align-items: center;
+}
+
+.progress-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.progress-stats .stat strong {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.progress-stats .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.progress-stats .stat-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+
+/* Platform badges - bottom right on mission cards */
+.mission-card .platform-badges {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 3px;
+}
+
+.mission-card .platform-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+/* Remove hover tooltips on difficulty/impact in cards */
+.mission-meta .difficulty::after,
+.mission-meta .impact::after {
+  display: none !important;
+}
+
+/* Modal tags - same height */
+.modal-sub .tldr-tag {
+  min-height: 26px;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Journey hero fix */
+.journey-hero {
+  padding: 140px 0 40px !important;
+}
+
+/* Uniform section padding for journey */
+.journey-page {
+  padding-top: 0 !important;
+}
