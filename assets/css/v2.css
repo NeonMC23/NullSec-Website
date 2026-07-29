@@ -1271,3 +1271,188 @@
 .community-page .section-header p {
   max-width: 560px;
 }
+
+/* ============================================================
+   Article List — Better spacing & styling
+   ============================================================ */
+.articles-list {
+  gap: 8px;
+}
+
+.article-list-item {
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.article-list-item:hover {
+  transform: translateX(4px);
+}
+
+.article-list-item .item-left h3 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.article-list-item .item-left p {
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.article-list-item .item-right {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-end;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.article-list-item .item-right .cat {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .article-list-item {
+    grid-template-columns: 1fr;
+    padding: 16px 18px;
+    gap: 8px;
+  }
+  .article-list-item .item-right {
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+}
+
+/* ============================================================
+   In Progress Section — FAQ-like
+   ============================================================ */
+.in-progress-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.in-progress-toggle:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.in-progress-toggle .count {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  background: var(--bg-elevated);
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+
+.in-progress-toggle .arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.in-progress-toggle.open .arrow {
+  transform: rotate(90deg);
+}
+
+.in-progress-list {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.in-progress-list.open {
+  display: flex;
+}
+
+.in-progress-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  padding-left: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.in-progress-item:first-child {
+  border-top: 1px solid var(--border);
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+
+.in-progress-item:last-child {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.in-progress-item::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+.in-progress-item:hover {
+  background: var(--accent-subtle);
+}
+
+.in-progress-item h4 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.in-progress-item .eta {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* ============================================================
+   Community Page — Better spacing
+   ============================================================ */
+.community-page {
+  padding-top: 120px;
+}
+
+.community-page .section-header p {
+  max-width: 560px;
+}
+
+.community-page .projects-grid {
+  gap: 20px;
+}
+
+.community-page .project-card {
+  padding: 28px 32px;
+}

@@ -486,9 +486,16 @@
     if (!mission) return;
 
     var done = isCompleted(id);
-    var stars = renderStars(mission.difficulty);
-    var impact = renderImpact(mission.impact);
-    var mobileTag = mission.mobileFriendly ? '<span class="tldr-tag">&#128241; Mobile friendly</span>' : '<span class="tldr-tag">&#128187; Desktop</span>';
+    var diffStars = '';
+    for (var i = 0; i < 5; i++) {
+      diffStars += '<span style="color:' + (i < mission.difficulty ? '#FBBF24' : '#3A3A45') + ';font-size:0.875rem;">\u2605</span>';
+    }
+    var impactDots = '<span style="display:inline-flex;gap:4px;align-items:center;">';
+    for (var i = 0; i < 5; i++) {
+      impactDots += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (i < mission.impact ? 'var(--accent)' : 'var(--bg-elevated)') + ';border:' + (i < mission.impact ? 'none' : '1px solid var(--border)') + ';"></span>';
+    }
+    impactDots += '</span>';
+    var mobileTag = mission.mobileFriendly ? '<span class="tldr-tag">\uD83D\uDCF1 Mobile</span>' : '<span class="tldr-tag">\uD83D\uDCBB Desktop</span>';
 
     Modal.open(
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">' +
@@ -497,8 +504,8 @@
       '</div>' +
       '<div class="modal-sub" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">' +
         '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:var(--accent-subtle);color:var(--accent);border-radius:100px;">&#9200; ' + mission.time + '</span>' +
-        '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(251,191,36,0.12);color:#FBBF24;border-radius:100px;">Difficulty: ' + stars + '</span>' +
-        '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(255,79,163,0.12);color:var(--accent);border-radius:100px;">Impact: ' + impact + '</span>' +
+        '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(251,191,36,0.12);color:#FBBF24;border-radius:100px;">Difficulty: ' + diffStars + '</span>' +
+        '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(255,79,163,0.12);color:var(--accent);border-radius:100px;">Impact: ' + impactDots + '</span>' +
         mobileTag +
       '</div>' +
       '<div class="modal-body">' + mission.guide + '</div>' +
@@ -550,8 +557,22 @@
           '<div class="stat"><strong>' + done + '</strong> done</div>' +
           '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && m.stage<=4;}); }).length)) + '</strong> left</div>' +
           '<div class="stat"><strong>' + total + '</strong> missions</div>' +
-          '<div class="stat"><strong>' + communityTotal + '</strong> community</div>' +
         '</div>';
+    }
+
+    // Weekly mission on journey page
+    var weeklyEl = document.getElementById('journey-weekly-mission');
+    if (weeklyEl) {
+      var weekMission = { title: 'Invite 5 people to Discord', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.', time: 'varies', difficulty: 2, impact: 5 };
+      var s = '';
+      for (var i = 0; i < weekMission.difficulty; i++) s += '\u2605';
+      for (var i = weekMission.difficulty; i < 5; i++) s += '\u2606';
+      var d = '<span style="display:inline-flex;gap:3px;">';
+      for (var i = 0; i < weekMission.impact; i++) d += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);"></span>';
+      for (var i = weekMission.impact; i < 5; i++) d += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);"></span>';
+      d += '</span>';
+      var wDone = localStorage.getItem('ns-5-invites') === 'done';
+      weeklyEl.innerHTML = '<div><span class="badge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--accent-subtle);color:var(--accent);border-radius:100px;margin-bottom:12px;">Community Mission</span><h3 style="font-size:1.1rem;margin-bottom:6px;">' + weekMission.title + '</h3><p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:12px;">' + weekMission.desc + '</p><div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.8125rem;color:var(--text-dim);"><span>&#9200; ' + weekMission.time + '</span><span>Difficulty: ' + s + '</span><span>Impact: ' + d + '</span></div></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn ' + (wDone ? 'btn-secondary' : 'btn-primary') + '" onclick="toggleJourneyWeekly(this)">' + (wDone ? '\u2713 Completed' : 'Mark as done') + '</button></div>';
     }
 
     stages.forEach(function (stage) {
@@ -572,3 +593,17 @@
     init();
   }
 })();
+
+
+window.toggleJourneyWeekly = function (btn) {
+  var done = localStorage.getItem('ns-5-invites') === 'done';
+  if (done) {
+    localStorage.removeItem('ns-5-invites');
+    btn.innerHTML = 'Mark as done';
+    btn.className = 'btn btn-primary';
+  } else {
+    localStorage.setItem('ns-5-invites', 'done');
+    btn.innerHTML = '\u2713 Completed';
+    btn.className = 'btn btn-secondary';
+  }
+};
