@@ -55,7 +55,7 @@
   <section class="hero">
     <div class="container">
       <h1 class="fade-in">
-        Privacy <span class="highlight">isn\'t optional.</span>
+        Privacy <span class="highlight">isn't optional.</span>
       </h1>
       <p class="fade-in fade-in-delay-1">Independent research about privacy, cybersecurity, digital rights, and the technologies that shape our digital world.</p>
       <div class="hero-actions fade-in fade-in-delay-2">
@@ -169,15 +169,10 @@
       }
 
       var missions = [
-        { title: "Invite Someone to NullSec", desc: "Share NullSec with a friend. Growing the community helps everyone.", time: "5 min", difficulty: 1, impact: 5, slug: "cm-invite-friend" },
-        { title: "Talk to Your Family About Privacy", desc: "Have a conversation with someone close to you about digital privacy.", time: "15 min", difficulty: 2, impact: 4, slug: "cm-talk-family" },
-        { title: "Report a Bug or Fix a Typo", desc: "Found something wrong? Report it and help make NullSec better.", time: "5 min", difficulty: 1, impact: 3, slug: "cm-fix-typo" },
-        { title: "Review a Guide for Accuracy", desc: "Read a guide and check if everything is correct.", time: "20 min", difficulty: 2, impact: 4, slug: "cm-review-docs" },
-        { title: "Share NullSec on Social Media", desc: "Post about NullSec to spread digital privacy awareness.", time: "5 min", difficulty: 1, impact: 4, slug: "cm-share-social" },
-        { title: "Help a Beginner", desc: "Walk someone through their first privacy step.", time: "30 min", difficulty: 2, impact: 5, slug: "cm-help-beginner" },
-      ];
+            { title: 'Attirer 5 personnes sur le serveur', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media. Every new member strengthens our community.', time: 'varie', difficulty: 2, impact: 5, slug: 'invite-5' },
+          ];
 
-      var weekNum = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+      var weekNum = 0;
       var mission = missions[weekNum % missions.length];
       var missionEl = document.getElementById("weekly-mission");
       if (missionEl) {
@@ -189,13 +184,14 @@
         for (var i = 0; i < mission.impact; i++) dots += "<span class=\"impact-dot filled\" style=\"display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);\"></span>";
         for (var i = mission.impact; i < 5; i++) dots += "<span class=\"impact-dot\" style=\"display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);\"></span>";
 
-        var done = localStorage.getItem("ns-mission-" + mission.slug) === "done";
-        var btnText = done ? "\u2713 Completed" : "Mark as done";
+        var invites = parseInt(localStorage.getItem("ns-invite-count") || "0", 10);
+            var done = invites >= 5;
+        var btnText = done ? "\u2713 Completed (" + invites + "/5)" : "Mark done (" + invites + "/5)";
         var btnClass = done ? "btn btn-secondary" : "btn btn-primary";
 
         missionEl.innerHTML =
           "<div>" +
-            "<span class=\"badge\">Week " + (weekNum % missions.length + 1) + "</span>" +
+            "<span class=\"badge\">Community Mission</span>" +
             "<h3>" + Utils.sanitize(mission.title) + "</h3>" +
             "<p>" + Utils.sanitize(mission.desc) + "</p>" +
             "<div class=\"weekly-mission-meta\">" +
@@ -215,16 +211,17 @@
   }
 
   window.toggleMission = function (slug, btn) {
-    var key = "ns-mission-" + slug;
-    var done = localStorage.getItem(key) === "done";
-    if (done) {
-      localStorage.removeItem(key);
-      btn.innerHTML = "Mark as done";
-      btn.className = "btn btn-primary";
-    } else {
-      localStorage.setItem(key, "done");
-      btn.innerHTML = "\u2713 Completed";
+    var invites = parseInt(localStorage.getItem("ns-invite-count") || "0", 10);
+    if (invites < 5) {
+      invites++;
+      localStorage.setItem("ns-invite-count", "" + invites);
+    }
+    if (invites >= 5) {
+      btn.innerHTML = "\u2713 Completed (" + invites + "/5)";
       btn.className = "btn btn-secondary";
+    } else {
+      btn.innerHTML = "Mark done (" + invites + "/5)";
+      btn.className = "btn btn-primary";
     }
   };
 

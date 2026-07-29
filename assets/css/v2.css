@@ -1146,3 +1146,128 @@
 .footer-col a:hover {
   transform: translateX(2px);
 }
+
+/* ============================================================
+   Modal — Enhanced
+   ============================================================ */
+.modal-overlay {
+  overscroll-behavior: contain;
+}
+
+.modal {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+/* Fix tooltip — apply on the container not per-star */
+.mission-meta {
+  position: relative;
+}
+
+.mission-meta .difficulty,
+.mission-meta .impact {
+  position: relative;
+  cursor: help;
+}
+
+.mission-meta .difficulty::after,
+.mission-meta .impact::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 50;
+  box-shadow: var(--shadow-elevated);
+}
+
+.mission-meta .difficulty:hover::after,
+.mission-meta .impact:hover::after {
+  opacity: 1;
+}
+
+/* Remove per-star tooltips (they conflict) */
+.star[data-tooltip],
+.impact-dot[data-tooltip] {
+  cursor: inherit;
+}
+.star[data-tooltip]::after,
+.impact-dot[data-tooltip]::after {
+  display: none !important;
+}
+
+/* Tool card modal click */
+.tool-card {
+  cursor: pointer;
+}
+
+/* Community page spacing */
+.community-section .section-header p {
+  max-width: 560px;
+}
+
+.community-section .projects-grid {
+  margin-top: 8px;
+}
+
+/* Article list spacing */
+.articles-list {
+  gap: 6px;
+}
+
+.article-list-item {
+  padding: 18px 24px;
+}
+
+.article-list-item .item-left h3 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.article-list-item .item-left p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.in-progress-toggle {
+  margin-top: 32px;
+}
+
+/* Community page — fix spacing */
+.community-page .projects-grid {
+  gap: 24px;
+}
+.community-page .project-card {
+  padding: 32px;
+}
+.community-page .section-header p {
+  max-width: 560px;
+}

@@ -468,7 +468,7 @@
   function renderStars(n) {
     var s = '';
     for (var i = 0; i < 5; i++) {
-      s += '<span class="star' + (i < n ? ' filled' : '') + '" data-tooltip="' + (i < n ? 'Difficulty level ' + n + '/5' : '') + '">&#9733;</span>';
+      s += '<span class="star' + (i < n ? ' filled' : '') + '">&#9733;</span>';
     }
     return s;
   }
@@ -476,7 +476,7 @@
   function renderImpact(n) {
     var d = '';
     for (var i = 0; i < 5; i++) {
-      d += '<span class="impact-dot' + (i < n ? ' filled' : '') + '" data-tooltip="' + (i < n ? 'Impact level ' + n + '/5' : '') + '"></span>';
+      d += '<span class="impact-dot' + (i < n ? ' filled' : '') + '"></span>';
     }
     return d;
   }
@@ -514,8 +514,6 @@
   window.completeFromModal = function (id) {
     toggleMission(id);
     Modal.close();
-    // Reopen with updated state
-    setTimeout(function () { window.openMissionModal(id); }, 100);
   };
 
   function renderMission(m) {
@@ -526,8 +524,8 @@
       '<p>' + Utils.sanitize(m.desc) + '</p>' +
       '<div class="mission-meta">' +
         '<span class="tag">&#9200; ' + m.time + '</span>' +
-        '<span class="difficulty" data-tooltip="Difficulty: ' + m.difficulty + '/5">' + renderStars(m.difficulty) + '</span>' +
-        '<span class="impact" data-tooltip="Impact: ' + m.impact + '/5">Impact: ' + renderImpact(m.impact) + '</span>' +
+        '<span class="difficulty">' + renderStars(m.difficulty) + '</span>' +
+        '<span class="impact">Impact: ' + renderImpact(m.impact) + '</span>' +
         (m.mobileFriendly ? '<span class="tag">&#128241;</span>' : '<span class="tag">&#128187;</span>') +
       '</div>' +
     '</div>';

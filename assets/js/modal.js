@@ -8,9 +8,11 @@
 
   window.Modal = {
     open: function (html) {
-      // Remove any existing modal
       var existing = document.querySelector('.modal-overlay');
-      if (existing) existing.remove();
+      if (existing) {
+        existing.classList.remove('open');
+        setTimeout(function() { existing.remove(); }, 200);
+      }
 
       var overlay = document.createElement('div');
       overlay.className = 'modal-overlay open';
@@ -32,6 +34,8 @@
 
       document.body.appendChild(overlay);
       document.body.style.overflow = 'hidden';
+      // Trigger animation by forcing reflow
+      overlay.offsetHeight;
     },
 
     close: function () {
