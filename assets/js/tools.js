@@ -63,7 +63,7 @@
       var freeTag = t.free ? '<span class="meta-tag free">Free</span>' : '';
       var diff = '';
       for (var i = 0; i < t.difficulty; i++) diff += '&#9679;';
-      return '<div class="tool-card">' +
+      return '<div class="tool-card" onclick="window.openToolModal('' + t.name + '', '' + t.category + '', '' + t.desc.replace(/'/g, "\'") + '', '' + t.url + '', ' + t.openSource + ', ' + t.free + ', ' + t.difficulty + ')" style="cursor:pointer;">' +
         '<div class="tool-top"><h3>' + Utils.sanitize(t.name) + '</h3><span class="tool-category">' + Utils.sanitize(t.category) + '</span></div>' +
         '<p>' + Utils.sanitize(t.desc) + '</p>' +
         '<div class="tool-meta">' +
@@ -71,7 +71,7 @@
           openSrc + freeTag +
         '</div>' +
         '<div class="tool-links">' +
-          '<a href="' + t.url + '" target="_blank" rel="noopener">Visit website &#8599;</a>' +
+          '<span style="color:var(--accent);font-size:0.8125rem;font-weight:500;">Click for details &#8599;</span>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -112,7 +112,33 @@
     renderTools(filtered);
   }
 
-  function init() {
+  
+
+window.openToolModal = function (name, category, desc, url, openSource, free, difficulty) {
+  var openSrcBadge = openSource ? '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(52,211,153,0.12);color:#34D399;border-radius:100px;">&#10003; Open Source</span>' : '';
+  var freeBadge = free ? '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(251,191,36,0.12);color:#FBBF24;border-radius:100px;">Free</span>' : '';
+  var diffStars = '';
+  for (var i = 0; i < difficulty; i++) diffStars += '&#9679;';
+  for (var i = difficulty; i < 5; i++) diffStars += '&#9675;';
+  
+  Modal.open(
+    '<h2>' + Utils.sanitize(name) + '</h2>' +
+    '<div class="modal-sub">' +
+      '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:var(--accent-subtle);color:var(--accent);border-radius:100px;">' + Utils.sanitize(category) + '</span>' +
+      '<span class="tldr-tag" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(52,211,153,0.12);color:#34D399;border-radius:100px;">Difficulty: ' + diffStars + '</span>' +
+      openSrcBadge + freeBadge +
+    '</div>' +
+    '<div class="modal-body">' +
+      '<p>' + Utils.sanitize(desc) + '</p>' +
+      '<p>This tool can be accessed directly from the official website. Check our guides for setup instructions and tips.</p>' +
+    '</div>' +
+    '<div class="modal-actions">' +
+      '<a href="' + url + '" class="btn btn-primary" target="_blank" rel="noopener">Visit website &#8599;</a>' +
+      '<button class="btn btn-secondary" onclick="Modal.close()">Close</button>' +
+    '</div>'
+  );
+};
+function init() {
     renderCategories('all');
     renderTools(TOOLS);
 

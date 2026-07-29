@@ -24,11 +24,20 @@ const Utils = {
    * @returns {string}          e.g. "July 27, 2026"
    */
   formatDate(isoString) {
-    const date = new Date(isoString + 'T00:00:00Z');
+    // Handle both '2026-07-27' and '2026-07-27T14:00:00' formats
+    var dateStr = isoString;
+    if (dateStr.indexOf('T') === -1) {
+      dateStr += 'T00:00:00Z';
+    } else {
+      dateStr += 'Z';
+    }
+    var date = new Date(dateStr);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
       timeZone: 'UTC',
     });
   },
