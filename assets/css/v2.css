@@ -1577,3 +1577,67 @@
   font-weight: 700;
   z-index: 2;
 }
+
+/* ============================================================
+   Article — Read state
+   ============================================================ */
+.article-list-item.read {
+  border-color: var(--border);
+  opacity: 0.55;
+  background: var(--bg);
+}
+
+.article-list-item.read .item-left h3 {
+  color: var(--text-muted);
+}
+
+.article-list-item.read .item-left p {
+  color: var(--text-dim);
+}
+
+.article-list-item.read .item-right {
+  opacity: 0.6;
+}
+
+.article-list-item.read::after {
+  content: '✓ Read';
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #34D399;
+  letter-spacing: 0.03em;
+}
+
+/* Featured article read state */
+.featured-article.read {
+  opacity: 0.6;
+  border-color: var(--border);
+}
+.featured-article.read .featured-article-body h3 {
+  color: var(--text-muted);
+}
+
+/* Article card read state (home latest) */
+.article-card.read {
+  opacity: 0.55;
+}
+.article-card.read .article-card-title {
+  color: var(--text-muted);
+}
+
+/* Mark as read button states */
+.btn-read {
+  min-width: 140px;
+  justify-content: center;
+}
+.btn-read.done {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34D399;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+.btn-read.done:hover {
+  background: rgba(52, 211, 153, 0.18);
+  border-color: #34D399;
+}

@@ -136,7 +136,9 @@
       var featured = published[0];
       var container = document.getElementById("featured-article");
       if (container && featured) {
-        container.innerHTML = '<a href="' + featured.url + '" class="featured-article"><img src="' + (featured.cover || "assets/images/placeholder.svg") + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" /><div class="featured-article-body"><span class="badge">Latest</span><h3>' + Utils.sanitize(featured.title) + '</h3><p>' + Utils.sanitize(featured.description) + '</p><span class="article-card-meta"><span>' + Utils.formatDate(featured.date) + '</span><span class="dot"></span><span>' + featured.readingTime + '</span></span></div></a>';
+        var featKey = 'ns-article-' + featured.url.replace('articles/', '').replace('.html', '');
+      var featRead = localStorage.getItem(featKey) === 'done';
+      container.innerHTML = '<a href="' + featured.url + '" class="featured-article' + (featRead ? ' read' : '') + '"><img src="' + (featured.cover || "assets/images/placeholder.svg") + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" /><div class="featured-article-body"><span class="badge">Latest</span><h3>' + Utils.sanitize(featured.title) + '</h3><p>' + Utils.sanitize(featured.description) + '</p><span class="article-card-meta"><span>' + Utils.formatDate(featured.date) + '</span><span class="dot"></span><span>' + featured.readingTime + '</span></span></div></a>';
       }
 
       var mission = { title: "Invite 5 people to Discord", desc: "Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media. Every new member strengthens our community.", time: "varies", difficulty: 2, impact: 5, slug: "invite-5" };

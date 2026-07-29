@@ -177,17 +177,14 @@
         </div>
       </div>
 
-      <nav class="article-navigation" aria-label="Article navigation">
-        <a href="privacy-in-europe.html" class="article-nav-link">
-          <div class="nav-label">Previous Article</div>
-          <div class="nav-title">Privacy in Europe</div>
-        </a>
-        <a href="metadata.html" class="article-nav-link next">
-          <div class="nav-label">Next Article</div>
-          <div class="nav-title">Metadata: The Silent Privacy Threat</div>
-        </a>
-      </nav>
+      
     </div>
+    <!-- Mark as read -->
+  <div style="text-align:center;margin-top:48px;padding-top:32px;border-top:1px solid var(--border);">
+    <button class="btn btn-secondary" id="mark-read-signal-vs-whatsapp" class="btn btn-secondary btn-read" onclick="toggleArticleRead('signal-vs-whatsapp')">Mark as read
+    </button>
+    <span id="read-status-signal-vs-whatsapp" style="display:none;margin-left:12px;font-size:0.875rem;color:#34D399;">&#10003; Read</span>
+  </div>
   </article>
 
   <section class="discord-section">
@@ -235,5 +232,39 @@
   <script src="../assets/js/search.js"></script>
   <script src="../assets/js/modal.js"></script>
   <script src="../assets/js/animations.js"></script>
+  <script>
+  function toggleArticleRead(slug) {
+    var key = 'ns-article-' + slug;
+    var done = localStorage.getItem(key) === 'done';
+    var btn = document.getElementById('mark-read-' + slug);
+    var status = document.getElementById('read-status-' + slug);
+    if (done) {
+      localStorage.removeItem(key);
+      btn.innerHTML = 'Mark as read';
+      btn.className = 'btn btn-secondary btn-read';
+      if (status) status.style.display = 'none';
+    } else {
+      localStorage.setItem(key, 'done');
+      btn.innerHTML = '&#10003; Read';
+      btn.className = 'btn btn-secondary btn-read done';
+      if (status) {
+        status.style.display = 'inline';
+      }
+    }
+  }
+  // Restore state on page load
+  (function() {
+    var slug = 'signal-vs-whatsapp';
+    var key = 'ns-article-' + slug;
+    var done = localStorage.getItem(key) === 'done';
+    var btn = document.getElementById('mark-read-' + slug);
+    var status = document.getElementById('read-status-' + slug);
+    if (done && btn) {
+      btn.innerHTML = '&#10003; Read';
+      btn.className = 'btn btn-secondary btn-read done';
+      if (status) status.style.display = 'inline';
+    }
+  })();
+  </script>
 </body>
 </html>

@@ -37,7 +37,9 @@
     }
 
     container.innerHTML = articles.map(function (a) {
-      return '<a href="' + a.url + '" class="article-list-item">' +
+      var readKey = 'ns-article-' + a.url.replace('articles/', '').replace('.html', '');
+      var isRead = localStorage.getItem(readKey) === 'done';
+      return '<a href="' + a.url + '" class="article-list-item' + (isRead ? ' read' : '') + '">' +
         '<div class="item-left">' +
           '<h3>' + Utils.sanitize(a.title) + '</h3>' +
           '<p>' + Utils.sanitize(a.description) + '</p>' +
