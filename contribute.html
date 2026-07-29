@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Articles — NullSec</title>
-  <meta name="description" content="Browse all articles about privacy, cybersecurity, digital rights, and more." />
-  <meta property="og:title" content="Articles — NullSec" />
-  <meta property="og:description" content="Browse all articles about privacy, cybersecurity, digital rights, and more." />
+  <title>Contribute — NullSec</title>
+  <meta name="description" content="Help build NullSec. Writing, translation, programming, design, research, and more." />
+  <meta property="og:title" content="Contribute — NullSec" />
+  <meta property="og:description" content="Help build NullSec. Writing, translation, programming, design, research, and more." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/articles.html" />
+  <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/contribute.html" />
   <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/og-image.svg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/articles.html" />
+  <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/contribute.html" />
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,9 +28,9 @@
         <a href="./">Home</a>
         <a href="journey.html">Journey</a>
         <a href="tools.html">Tools</a>
-        <a href="articles.html" class="active">Articles</a>
+        <a href="articles.html">Articles</a>
         <a href="community.html">Community</a>
-        <a href="contribute.html">Contribute</a>
+        <a href="contribute.html" class="active">Contribute</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -53,35 +53,58 @@
   
   <section class="section" style="padding-top: 120px;">
     <div class="container">
-      <div class="section-header fade-in">
-        <h1>Articles</h1>
-        <p>In-depth research and analysis on privacy, cybersecurity, digital rights, and open technology.</p>
+      <div class="section-header centered fade-in">
+        <h1>Contribute</h1>
+        <p>NullSec is built by the community. Everyone can help, regardless of their skills.</p>
       </div>
-      <div class="filter-bar fade-in fade-in-delay-1" id="articles-filter-bar">
-        <select class="sort-select" id="sort-select" aria-label="Sort articles">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="category">Category</option>
-        </select>
-      </div>
-      <div id="articles-list" class="articles-list fade-in fade-in-delay-1"></div>
-
-      <div class="in-progress-section fade-in fade-in-delay-2">
-        <button class="in-progress-toggle" id="in-progress-toggle" onclick="this.classList.toggle('open'); document.getElementById('in-progress-list').classList.toggle('open')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-          Articles in progress
-          <span class="arrow">&#9654;</span>
-        </button>
-        <div class="in-progress-list" id="in-progress-list">
-          <!-- Dynamically loaded -->
+      <div class="contribute-grid fade-in fade-in-delay-1">
+        <div class="contribute-card">
+          <span class="icon">&#x270F;&#xFE0F;</span>
+          <h3>Writing Guides</h3>
+          <p>Help others by writing clear, practical guides. No technical writing experience needed — we help you structure and edit.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F310;</span>
+          <h3>Translation</h3>
+          <p>Translate articles and guides into your language. We are building toward full EN/FR support and beyond.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F4BB;</span>
+          <h3>Programming</h3>
+          <p>Contribute to our open source projects on GitHub. HTML, CSS, JavaScript, Python, and Linux scripting.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F3A8;</span>
+          <h3>Design</h3>
+          <p>Help improve the website, create illustrations, or design icons and diagrams for our guides.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F50D;</span>
+          <h3>Testing</h3>
+          <p>Test guides and tools, report bugs, suggest improvements. Your feedback makes everything better.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F4D6;</span>
+          <h3>Documentation</h3>
+          <p>Improve our documentation, write READMEs, create cheatsheets, and organize our knowledge base.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F50C;</span>
+          <h3>Research</h3>
+          <p>Investigate privacy tools, test software, compare alternatives, and share your findings with the community.</p>
+        </div>
+        <div class="contribute-card">
+          <span class="icon">&#x1F41B;</span>
+          <h3>Bug Reports</h3>
+          <p>Found a broken link, typo, or issue? Report it on GitHub or Discord. Every fix helps.</p>
         </div>
       </div>
     </div>
   </section>
   <section class="discord-section">
     <div class="container">
-      <h2>Join the Discussion</h2>
-      <p>Discuss articles and research on our Discord.</p>
+      <h2>Ready to Help?</h2>
+      <p>Join our Discord and introduce yourself in the #contributors channel.</p>
       <a href="https://discord.com/invite/uTeCwQQtn" class="btn btn-primary" target="_blank" rel="noopener">Join Discord</a>
     </div>
   </section>
@@ -114,6 +137,5 @@
   <script src="assets/js/fuse.min.js"></script>
   <script src="assets/js/search.js"></script>
   <script src="assets/js/animations.js"></script>
-  <script src="assets/js/articles.js"></script>
 </body>
 </html>

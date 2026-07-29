@@ -1,226 +1,209 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Primary Meta -->
-  <title>NullSec — Privacy, Cybersecurity &amp; Digital Rights Research</title>
+  <title>NullSec — Privacy, Cybersecurity &amp; Digital Rights</title>
   <meta name="description" content="Independent research about privacy, cybersecurity, digital rights, Linux, open source, and self-hosting. Privacy isn't optional." />
-  <meta name="keywords" content="privacy, cybersecurity, digital rights, linux, open source, self hosting, nullsec" />
-  <meta name="author" content="NullSec" />
-
-  <!-- OpenGraph -->
-  <meta property="og:title" content="NullSec — Privacy, Cybersecurity &amp; Digital Rights Research" />
-  <meta property="og:description" content="Independent research about privacy, cybersecurity, digital rights, Linux, open source, and self-hosting." />
+  <meta property="og:title" content="NullSec — Privacy, Cybersecurity &amp; Digital Rights" />
+  <meta property="og:description" content="Independent research about privacy, cybersecurity, digital rights, and open technology." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/" />
-  <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/placeholder.svg" />
-
-  <!-- Twitter Cards -->
+  <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/og-image.svg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="NullSec — Privacy, Cybersecurity &amp; Digital Rights Research" />
-  <meta name="twitter:description" content="Independent research about privacy, cybersecurity, digital rights, Linux, open source, and self-hosting." />
-  <meta name="twitter:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/placeholder.svg" />
-
-  <!-- Canonical -->
+  <meta name="twitter:title" content="NullSec — Privacy, Cybersecurity &amp; Digital Rights" />
+  <meta name="twitter:description" content="Independent research about privacy, cybersecurity, digital rights, and open technology." />
   <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/" />
-
-  <!-- Theme -->
   <meta name="theme-color" content="#0B0B0F" />
-
-  <!-- Preload fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!-- Stylesheet -->
   <link rel="stylesheet" href="assets/css/style.css" />
-
-  <!-- Favicon -->
+  <link rel="stylesheet" href="assets/css/v2.css" />
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.svg" />
 </head>
 <body>
-
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
+  <!-- Navigation -->
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="container">
-      <a href="./" class="navbar-brand">
-        <span class="logo-dot"></span>
-        NullSec
-      </a>
-
+      <a href="./" class="navbar-brand"><span class="logo-dot"></span> NullSec</a>
       <div class="navbar-links">
         <a href="./" class="active">Home</a>
+        <a href="journey.html">Journey</a>
+        <a href="tools.html">Tools</a>
         <a href="articles.html">Articles</a>
-        <a href="resources.html">Resources</a>
-        <a href="about.html">About</a>
+        <a href="community.html">Community</a>
+        <a href="contribute.html">Contribute</a>
       </div>
-
       <div class="navbar-actions">
-        <button class="icon-btn" id="search-btn" aria-label="Search articles (Ctrl+K)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
+        <button class="icon-btn" id="search-btn" aria-label="Search (Ctrl+K)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
-        <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">
-          <!-- Icon set by JS -->
-        </button>
+        <button class="icon-btn" id="theme-toggle"></button>
         <a href="https://discord.com/invite/uTeCwQQtn" class="btn-discord-nav" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
-          Discord
-        </a>
-        <button class="hamburger" aria-label="Toggle menu">
-          <span></span><span></span><span></span>
-        </button>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg> Discord</a>
+        <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
-
-  <!-- Mobile Menu -->
   <div class="mobile-menu" role="navigation" aria-label="Mobile navigation">
     <a href="./">Home</a>
+    <a href="journey.html">Journey</a>
+    <a href="tools.html">Tools</a>
     <a href="articles.html">Articles</a>
-    <a href="resources.html">Resources</a>
-    <a href="about.html">About</a>
+    <a href="community.html">Community</a>
+    <a href="contribute.html">Contribute</a>
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
 
-  <!-- ============================================================
-       Hero
-       ============================================================ -->
+  <!-- Hero (unchanged) -->
   <section class="hero">
     <div class="container">
       <h1 class="fade-in">
         Privacy <span class="highlight">isn't optional.</span>
       </h1>
-      
       <p class="fade-in fade-in-delay-1">
-        Independent research about privacy, cybersecurity, digital rights, 
+        Independent research about privacy, cybersecurity, digital rights,
         and the technologies that shape our digital world.
       </p>
       <div class="hero-actions fade-in fade-in-delay-2">
-        <a href="articles.html" class="btn btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          Read Articles
+        <a href="journey.html" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Start Your Journey
         </a>
         <a href="https://discord.com/invite/uTeCwQQtn" class="btn btn-secondary" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
           Join Discord
         </a>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================
-       Featured Article
-       ============================================================ -->
+  <!-- ⭐ Start Here -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Start Here</h2>
+        <p>Not sure where to begin? Pick a first step to improve your digital life.</p>
+      </div>
+      <div class="start-here-grid fade-in fade-in-delay-1">
+        <a href="journey.html#secure-accounts" class="start-card">
+          <span class="icon">&#x1F512;</span>
+          <h4>Secure Your Accounts</h4>
+          <p>Enable 2FA and use a password manager</p>
+          <span class="arrow">&#8594;</span>
+        </a>
+        <a href="journey.html#block-ads" class="start-card">
+          <span class="icon">&#x1F6E1;&#xFE0F;</span>
+          <h4>Block Ads &amp; Trackers</h4>
+          <p>Install uBlock Origin in 2 minutes</p>
+          <span class="arrow">&#8594;</span>
+        </a>
+        <a href="journey.html#private-messaging" class="start-card">
+          <span class="icon">&#x1F4AC;</span>
+          <h4>Private Messaging</h4>
+          <p>Switch to Signal for encrypted chat</p>
+          <span class="arrow">&#8594;</span>
+        </a>
+        <a href="journey.html#better-browsing" class="start-card">
+          <span class="icon">&#x1F310;</span>
+          <h4>Better Web Browsing</h4>
+          <p>Switch to Firefox or Brave</p>
+          <span class="arrow">&#8594;</span>
+        </a>
+        <a href="journey.html" class="start-card">
+          <span class="icon">&#x1F4D6;</span>
+          <h4>Read Your First Guide</h4>
+          <p>Follow the full learning journey</p>
+          <span class="arrow">&#8594;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weekly Mission -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>This Week's Mission</h2>
+        <p>One small step. Big impact. Try it now.</p>
+      </div>
+      <div class="weekly-mission fade-in fade-in-delay-1" id="weekly-mission">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Community Highlights -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Community Highlights</h2>
+        <p>Projects, guides, and contributions from the NullSec community.</p>
+      </div>
+      <div class="highlights-grid fade-in fade-in-delay-1" id="highlights-grid">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Article -->
   <section class="section" id="featured-section">
     <div class="container">
       <div class="section-header fade-in">
-        <h2>Featured Article</h2>
-        <p>Our latest in-depth research, selected for you.</p>
+        <h2>Latest Article</h2>
+        <p>Our most recent in-depth research.</p>
       </div>
-      <div id="featured-article" class="fade-in fade-in-delay-1">
-        <!-- Dynamically loaded -->
-      </div>
+      <div id="featured-article" class="fade-in fade-in-delay-1"></div>
     </div>
   </section>
 
-  <!-- ============================================================
-       Latest Articles (preview)
-       ============================================================ -->
-  <section class="section">
+  <!-- Discord CTA -->
+  <section class="discord-section">
     <div class="container">
-      <div class="section-header fade-in">
-        <h2>Latest Articles</h2>
-        <p>Recent publications on privacy, security, and digital rights.</p>
-      </div>
-      <div id="latest-articles-grid" class="articles-grid fade-in fade-in-delay-1">
-        <!-- Dynamically loaded -->
-      </div>
-      <div style="text-align:center; margin-top: 40px;" class="fade-in">
-        <a href="articles.html" class="btn btn-secondary">
-          View All Articles
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <h2 class="fade-in">Join the Community</h2>
+      <p class="fade-in fade-in-delay-1">
+        Learn, share, and improve your digital life with others.
+      </p>
+      <div class="fade-in fade-in-delay-2">
+        <a href="https://discord.com/invite/uTeCwQQtn" class="btn btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          Join Discord
         </a>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================
-       Categories
-       ============================================================ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header centered fade-in">
-        <h2>Topics</h2>
-        <p>Explore articles by category.</p>
-      </div>
-      <div id="categories-grid" class="categories-grid fade-in fade-in-delay-1">
-        <!-- Dynamically loaded -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       Resources preview
-       ============================================================ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header fade-in">
-        <h2>Resources</h2>
-        <p>Curated tools and software for privacy and security.</p>
-      </div>
-      <div class="fade-in fade-in-delay-1" style="text-align:center;">
-        <a href="resources.html" class="btn btn-secondary">
-          Browse Resources
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-
-  <!-- ============================================================
-       Footer
-       ============================================================ -->
+  <!-- Footer -->
   <footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="./" class="navbar-brand">
-            <span class="logo-dot"></span>
-            NullSec
-          </a>
-          <p>Independent research about privacy, cybersecurity, digital rights, and technology.</p>
+          <a href="./" class="navbar-brand"><span class="logo-dot"></span> NullSec</a>
+          <p>Independent research and tools for your digital life.</p>
         </div>
         <div class="footer-col">
-          <h4>Pages</h4>
+          <h4>Explore</h4>
           <a href="./">Home</a>
+          <a href="journey.html">Learning Journey</a>
+          <a href="tools.html">Tools</a>
           <a href="articles.html">Articles</a>
-          <a href="resources.html">Resources</a>
-          <a href="about.html">About</a>
+          <a href="community.html">Community</a>
         </div>
         <div class="footer-col">
           <h4>Topics</h4>
-          <a href="articles.html?category=Privacy">Privacy</a>
-          <a href="articles.html?category=Cybersecurity">Cybersecurity</a>
-          <a href="articles.html?category=Linux">Linux</a>
-          <a href="articles.html?category=Open+Source">Open Source</a>
-          <a href="articles.html?category=Self+Hosting">Self Hosting</a>
+          <a href="tools.html?category=Privacy">Privacy</a>
+          <a href="tools.html?category=Security">Security</a>
+          <a href="tools.html?category=Linux">Linux</a>
+          <a href="tools.html?category=Open+Source">Open Source</a>
+          <a href="tools.html?category=Self+Hosting">Self Hosting</a>
         </div>
         <div class="footer-col">
           <h4>Community</h4>
           <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
           <a href="https://github.com/nullsec" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://twitter.com/nullsec" target="_blank" rel="noopener">Twitter</a>
-          <a href="sitemap.xml" target="_blank">Sitemap</a>
+          <a href="contribute.html">Contribute</a>
+          <a href="projects.html">Projects</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -230,27 +213,18 @@
     </div>
   </footer>
 
-  <!-- ============================================================
-       Search Overlay
-       ============================================================ -->
-  <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Search articles">
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Search">
     <div class="search-modal">
       <div class="search-input-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="search-input" placeholder="Search articles..." autocomplete="off" />
         <span class="kbd-hint">ESC</span>
       </div>
-      <div class="search-results" id="search-results">
-        <div class="search-empty">Start typing to search articles...</div>
-      </div>
+      <div class="search-results" id="search-results"><div class="search-empty">Start typing to search articles...</div></div>
     </div>
   </div>
 
-  <!-- ============================================================
-       Scripts
-       ============================================================ -->
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/navigation.js"></script>
@@ -258,27 +232,24 @@
   <script src="assets/js/search.js"></script>
   <script src="assets/js/animations.js"></script>
   <script>
-    /**
-     * Home page only: load featured article & latest articles preview.
-     */
     (function () {
       'use strict';
 
+      // --- Featured Article ---
       async function loadHomeData() {
         try {
-          const res = await fetch('data/articles.json');
-          const articles = await res.json();
+          var res = await fetch('data/articles.json');
+          var articles = await res.json();
 
-          // --- Featured Article ---
-          const featured = articles.find(function (a) { return a.featured; }) || articles[0];
-          const featuredContainer = document.getElementById('featured-article');
+          var published = articles.filter(function (a) { return a.status === 'published'; });
+          var featured = published[0];
+          var featuredContainer = document.getElementById('featured-article');
           if (featuredContainer && featured) {
             featuredContainer.innerHTML =
               '<a href="' + featured.url + '" class="featured-article">' +
-                '<img src="' + (featured.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" onerror="this.src=\'assets/images/placeholder.svg\'" />' +
+                '<img src="' + (featured.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" />' +
                 '<div class="featured-article-body">' +
-                  '<span class="badge">Featured</span>' +
-                  (featured.status === 'in-progress' ? '<span class="status-badge status-badge--in-progress" style="margin-left:8px"><span class="dot"></span> In progress</span>' : '') +
+                  '<span class="badge">Latest</span>' +
                   '<h3>' + Utils.sanitize(featured.title) + '</h3>' +
                   '<p>' + Utils.sanitize(featured.description) + '</p>' +
                   '<span class="article-card-meta">' +
@@ -290,74 +261,65 @@
               '</a>';
           }
 
-          // --- Latest Articles (first 3) ---
-          const latest = articles
-            .sort(function (a, b) { return new Date(b.date) - new Date(a.date); })
-            .slice(0, 3);
-          const latestGrid = document.getElementById('latest-articles-grid');
-          if (latestGrid) {
-            latestGrid.innerHTML = latest.map(function (a) {
-              var badge = '';
-              if (a.status === 'in-progress') {
-                badge = '<span class="status-badge status-badge--in-progress"><span class="dot"></span> In progress</span>';
-              }
-              return '<a href="' + a.url + '" class="article-card">' +
-                '<img src="' + (a.cover || 'assets/images/placeholder.svg') + '" alt="' + Utils.sanitize(a.title) + '" class="article-card-cover" loading="lazy" onerror="this.src=\'assets/images/placeholder.svg\'" />' +
-                '<div class="article-card-body">' +
-                  '<span class="article-card-category">' + Utils.sanitize(a.category) + '</span>' +
-                  '<h3 class="article-card-title">' + Utils.sanitize(a.title) + '</h3>' +
-                  '<p class="article-card-description">' + Utils.sanitize(a.description) + '</p>' +
-                  badge +
-                  '<div class="article-card-meta">' +
-                    '<span>' + Utils.formatDate(a.date) + '</span>' +
-                    '<span class="dot"></span>' +
-                    '<span>' + a.readingTime + '</span>' +
-                  '</div>' +
+          // --- Weekly Mission ---
+          var missions = [
+            { title: 'Install uBlock Origin', desc: 'Block ads, trackers, and malware across your browser. One of the most effective privacy tools.', time: '2 min', difficulty: 1, impact: 5, slug: 'ublock-origin' },
+            { title: 'Enable Two-Factor Authentication', desc: 'Add a second layer of security to your most important accounts. Takes minutes, prevents hacks.', time: '5 min', difficulty: 1, impact: 5, slug: 'enable-2fa' },
+            { title: 'Switch to Signal', desc: 'Replace WhatsApp or Messenger with end-to-end encrypted messaging. Private by design.', time: '5 min', difficulty: 1, impact: 4, slug: 'signal' },
+            { title: 'Check Your Password Health', desc: 'Find out if your passwords have been leaked and learn how to create strong, unique ones.', time: '3 min', difficulty: 1, impact: 5, slug: 'password-health' },
+            { title: 'Install a Password Manager', desc: 'Stop reusing passwords. A password manager generates and stores strong passwords securely.', time: '10 min', difficulty: 2, impact: 5, slug: 'password-manager' },
+            { title: 'Switch to a Private Browser', desc: 'Replace Chrome with Firefox or Brave. Better privacy, better performance, more control.', time: '5 min', difficulty: 1, impact: 3, slug: 'private-browser' },
+          ];
+
+          // Pick a random mission for the week (seeded by week number)
+          var weekNum = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+          var mission = missions[weekNum % missions.length];
+          var missionEl = document.getElementById('weekly-mission');
+          if (missionEl) {
+            var stars = '';
+            for (var i = 0; i < mission.difficulty; i++) stars += '&#9733;';
+            for (var i = mission.difficulty; i < 5; i++) stars += '&#9734;';
+            var impactDots = '';
+            for (var i = 0; i < mission.impact; i++) impactDots += '<span class="impact-dot filled"></span>';
+            for (var i = mission.impact; i < 5; i++) impactDots += '<span class="impact-dot"></span>';
+
+            var completed = localStorage.getItem('ns-mission-' + mission.slug) === 'done';
+            var btnText = completed ? '&#10003; Completed' : 'Mark as done';
+            var btnClass = completed ? 'btn btn-secondary' : 'btn btn-primary';
+
+            missionEl.innerHTML =
+              '<div>' +
+                '<span class="badge">Week ' + (weekNum % missions.length + 1) + '</span>' +
+                '<h3>' + Utils.sanitize(mission.title) + '</h3>' +
+                '<p>' + Utils.sanitize(mission.desc) + '</p>' +
+                '<div class="weekly-mission-meta">' +
+                  '<span class="meta-item">&#9200; <strong>' + mission.time + '</strong></span>' +
+                  '<span class="meta-item">Difficulty: <span class="stars">' + stars + '</span></span>' +
+                  '<span class="meta-item">Impact: ' + impactDots + '</span>' +
                 '</div>' +
-              '</a>';
-            }).join('');
+              '</div>' +
+              '<div>' +
+                '<button class="' + btnClass + '" onclick="toggleMission(\'' + mission.slug + '\', this)">' + btnText + '</button>' +
+              '</div>';
           }
-
-          // --- Categories ---
-          const categoryCounts = {};
-          articles.forEach(function (a) {
-            categoryCounts[a.category] = (categoryCounts[a.category] || 0) + 1;
-          });
-          const categoryIcons = {
-            'Privacy': '&#x1F50F;',
-            'Cybersecurity': '&#x1F6E1;&#xFE0F;',
-            'Digital Rights': '&#x2696;&#xFE0F;',
-            'Linux': '&#x1F427;',
-            'Open Source': '&#x1F4E6;',
-            'Artificial Intelligence': '&#x1F916;',
-            'Self Hosting': '&#x1F4E1;&#xFE0F;',
-            'Technology': '&#x1F4BB;',
-          };
-          const categoriesGrid = document.getElementById('categories-grid');
-          if (categoriesGrid) {
-            const sorted = Object.keys(categoryCounts).sort();
-            categoriesGrid.innerHTML = sorted.map(function (cat) {
-              return '<a href="articles.html?category=' + encodeURIComponent(cat) + '" class="category-card">' +
-                '<span class="icon">' + (categoryIcons[cat] || '&#x1F4D6;') + '</span>' +
-                '<h4>' + Utils.sanitize(cat) + '</h4>' +
-                '<span class="count">' + categoryCounts[cat] + ' article' + (categoryCounts[cat] !== 1 ? 's' : '') + '</span>' +
-              '</a>';
-            }).join('');
-          }
-
-          // Re-run fade-in observer for dynamically added elements
-          if (window.AnimationsObserver) {
-            // Re-observe new fade-in elements
-          }
-          // Simple approach: just add visible class after a small delay
-          setTimeout(function () {
-            document.querySelectorAll('#featured-article .fade-in, #latest-articles-grid .fade-in, #categories-grid .fade-in')
-              .forEach(function (el) { el.classList.add('visible'); });
-          }, 100);
         } catch (err) {
           console.error('Home data load error:', err);
         }
       }
+
+      window.toggleMission = function (slug, btn) {
+        var key = 'ns-mission-' + slug;
+        var done = localStorage.getItem(key) === 'done';
+        if (done) {
+          localStorage.removeItem(key);
+          btn.innerHTML = 'Mark as done';
+          btn.className = 'btn btn-primary';
+        } else {
+          localStorage.setItem(key, 'done');
+          btn.innerHTML = '&#10003; Completed';
+          btn.className = 'btn btn-secondary';
+        }
+      };
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', loadHomeData);

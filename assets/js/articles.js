@@ -1,134 +1,90 @@
 /**
- * NullSec — Articles Module
+ * NullSec — Articles Module (V2)
  * Loads article metadata from /data/articles.json and renders
- * the article cards on the articles listing page.
- * Supports filtering by category and sorting.
+ * a clean article list. Shows published and in-progress separately.
  */
 
 (function () {
   'use strict';
 
-  /** Main entry: load and render articles on articles.html */
   async function loadArticles() {
-    const grid = document.getElementById('articles-grid');
-    if (!grid) return; // Not on the articles page
+    var list = document.getElementById('articles-list');
+    var progressList = document.getElementById('in-progress-list');
+    if (!list) return;
 
     try {
-      const res = await fetch('data/articles.json');
-      const articles = await res.json();
-      renderArticles(articles, grid);
-      setupFilters(articles, grid);
+      var res = await fetch('data/articles.json');
+      var articles = await res.json();
+
+      var published = articles.filter(function (a) { return a.status !== 'in-progress'; });
+      var inProgress = articles.filter(function (a) { return a.status === 'in-progress'; });
+
+      renderList(published, list);
+      if (progressList) {
+        renderProgressList(inProgress, progressList);
+      }
+      setupSort(published, list);
     } catch (err) {
-      grid.innerHTML =
-        '<p style="color: var(--text-dim);">Failed to load articles. Please try again later.</p>';
+      list.innerHTML = '<p style="color: var(--text-dim);">Failed to load articles.</p>';
       console.error('Articles load error:', err);
     }
   }
 
-  /**
-   * Render an array of articles into the grid.
-   * @param {Array} articles
-   * @param {HTMLElement} grid
-   */
-  function renderArticles(articles, grid) {
-    if (articles.length === 0) {
-      grid.innerHTML =
-        '<p style="color: var(--text-dim);">No articles published yet. Check back soon.</p>';
+  function renderList(articles, container) {
+    if (!articles.length) {
+      container.innerHTML = '<p style="color: var(--text-dim); padding: 20px;">No articles yet. Check back soon.</p>';
       return;
     }
 
-    grid.innerHTML = articles
-      .map(
-        (a) => `
-        <a href="${a.url}" class="article-card">
-          <img
-            src="${a.cover || 'assets/images/placeholder.svg'}"
-            alt="${Utils.sanitize(a.title)}"
-            class="article-card-cover"
-            loading="lazy"
-            onerror="this.src='assets/images/placeholder.svg'"
-          />
-          <div class="article-card-body">
-            <span class="article-card-category">${Utils.sanitize(a.category)}</span>
-            <h3 class="article-card-title">${Utils.sanitize(a.title)}</h3>
-            <p class="article-card-description">${Utils.sanitize(a.description)}</p>
-            ${a.status === 'in-progress' ? '<span class="status-badge status-badge--in-progress"><span class="dot"></span> In progress</span>' : ''}
-            <div class="article-card-meta">
-              <span>${Utils.formatDate(a.date)}</span>
-              <span class="dot"></span>
-              <span>${a.readingTime}</span>
-            </div>
-          </div>
-        </a>
-      `
-      )
-      .join('');
+    container.innerHTML = articles.map(function (a) {
+      return '<a href="' + a.url + '" class="article-list-item">' +
+        '<div class="item-left">' +
+          '<h3>' + Utils.sanitize(a.title) + '</h3>' +
+          '<p>' + Utils.sanitize(a.description) + '</p>' +
+        '</div>' +
+        '<div class="item-right">' +
+          '<span class="cat">' + Utils.sanitize(a.category) + '</span>' +
+          '<span>' + Utils.formatDate(a.date) + '</span>' +
+          '<span>' + a.readingTime + '</span>' +
+        '</div>' +
+      '</a>';
+    }).join('');
   }
 
-  /**
-   * Set up category filter and sort buttons.
-   * @param {Array} originalArticles - Full article list
-   * @param {HTMLElement} grid
-   */
-  function setupFilters(originalArticles, grid) {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const sortSelect = document.getElementById('sort-select');
+  function renderProgressList(articles, container) {
+    if (!articles.length) {
+      container.innerHTML = '<p style="color: var(--text-dim); padding: 12px 20px;">No upcoming articles planned.</p>';
+      return;
+    }
+    container.innerHTML = articles.map(function (a) {
+      return '<div class="in-progress-item">' +
+        '<h4>' + Utils.sanitize(a.title) + '</h4>' +
+        '<span class="eta">' + Utils.sanitize(a.category) + '</span>' +
+      '</div>';
+    }).join('');
+  }
 
-    if (!filterBtns.length && !sortSelect) return;
+  function setupSort(articles, container) {
+    var sortSelect = document.getElementById('sort-select');
+    if (!sortSelect) return;
 
-    let activeCategory = 'all';
-    let activeSort = sortSelect?.value || 'newest';
-
-    function applyFiltersAndSort() {
-      let filtered =
-        activeCategory === 'all'
-          ? [...originalArticles]
-          : originalArticles.filter((a) => a.category === activeCategory);
-
-      // Sort
-      switch (activeSort) {
+    sortSelect.addEventListener('change', function () {
+      var sorted = [].concat(articles);
+      switch (sortSelect.value) {
         case 'newest':
-          filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+          sorted.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
           break;
         case 'oldest':
-          filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+          sorted.sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
           break;
         case 'category':
-          filtered.sort((a, b) => a.category.localeCompare(b.category));
-          break;
-        case 'featured':
-          filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-          break;
-        default:
+          sorted.sort(function (a, b) { return a.category.localeCompare(b.category); });
           break;
       }
-
-      renderArticles(filtered, grid);
-    }
-
-    // Filter buttons
-    filterBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeCategory = btn.getAttribute('data-category') || 'all';
-        applyFiltersAndSort();
-      });
+      renderList(sorted, container);
     });
-
-    // Sort select
-    if (sortSelect) {
-      sortSelect.addEventListener('change', () => {
-        activeSort = sortSelect.value;
-        applyFiltersAndSort();
-      });
-    }
-
-    // Initial render
-    applyFiltersAndSort();
   }
 
-  // Auto-initialise on page load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadArticles);
   } else {

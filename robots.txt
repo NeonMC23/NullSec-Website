@@ -1,8 +1,7 @@
-# NullSec — Robots.txt
+# NullSec — robots.txt
 # https://neonmc23.github.io/NullSec-Website
 
 User-agent: *
 Allow: /
 
-# Sitemap
 Sitemap: https://neonmc23.github.io/NullSec-Website/sitemap.xml
