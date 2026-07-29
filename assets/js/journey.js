@@ -545,7 +545,7 @@
 
   function renderAll() {
     var completed = getProgress();
-    var total = MISSIONS.filter(function (m) { return m.stage <= 4; }).length;
+    var total = MISSIONS.filter(function (m) { return m.stage <= 4; }).length + 1; // +1 for weekly mission
     var communityTotal = MISSIONS.filter(function (m) { return m.stage === 99; }).length;
     var done = completed.length;
     var pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -570,7 +570,7 @@
     // Weekly mission on journey page
     var weeklyEl = document.getElementById('journey-weekly-mission');
     if (weeklyEl) {
-      var weekMission = { title: 'Invite 5 people to Discord', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.', time: '~5 min', difficulty: 2, impact: 5 };
+      var weekMission = { title: 'Invite 5 people to Discord', desc: 'Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media.', time: '~', difficulty: 2, impact: 5 };
       var s = '';
       for (var i = 0; i < weekMission.difficulty; i++) s += '\u2605';
       for (var i = weekMission.difficulty; i < 5; i++) s += '\u2606';

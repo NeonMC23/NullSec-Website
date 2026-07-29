@@ -151,7 +151,7 @@
         dots += "</span>";
 
         var done = localStorage.getItem("ns-5-invites") === "done";
-        missionEl.innerHTML = '<div><span class="badge">Community Mission</span><h3>' + Utils.sanitize(mission.title) + '</h3><p>' + Utils.sanitize(mission.desc) + '</p><div class="weekly-mission-meta"><span class="meta-item">&#9200; <strong>' + mission.time + '</strong></span><span class="meta-item">Difficulty: <span class="stars">' + stars + '</span></span><span class="meta-item">Impact: ' + dots + '</span></div></div><div style="display:flex;gap:8px;align-items:start;justify-content:center;"><button class="' + (done ? "btn btn-secondary" : "btn btn-primary") + '" onclick="toggleInviteMission(this)">' + (done ? "✓ Completed" : "Mark as done") + '</button><a href="journey.html" class="btn btn-secondary" style="font-size:0.8125rem;padding:8px 16px;">View all &#8594;</a></div>';
+        missionEl.innerHTML = '<div><span class="badge">Community Mission</span><h3>' + Utils.sanitize(mission.title) + '</h3><p>' + Utils.sanitize(mission.desc) + '</p><div class="weekly-mission-meta"><span class="meta-item">&#9200; <strong>' + mission.time + '</strong></span><span class="meta-item">Difficulty: <span class="stars">' + stars + '</span></span><span class="meta-item">Impact: ' + dots + '</span></div></div><div style="display:flex;gap:8px;align-items:start;justify-content:center;"><button class="' + (done ? "btn btn-secondary" : "btn btn-primary") + '" onclick="toggleInviteMission(this)">' + (done ? "✓ Completed" : "Mark as done") + '</button><a href="journey.html" class="btn btn-secondary" style="min-height:40px;display:inline-flex;align-items:center;">View all &#8594;</a></div>';
       }
     } catch (err) { console.error("Home error:", err); }
   }
