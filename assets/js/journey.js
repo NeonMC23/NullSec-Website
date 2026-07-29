@@ -561,7 +561,7 @@
         '<div class="progress-stats">' +
           '<div class="stat"><strong>' + done + '</strong><span class="stat-label">done</span></div>' +
           '<div class="stat-divider"></div>' +
-          '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && m.stage<=4;}); }).length)) + '</strong><span class="stat-label">left</span></div>' +
+          '<div class="stat"><strong>' + (total - (completed.filter(function(id) { return MISSIONS.find(function(m){return m.id===id && m.stage<=4;}) || id === 'weekly-community'; }).length)) + '</strong><span class="stat-label">left</span></div>' +
           '<div class="stat-divider"></div>' +
           '<div class="stat"><strong>' + total + '</strong><span class="stat-label">missions</span></div>' +
         '</div>';
@@ -578,8 +578,9 @@
       for (var i = 0; i < weekMission.impact; i++) d += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);"></span>';
       for (var i = weekMission.impact; i < 5; i++) d += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);"></span>';
       d += '</span>';
-      var wDone = localStorage.getItem('ns-5-invites') === 'done';
-      weeklyEl.innerHTML = '<div><span class="badge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--accent-subtle);color:var(--accent);border-radius:100px;margin-bottom:12px;">Community Mission</span><h3 style="font-size:1.1rem;margin-bottom:6px;">' + weekMission.title + '</h3><p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:12px;">' + weekMission.desc + '</p><div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.8125rem;color:var(--text-dim);"><span>&#9200; ' + weekMission.time + '</span><span>Difficulty: ' + s + '</span><span>Impact: ' + d + '</span></div></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn ' + (wDone ? 'btn-secondary' : 'btn-primary') + '" onclick="toggleJourneyWeekly(this)">' + (wDone ? '\u2713 Completed' : 'Mark as done') + '</button></div>';
+      var wDone = isCompleted('weekly-community');
+      var completedClass = wDone ? ' completed' : '';
+      weeklyEl.innerHTML = '<div class="weekly-mission' + completedClass + '"><div><span class="badge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--accent-subtle);color:var(--accent);border-radius:100px;margin-bottom:12px;">Community Mission</span><h3 style="font-size:1.1rem;margin-bottom:6px;">' + weekMission.title + '</h3><p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:12px;">' + weekMission.desc + '</p><div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.8125rem;color:var(--text-dim);"><span>&#9200; ' + weekMission.time + '</span><span>Difficulty: ' + s + '</span><span>Impact: ' + d + '</span></div></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn ' + (wDone ? 'btn-secondary' : 'btn-primary') + '" onclick="toggleJourneyWeekly(this)">' + (wDone ? '\u2713 Completed' : 'Mark as done') + '</button></div></div>';
     }
 
     stages.forEach(function (stage) {
@@ -603,14 +604,6 @@
 
 
 window.toggleJourneyWeekly = function (btn) {
-  var done = localStorage.getItem('ns-5-invites') === 'done';
-  if (done) {
-    localStorage.removeItem('ns-5-invites');
-    btn.innerHTML = 'Mark as done';
-    btn.className = 'btn btn-primary';
-  } else {
-    localStorage.setItem('ns-5-invites', 'done');
-    btn.innerHTML = '\u2713 Completed';
-    btn.className = 'btn btn-secondary';
-  }
+  toggleMission('weekly-community');
+  renderAll();
 };
