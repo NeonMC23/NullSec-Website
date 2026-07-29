@@ -496,9 +496,6 @@
     }
     impactDots += '</span>';
     var mobileTag = '';
-    if (mission.mobileFriendly === true) mobileTag = '<span class="tldr-tag">\uD83D\uDCF1 Mobile</span>';
-    else if (mission.mobileFriendly === false) mobileTag = '<span class="tldr-tag">\uD83D\uDCBB Desktop</span>';
-    else mobileTag = '<span class="tldr-tag">\uD83D\uDCF1 \uD83D\uDCBB All platforms</span>';
 
     Modal.open(
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">' +
@@ -537,9 +534,6 @@
         '<span class="difficulty">' + renderStars(m.difficulty) + '</span>' +
         '<span class="impact">' + renderImpact(m.impact) + '</span>' +
       '</div>' +
-      (m.mobileFriendly === true ? '<div class="platform-badges"><span class="platform-badge">&#128241;</span></div>' : '') +
-      (m.mobileFriendly === false ? '<div class="platform-badges"><span class="platform-badge">&#128187;</span></div>' : '') +
-      (m.mobileFriendly !== true && m.mobileFriendly !== false ? '<div class="platform-badges"><span class="platform-badge">&#128241; &#128187;</span></div>' : '') +
     '</div>';
   }
 
