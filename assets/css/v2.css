@@ -1579,33 +1579,26 @@
 }
 
 /* ============================================================
-   Article — Read state (like mission cards)
+   Article — Read state (premium, clean)
    ============================================================ */
 .article-list-item {
   position: relative;
 }
 
 .article-list-item.read {
-  border-color: #34D399;
-  background: rgba(52, 211, 153, 0.03);
+  border-color: rgba(52, 211, 153, 0.25);
+  background: rgba(52, 211, 153, 0.02);
 }
 
 .article-list-item.read::before {
-  content: '✓';
+  content: '';
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 22px;
-  height: 22px;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
   background: #34D399;
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  z-index: 2;
+  border-radius: 0 3px 3px 0;
 }
 
 .article-list-item.read .item-left h3 {
@@ -1622,19 +1615,14 @@
 
 /* Featured article read state */
 .featured-article.read {
-  border-color: #34D399;
-  background: rgba(52, 211, 153, 0.03);
-  opacity: 0.7;
-}
-.featured-article.read .featured-article-body h3 {
-  color: var(--text-muted);
+  border-color: rgba(52, 211, 153, 0.25);
+  background: rgba(52, 211, 153, 0.02);
 }
 
 /* Article card read state (home latest) */
 .article-card.read {
-  border-color: #34D399;
-  background: rgba(52, 211, 153, 0.03);
-  opacity: 0.6;
+  border-color: rgba(52, 211, 153, 0.25);
+  background: rgba(52, 211, 153, 0.02);
 }
 .article-card.read .article-card-title {
   color: var(--text-muted);
