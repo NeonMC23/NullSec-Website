@@ -1,6 +1,7 @@
 # NullSec Website
 
 [![Site Status](https://img.shields.io/badge/status-live-success)](https://neonmc23.github.io/NullSec-Website/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 The official website for **NullSec**, a community focused on privacy, cybersecurity, digital rights, Linux, open source, artificial intelligence, self-hosting, and technology.
 
