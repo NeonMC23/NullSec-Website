@@ -130,7 +130,7 @@ console.log('== 6. SQL security (STATIC) ==');
   const { join } = await import('node:path');
   const root = process.cwd();
   const m11 = readFileSync(join(root, 'backend/supabase/migrations/0011_community_activity_events.sql'), 'utf8');
-  const m12 = readFileSync(join(root, 'backend/supabase/migrations/0012_activity_event_privileges.sql'), 'utf8');
+  const m12 = readFileSync(join(root, 'backend/supabase/functions/rpc_privileges.sql'), 'utf8');
   const m13 = readFileSync(join(root, 'backend/supabase/migrations/0013_country_metrics_view.sql'), 'utf8');
   const rec = readFileSync(join(root, 'backend/supabase/functions/rpc_activity_event.sql'), 'utf8');
 

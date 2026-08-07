@@ -282,9 +282,14 @@ d'environnement requises (production, non commitées) :
 
 1. Créer le projet Supabase (région UE).
 2. Déployer les migrations `0001`…`0016` dans l'ordre (SQL Editor / CLI).
-3. Déployer les RPC (`rpc_auth`, `rpc_sync`, `rpc_activity`, `rpc_country_metrics`,
-   `rpc_tool_activity`, `rpc_profile`, `rpc_activity_event`) puis grants
-   (`0005`/`0008`/`0012`).
+   ⚠️ Sur une base vierge, `0003`/`0004`/`0005`/`0008`/`0012` sont désormais des
+   **no-op** (privilèges de fonction déplacés) : le déploiement cloud-first
+   applique `migrations → RPC creation → RPC privilege hardening`.
+3. Déployer la création des RPC (`rpc_auth`, `rpc_sync`, `rpc_activity`,
+   `rpc_country_metrics`, `rpc_tool_activity`, `rpc_profile`,
+   `rpc_activity_event`), puis **en dernier** `rpc_privileges.sql`
+   (RPC privilege hardening : révoque le grant `PUBLIC` par défaut, GRANT les
+   fonctions publiques à `anon, authenticated`, révoque `ns_create_session`).
 4. Vérifier `pg_proc.proacl` (ns_create_session inaccessible ; RPC publics grantés).
 5. Vérifier RLS (tables privées sans accès anon ; agrégats SELECT anon ; vue non
    publique).

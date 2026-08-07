@@ -55,7 +55,9 @@ node tests/m28-tests.mjs       # suite M28 (durcissement production)
   REVOKE des écritures.
 - `SECURITY DEFINER` + `search_path` sur chaque RPC.
 - Aucun `p_user_id` client dans les RPC exposées (isolation cross-user).
-- Contrôle EXECUTE explicite (0003/0004) — `ns_create_session` révoqué.
+- Contrôle EXECUTE explicite dans `rpc_privileges.sql` (appliqué après création des
+  RPC) — `ns_create_session` révoqué ; **aucune migration** ne contient de
+  `REVOKE/GRANT EXECUTE ON FUNCTION` (correctif d'ordre de déploiement base vierge).
 - Les noms d'arguments RPC du frontend (`api-client.js`) correspondent aux signatures SQL.
 
 ### `m14-tests.mjs` (local + mock)
@@ -98,6 +100,6 @@ côté dashboard/CLI une fois un projet disponible.
 
 ## Cloud-first deployment (M28)
 
-- `tests/m28-deploy-tests.mjs` — STATIC : ordre des migrations (0001→0016), ordre RPC dans `deploy.sh`, aucun secret littéral, fail-safe.
+- `tests/m28-deploy-tests.mjs` — STATIC : ordre des migrations (0001→0016), ordre RPC + `rpc_privileges.sql` dans `deploy.sh` (hardening appliqué en dernier), aucun secret littéral, fail-safe, aucune migration avec privilège de fonction.
 - Workflow : `.github/workflows/supabase-deploy.yml` (Management API, pas de CLI local).
 - Voir `docs/cloud-deployment.md`.

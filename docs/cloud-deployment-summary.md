@@ -29,13 +29,27 @@ méthode la plus fiable sans dépendance CLI/linking local (le CLI échoue local
 ### 3. Scripts
 - `backend/supabase/scripts/apply-sql.sh` : applique un fichier SQL via la Management
   API, n'écho jamais le token, échoue (set -e) sur erreur.
-- `backend/supabase/scripts/deploy.sh` : orchestre migrations (0001→0016) puis RPC
-  (ordre stable : auth → sync → activity → tool_activity → profile → activity_event →
-  country_metrics).
+- `backend/supabase/scripts/deploy.sh` : orchestre migrations (0001→0016) → création
+  RPC (ordre stable : auth → sync → activity → tool_activity → profile → activity_event →
+  country_metrics) → **RPC privilege hardening** (`rpc_privileges.sql`, appliqué en dernier).
+
+### 3b. Correction de l'ordre de déploiement (base vierge)
+- Les migrations `0003`/`0004`/`0005`/`0008`/`0012` contenaient des
+  `REVOKE/GRANT EXECUTE ON FUNCTION` sur des fonctions créées **après** les
+  migrations → sur une base vierge, `0003` échouait avec
+  `42883: function public.ns_create_session(bigint) does not exist`.
+- **Correctif** : tous les privilèges de fonction ont été déplacés vers
+  `backend/supabase/functions/rpc_privileges.sql`, appliqué **après** la création
+  des RPC. Ces 5 migrations sont devenues des **no-op documentés** (historique
+  `0001→0016` conservé, aucun renommage, aucune duplication de fonction,
+  permissions inchangées, idempotent, compatible base vierge).
+- Nouvel ordre : `migrations 0001→0016` → `RPC creation` → `RPC privilege hardening`.
 
 ### 4. Audit migrations (0001 → 0016)
 - 16 migrations, toutes `BEGIN;…COMMIT;` (transactionnelles), ordre lexicographique.
 - Aucun `DROP TABLE` destructif ; usage de `IF NOT EXISTS`.
+- **Aucune migration ne contient de `REVOKE/GRANT EXECUTE ON FUNCTION`** (contrôles
+  déplacés vers `rpc_privileges.sql`, appliqué après la création des RPC).
 - RLS activée sur toutes les tables sensibles ; RPC `SECURITY DEFINER` avec
   `search_path = public` ; grants explicites ; `community_activity_events` reste privé.
 - Aucun `service_role`/secret exposé.
@@ -73,6 +87,7 @@ méthode la plus fiable sans dépendance CLI/linking local (le CLI échoue local
 
 - **Créés** : `.github/workflows/supabase-deploy.yml`, `backend/supabase/scripts/apply-sql.sh`,
   `backend/supabase/scripts/deploy.sh`, `docs/cloud-deployment.md`,
-  `tests/m28-deploy-tests.mjs`.
+  `tests/m28-deploy-tests.mjs`, `backend/supabase/functions/rpc_privileges.sql`.
 - **Modifiés** : `backend/supabase/README.md`, `docs/deployment-guide.md`,
-  `tests/run-all.sh`, `tests/README.md`.
+  `tests/run-all.sh`, `tests/README.md`, les migrations
+  `0003/0004/0005/0008/0012` (no-op documentés), `tests/sql-audit.mjs`.

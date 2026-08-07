@@ -46,15 +46,20 @@ console.log('== 1. Migration ordering ==');
 console.log('== 2. deploy.sh references ==');
 {
   const deploy = readFileSync(join(SCRIPTS, 'deploy.sh'), 'utf8');
+  // Strip shell comments so a header prose mention does not skew indexOf ordering.
+  const deployCode = deploy.replace(/#[^\n]*/g, '');
   ok(/migrations\/\*\.sql/.test(deploy) && /sort/.test(deploy),
     'deploy.sh iterates migrations in lexicographic order');
   // RPC files in stable order.
-  const rpcs = ['rpc_auth', 'rpc_sync', 'rpc_activity', 'rpc_tool_activity', 'rpc_profile', 'rpc_activity_event', 'rpc_country_metrics'];
+  const rpcs = ['rpc_auth', 'rpc_sync', 'rpc_activity', 'rpc_tool_activity', 'rpc_profile', 'rpc_activity_event', 'rpc_country_metrics', 'rpc_privileges'];
   const re = new RegExp(rpcs.join('|'));
-  ok(rpcs.every(r => new RegExp(r + '\\.sql').test(deploy)), 'deploy.sh references all 7 RPC files');
+  ok(rpcs.every(r => new RegExp(r + '\\.sql').test(deploy)), 'deploy.sh references all 8 RPC/hardening files');
   // Order check: auth before sync before activity...
-  const idxs = rpcs.map(r => deploy.indexOf(r + '.sql'));
-  ok(idxs.every((v, i) => i === 0 || v > idxs[i - 1]), 'RPC applied in stable dependency-safe order');
+  const idxs = rpcs.map(r => deployCode.indexOf(r + '.sql'));
+  ok(idxs.every((v, i) => i === 0 || v > idxs[i - 1]), 'RPC + hardening applied in stable dependency-safe order');
+  // rpc_privileges.sql MUST be applied LAST (after every RPC function exists).
+  ok(deployCode.indexOf('rpc_privileges.sql') > deployCode.indexOf('rpc_country_metrics.sql'),
+    'rpc_privileges.sql applied after all RPC functions');
 }
 
 /* 3. No literal secrets in workflow/scripts */
@@ -87,8 +92,20 @@ console.log('== 4. Fail-safe ==');
 /* 5. All RPC files exist */
 console.log('== 5. RPC files exist ==');
 {
-  const rpcs = ['rpc_auth.sql', 'rpc_sync.sql', 'rpc_activity.sql', 'rpc_tool_activity.sql', 'rpc_profile.sql', 'rpc_activity_event.sql', 'rpc_country_metrics.sql'];
+  const rpcs = ['rpc_auth.sql', 'rpc_sync.sql', 'rpc_activity.sql', 'rpc_tool_activity.sql', 'rpc_profile.sql', 'rpc_activity_event.sql', 'rpc_country_metrics.sql', 'rpc_privileges.sql'];
   for (const r of rpcs) ok(readdirSync(FN).includes(r), r + ' exists');
+}
+
+/* 6. No function-level EXECUTE statements in migrations (deployment-order fix) */
+console.log('== 6. No function privileges in migrations ==');
+{
+  const migFiles = readdirSync(MIG).filter(f => f.endsWith('.sql'));
+  let found = [];
+  for (const f of migFiles) {
+    const src = readFileSync(join(MIG, f), 'utf8').replace(/--[^\n]*/g, '');
+    if (/EXECUTE ON FUNCTION/.test(src)) found.push(f);
+  }
+  ok(found.length === 0, 'no migration contains GRANT/REVOKE EXECUTE ON FUNCTION (got: ' + (found.join(', ') || 'none') + ')');
 }
 
 console.log(`\n--- M28 CLOUD DEPLOY STATIC: ${passed} passed, ${failed} failed ---`);

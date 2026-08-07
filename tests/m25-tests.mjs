@@ -148,7 +148,7 @@ console.log('== 6. Backend static audit (STATIC) ==');
   const root = process.cwd();
   const rec = readFileSync(join(root, 'backend/supabase/functions/rpc_activity_event.sql'), 'utf8');
   const m11 = readFileSync(join(root, 'backend/supabase/migrations/0011_community_activity_events.sql'), 'utf8');
-  const m12 = readFileSync(join(root, 'backend/supabase/migrations/0012_activity_event_privileges.sql'), 'utf8');
+  const m12 = readFileSync(join(root, 'backend/supabase/functions/rpc_privileges.sql'), 'utf8');
   const m14 = readFileSync(join(root, 'backend/supabase/migrations/0014_activity_trigger_support.sql'), 'utf8');
 
   ok(/SECURITY DEFINER/.test(rec) && /SET search_path = public/.test(rec),
@@ -158,7 +158,7 @@ console.log('== 6. Backend static audit (STATIC) ==');
   ok(/ENABLE ROW LEVEL SECURITY/.test(m11), 'events RLS enabled');
   ok(/GRANT EXECUTE ON FUNCTION public\.ns_record_activity/.test(m12) &&
     /REVOKE EXECUTE ON FUNCTION public\.ns_record_activity/.test(m12),
-    '0012 controls EXECUTE');
+    'rpc_privileges.sql controls ns_record_activity EXECUTE');
   ok(/ENABLE ROW LEVEL SECURITY/.test(m14) && /REVOKE SELECT ON public\.v_country_metrics/.test(m14),
     '0014 re-affirms RLS');
 }

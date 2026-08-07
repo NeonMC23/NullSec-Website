@@ -1,32 +1,30 @@
-BEGIN;
-
 -- NullSec — Function-level permission hardening (Milestone 14)
 -- ------------------------------------------------------------------
--- PostgREST exposes RPC functions in the `public` schema to the role used
--- by the anon key. By default, PostgreSQL grants EXECUTE on functions to
--- PUBLIC, so an anonymous client could call internal helpers directly.
+-- DEPLOYMENT-FIXED (this migration is now a documentation placeholder).
 --
--- The critical one is `ns_create_session(p_user_id bigint)`: it is
--- SECURITY DEFINER and mints a valid session token for a caller-supplied
--- user_id. If callable by anon, any client could mint a session for ANY
--- existing user_id and impersonate them. It must never be exposed.
+-- The function-level EXECUTE controls that lived here have been MOVED to
+--   backend/supabase/functions/rpc_privileges.sql
+-- and are applied AFTER the RPC functions are created (see scripts/deploy.sh).
 --
--- Intended exposure model:
---   - PUBLIC entry points (anon must call these — keep EXECUTE):
---       ns_register, ns_login, ns_logout, ns_validate_session,
---       ns_sync_push, ns_sync_pull, ns_activity, ns_metrics
+-- WHY: deployment order is `migrations 0001→0016 -> RPC creation -> RPC
+-- privilege hardening`. On a fresh database the RPC functions do not exist
+-- when this migration runs, so `REVOKE EXECUTE ON FUNCTION public.ns_create_session(bigint)`
+-- failed with `42883: function public.ns_create_session(bigint) does not exist`.
+--
+-- The intended exposure model is unchanged and enforced in rpc_privileges.sql:
+--   - PUBLIC entry points (anon may call these): ns_register, ns_login,
+--     ns_logout, ns_validate_session, ns_sync_push, ns_sync_pull, ns_activity,
+--     ns_metrics, ns_country_metrics, ns_tool_activity, ns_update_profile,
+--     ns_record_activity.
 --   - INTERNAL helper (never callable by anon/authenticated):
---       ns_create_session
+--     ns_create_session.
 --
--- ns_validate_session / ns_logout only ever operate on a token the caller
--- already holds (returning a user_id or revoking a session); they cannot be
--- abused to reach another user, so they stay public for the frontend.
+-- This file is intentionally a no-op (kept so the 0001→0016 migration history
+-- is preserved without renumbering). It is idempotent and compatible with a
+-- fresh database.
 
-REVOKE EXECUTE ON FUNCTION public.ns_create_session(bigint)
-  FROM anon, authenticated;
+BEGIN;
 
--- Verify after applying:
---   SELECT proname, proacl FROM pg_proc
---   WHERE proname IN ('ns_create_session','ns_validate_session');
+-- (function privileges now live in backend/supabase/functions/rpc_privileges.sql)
 
 COMMIT;

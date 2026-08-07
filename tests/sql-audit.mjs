@@ -11,7 +11,9 @@
  *   4. RLS enabled on every table in 0002_rls.sql + anon privileges.
  *   5. SECURITY DEFINER + explicit search_path on every RPC function.
  *   6. No client-chosen user_id in the public RPC argument list.
- *   7. EXECUTE privilege control in 0003/0004 (ns_create_session revoked).
+ *   7. EXECUTE privilege control lives ONLY in rpc_privileges.sql (applied
+ *      after RPC creation) — ns_create_session revoked, public API granted;
+ *      and NO migration contains function-level EXECUTE statements.
  *   8. Frontend api-client RPC arg names match the SQL signatures.
  */
 import { readFileSync } from 'node:fs';
@@ -38,6 +40,10 @@ const rpcSrc = {};
 for (const f of rpcFiles) rpcSrc[f] = readFileSync(join(FN, f), 'utf8');
 
 const apiSrc = readFileSync(join(JS, 'api-client.js'), 'utf8');
+const hardening = readFileSync(join(FN, 'rpc_privileges.sql'), 'utf8');
+// Strip SQL line comments so explanatory prose ("REVOKE EXECUTE ON FUNCTION …"
+// in a comment) does not trip the "no function privileges in migrations" guard.
+const allMigSrc = migrationFiles.map(f => migSrc[f].replace(/--[^\n]*/g, '')).join('\n');
 
 /* ------------------------------------------------------------------ *
  * 1. Migration ordering                                               *
@@ -174,22 +180,31 @@ console.log('== 6. Client user_id isolation ==');
  * ------------------------------------------------------------------ */
 console.log('== 7. EXECUTE control ==');
 {
-  const m3 = migSrc['0003_rls_functions.sql'];
-  const m4 = migSrc['0004_rls_privileges.sql'];
-  ok(/REVOKE EXECUTE ON FUNCTION public\.ns_create_session/.test(m3) &&
-    /REVOKE EXECUTE ON FUNCTION public\.ns_create_session/.test(m4) &&
-    /REVOKE EXECUTE ON FUNCTION public\.ns_create_session\(bigint\) FROM PUBLIC/.test(m4) &&
-    /REVOKE EXECUTE ON FUNCTION public\.ns_create_session\(bigint\) FROM anon, authenticated/.test(m4),
+  // Function-level EXECUTE controls MUST NOT live in migrations: on a fresh
+  // database the RPC functions do not exist when migrations run (error 42883).
+  ok(!/EXECUTE ON FUNCTION/.test(allMigSrc),
+    'no migration contains a function-level EXECUTE statement (moved to rpc_privileges.sql)');
+
+  // ns_create_session: never callable by anon/authenticated/PUBLIC.
+  ok(/REVOKE EXECUTE ON FUNCTION public\.ns_create_session\(bigint\) FROM PUBLIC/.test(hardening) &&
+    /REVOKE EXECUTE ON FUNCTION public\.ns_create_session\(bigint\) FROM anon, authenticated/.test(hardening),
     'ns_create_session EXECUTE revoked from PUBLIC/anon/authenticated');
-  // Public API functions explicitly granted to anon
+  ok(!/GRANT EXECUTE ON FUNCTION public\.ns_create_session/.test(hardening),
+    'ns_create_session is NEVER granted EXECUTE to anon/authenticated');
+
+  // Public API functions explicitly granted to anon + revoked from PUBLIC.
   const publicAPI = ['ns_register', 'ns_login', 'ns_logout', 'ns_validate_session',
-    'ns_sync_pull', 'ns_sync_push', 'ns_activity', 'ns_metrics'];
+    'ns_sync_pull', 'ns_sync_push', 'ns_activity', 'ns_metrics',
+    'ns_country_metrics', 'ns_tool_activity', 'ns_update_profile', 'ns_record_activity'];
   for (const fn of publicAPI) {
-    ok(new RegExp('GRANT EXECUTE ON FUNCTION public\\.' + fn + '\\b[\\s\\S]*?TO anon, authenticated').test(m4),
+    ok(new RegExp('GRANT EXECUTE ON FUNCTION public\\.' + fn + '\\b[\\s\\S]*?TO anon, authenticated').test(hardening),
       `explicit GRANT EXECUTE ${fn} to anon, authenticated`);
-    ok(new RegExp('REVOKE EXECUTE ON FUNCTION public\\.' + fn + '\\b[\\s\\S]*?FROM PUBLIC').test(m4),
+    ok(new RegExp('REVOKE EXECUTE ON FUNCTION public\\.' + fn + '\\b[\\s\\S]*?FROM PUBLIC').test(hardening),
       `REVOKE EXECUTE ${fn} from PUBLIC (no default reliance)`);
   }
+  // The hardening file is transactional + idempotent (GRANT/REVOKE are no-ops).
+  ok(hardening.includes('BEGIN;') && hardening.includes('COMMIT;'),
+    'rpc_privileges.sql wraps body in BEGIN/COMMIT');
 }
 
 /* ------------------------------------------------------------------ *
@@ -231,7 +246,7 @@ console.log('== 8. Frontend RPC arg-name match ==');
 console.log('== 9. ns_country_metrics (M18) ==');
 {
   const rpc = rpcSrc['rpc_country_metrics.sql'];
-  const m5 = migSrc['0005_country_metrics_privileges.sql'];
+  const m5 = hardening; // EXECUTE control now in rpc_privileges.sql
   ok(/CREATE OR REPLACE FUNCTION public\.ns_country_metrics\(\)/.test(rpc),
     'ns_country_metrics defined with no params');
   ok(/SECURITY DEFINER/.test(rpc) && /SET search_path = public/.test(rpc),
@@ -249,7 +264,7 @@ console.log('== 9. ns_country_metrics (M18) ==');
   // EXECUTE control in 0005.
   ok(/REVOKE EXECUTE ON FUNCTION public\.ns_country_metrics\(\)[\s\S]*?FROM PUBLIC/.test(m5) &&
     /GRANT EXECUTE ON FUNCTION public\.ns_country_metrics\(\)[\s\S]*?TO anon, authenticated/.test(m5),
-    '0005 revokes PUBLIC + grants anon/authenticated EXECUTE on ns_country_metrics');
+    'rpc_privileges.sql revokes PUBLIC + grants anon/authenticated EXECUTE on ns_country_metrics');
   // Frontend calls it via ApiClient.
   ok(/countryMetrics\s*:\s*function/.test(apiSrc) && /ns_country_metrics/.test(apiSrc),
     'frontend ApiClient exposes countryMetrics -> ns_country_metrics');
@@ -292,7 +307,7 @@ console.log('== 10. M19 metric & challenge semantics ==');
 console.log('== 11. M20 data model ==');
 {
   const m7 = migSrc['0007_country_metrics_data.sql'];
-  const m8 = migSrc['0008_country_metrics_privileges.sql'];
+  const m8 = hardening; // EXECUTE control now in rpc_privileges.sql
   const tool = rpcSrc['rpc_tool_activity.sql'];
   const prof = rpcSrc['rpc_profile.sql'];
   const rpc = rpcSrc['rpc_country_metrics.sql'];
@@ -314,10 +329,10 @@ console.log('== 11. M20 data model ==');
   // 0008: EXECUTE control.
   ok(/REVOKE EXECUTE ON FUNCTION public\.ns_tool_activity\(text, text\) FROM PUBLIC/.test(m8) &&
     /GRANT EXECUTE ON FUNCTION public\.ns_tool_activity\(text, text\) TO anon, authenticated/.test(m8),
-    '0008 controls ns_tool_activity EXECUTE');
+    'rpc_privileges.sql controls ns_tool_activity EXECUTE');
   ok(/REVOKE EXECUTE ON FUNCTION public\.ns_update_profile\(text, text, text\) FROM PUBLIC/.test(m8) &&
     /GRANT EXECUTE ON FUNCTION public\.ns_update_profile\(text, text, text\) TO anon, authenticated/.test(m8),
-    '0008 controls ns_update_profile EXECUTE');
+    'rpc_privileges.sql controls ns_update_profile EXECUTE');
 
   // ns_tool_activity: token-authenticated, country derived server-side.
   ok(/SECURITY DEFINER/.test(tool) && /SET search_path = public/.test(tool),
@@ -398,7 +413,7 @@ console.log('== 13. M21 final data model ==');
 console.log('== 14. M24 activity pipeline ==');
 {
   const m11 = migSrc['0011_community_activity_events.sql'];
-  const m12 = migSrc['0012_activity_event_privileges.sql'];
+  const m12 = hardening; // EXECUTE control now in rpc_privileges.sql
   const rec = rpcSrc['rpc_activity_event.sql'];
 
   ok(/CREATE TABLE IF NOT EXISTS public\.community_activity_events/.test(m11),
@@ -416,7 +431,7 @@ console.log('== 14. M24 activity pipeline ==');
 
   ok(/REVOKE EXECUTE ON FUNCTION public\.ns_record_activity/.test(m12) &&
     /GRANT EXECUTE ON FUNCTION public\.ns_record_activity\b/.test(m12),
-    '0012 controls ns_record_activity EXECUTE');
+    'rpc_privileges.sql controls ns_record_activity EXECUTE');
 
   ok(/SECURITY DEFINER/.test(rec) && /SET search_path = public/.test(rec),
     'ns_record_activity SECURITY DEFINER + search_path');

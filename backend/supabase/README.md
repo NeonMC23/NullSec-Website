@@ -44,24 +44,36 @@ Déploiement **cloud-first** (voir `docs/cloud-deployment.md`) : le workflow
 `supabase link`. Le script `backend/supabase/scripts/deploy.sh` orchestre le tout.
 
 ```bash
-# Ordre (0001 → 0016) :
+# Ordre de déploiement (critical sur base vierge) :
+#   migrations 0001→0016  ->  RPC creation  ->  RPC privilege hardening
+# Les migrations ne doivent PAS contenir de REVOKE/GRANT EXECUTE ON FUNCTION
+# (les fonctions n'existent pas encore à ce stade). Ces contrôles vivent dans
+# rpc_privileges.sql, appliqué APRÈS la création des RPC.
+
 0001_schema.sql          # tables + contraintes + index + seed
-0002_rls.sql             # RLS + politiques + REVOKE
-0003_rls_functions.sql   # révoque EXECUTE sur ns_create_session
-0004_rls_privileges.sql  # contrôle EXPLICITE des EXECUTE (public API only)
-0005_country_metrics_privileges.sql  # EXECUTE de ns_country_metrics (M18)
+0002_rls.sql             # RLS + politiques + REVOKE (tables/vues uniquement)
+0003_rls_functions.sql   # NO-OP — privilèges de fonction déplacés vers rpc_privileges.sql
+0004_rls_privileges.sql  # NO-OP — privilèges de fonction déplacés vers rpc_privileges.sql
+0005_country_metrics_privileges.sql  # NO-OP — déplacé vers rpc_privileges.sql
 0006_challenge_semantics.sql  # kind events/unique_countries sur challenges (M19)
 0007_country_metrics_data.sql  # pays utilisateur + tool_activity (M20)
-0008_country_metrics_privileges.sql  # EXECUTE ns_tool_activity/ns_update_profile (M20)
+0008_country_metrics_privileges.sql  # NO-OP — déplacé vers rpc_privileges.sql
 0009_community_intelligence_tables.sql  # tables communautaires préparées (M20)
 0010_community_data_model_final.sql  # finalise country_membership + community_propagation (M21)
 0011_community_activity_events.sql  # table interne privée d événements (M24)
-0012_activity_event_privileges.sql  # EXECUTE ns_record_activity (M24)
+0012_activity_event_privileges.sql  # NO-OP — déplacé vers rpc_privileges.sql
 0013_country_metrics_view.sql  # vue d agrégation v_country_metrics (M24)
 0014_activity_trigger_support.sql  # index agrégation + re-affirmation RLS (M25)
 0015_community_action_support.sql  # index type/created + re-affirmation RLS (M26)
 0016_activity_metrics_refinement.sql  # community_activity dans la vue (M27)
 ```
+
+Après les migrations puis les RPC (`rpc_auth` → `rpc_sync` → `rpc_activity` →
+`rpc_tool_activity` → `rpc_profile` → `rpc_activity_event` → `rpc_country_metrics`),
+`deploy.sh` applique **en dernier** `rpc_privileges.sql` : il révoque le grant
+`PUBLIC` par défaut sur toutes les fonctions, GRANT les fonctions publiques à
+`anon, authenticated`, et révoque `ns_create_session` (helper interne) de
+`anon/authenticated`. C'est l'étape de **RPC privilege hardening**.
 
 ## 5. RPC (API publique, anon + authenticated)
 
@@ -89,7 +101,10 @@ Helper interne (NON exposé) : `ns_create_session(bigint)`.
 - Tokens de session hachés SHA-256 côté serveur ; jamais en localStorage.
 - Sync token-authentifiée : `user_id` dérivé côté serveur via `ns_validate_session`.
 - RLS sur toutes les tables ; tables privées sans accès anon ; agrégats en SELECT anon.
-- Contrôle explicite des EXECUTE (migration 0004).
+- Contrôle explicite des EXECUTE dans `rpc_privileges.sql` (appliqué après la
+  création des RPC) : fonctions publiques GRANT à `anon, authenticated`,
+  `ns_create_session` révoqué de `anon/authenticated`, grant `PUBLIC` par
+  défaut révoqué partout.
 
 ## RPC futurs (M21 — contrat, non déployés)
 

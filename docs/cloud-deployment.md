@@ -20,7 +20,7 @@ GitHub (source of truth)
                      ▼
               Supabase project "NullSec Community" (region West EU — Paris)
                      │
-                     └── migrations (0001→0016) + RPC functions
+                     └── migrations (0001→0016) + RPC functions + RPC hardening
 ```
 
 - **GitHub Pages** : héberge le frontend statique (HTML/CSS/JS). Aucun secret.
@@ -42,8 +42,10 @@ GitHub (source of truth)
 ## 3. Supabase role
 
 - Backend de production (PostgreSQL, RLS, RPC).
-- Le projet « NullSec Community » (région West EU — Paris) reçoit les migrations
-  `0001`…`0016` puis les RPC.
+- Le projet « NullSec Community » (région West EU — Paris) reçoit, dans l'ordre :
+  1. les migrations `0001`…`0016` (schéma / RLS / vues — **aucun** privilège de fonction) ;
+  2. la création des fonctions RPC (`rpc_*.sql`) ;
+  3. le **RPC privilege hardening** (`rpc_privileges.sql`, appliqué en dernier).
 - Les secrets (service-role, access token, project ref) vivent uniquement dans
   GitHub Secrets et le dashboard Supabase.
 
@@ -66,8 +68,13 @@ masque ; le script ne les echo jamais).
 2. Le workflow `supabase-deploy.yml` se déclenche.
 3. `backend/supabase/scripts/deploy.sh` :
    - applique chaque migration `0001…0016` via la Management API (ordre lexicographique) ;
-   - applique les RPC (ordre stable : auth → sync → activity → tool_activity →
-     profile → activity_event → country_metrics) ;
+     les migrations ne contiennent **aucun** `REVOKE/GRANT EXECUTE ON FUNCTION`
+     (sur une base vierge les fonctions n'existent pas encore) ;
+   - applique la création des RPC (ordre stable : auth → sync → activity →
+     tool_activity → profile → activity_event → country_metrics) ;
+   - applique **en dernier** `rpc_privileges.sql` (RPC privilege hardening) :
+     révoque le grant `PUBLIC` par défaut, GRANT les fonctions publiques à
+     `anon, authenticated`, révoque `ns_create_session` de `anon/authenticated` ;
    - **s'arrête (fail) dès qu'une étape échoue** (set -e).
 4. En cas de succès, la base est à jour. Aucune machine locale requise.
 
