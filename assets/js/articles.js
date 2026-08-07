@@ -7,17 +7,28 @@
 (function () {
   'use strict';
 
+  function setupInProgressToggle() {
+    let toggle = document.getElementById('in-progress-toggle');
+    let list = document.getElementById('in-progress-list');
+    if (!toggle || !list) return;
+    toggle.addEventListener('click', function () {
+      let open = list.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
   async function loadArticles() {
-    var list = document.getElementById('articles-list');
-    var progressList = document.getElementById('in-progress-list');
+    let list = document.getElementById('articles-list');
+    let progressList = document.getElementById('in-progress-list');
     if (!list) return;
+    setupInProgressToggle();
 
     try {
-      var res = await fetch('data/articles.json');
-      var articles = await res.json();
+      let articles = await Data.loadArticles();
 
-      var published = articles.filter(function (a) { return a.status !== 'in-progress'; });
-      var inProgress = articles.filter(function (a) { return a.status === 'in-progress'; });
+      let published = articles.filter(function (a) { return a.status !== 'in-progress'; });
+      let inProgress = articles.filter(function (a) { return a.status === 'in-progress'; });
 
       renderList(published, list);
       if (progressList) {
@@ -25,53 +36,61 @@
       }
       setupSort(published, list);
     } catch (err) {
-      list.innerHTML = '<p style="color: var(--text-dim);">Failed to load articles.</p>';
+      Utils.clear(list);
+      list.appendChild(Utils.el('p', { style: 'color: var(--text-dim);', text: 'Failed to load articles.' }));
       console.error('Articles load error:', err);
     }
   }
 
   function renderList(articles, container) {
+    Utils.clear(container);
     if (!articles.length) {
-      container.innerHTML = '<p style="color: var(--text-dim); padding: 20px;">No articles yet. Check back soon.</p>';
+      container.appendChild(Utils.el('p', {
+        style: 'color: var(--text-dim); padding: 20px;',
+        text: 'No articles yet. Check back soon.'
+      }));
       return;
     }
 
-    container.innerHTML = articles.map(function (a) {
-      var readKey = 'ns-article-' + a.url.replace('articles/', '').replace('.html', '');
-      var isRead = localStorage.getItem(readKey) === 'done';
-      return '<a href="' + a.url + '" class="article-list-item' + (isRead ? ' read' : '') + '">' +
-        '<div class="item-left">' +
-          '<h3>' + Utils.sanitize(a.title) + '</h3>' +
-          '<p>' + Utils.sanitize(a.description) + '</p>' +
-        '</div>' +
-        '<div class="item-right">' +
-          '<span class="cat">' + Utils.sanitize(a.category) + '</span>' +
-          '<span>' + Utils.formatDate(a.date) + '</span>' +
-          '<span>' + a.readingTime + '</span>' +
-        '</div>' +
-      '</a>';
-    }).join('');
+    articles.forEach(function (a) {
+      let slug = a.url.replace('articles/', '').replace('.html', '');
+      let isRead = Progress.isArticleRead(slug);
+      let item = Utils.el('a', { href: a.url, class: 'article-list-item' + (isRead ? ' read' : '') });
+      let left = Utils.el('div', { class: 'item-left' });
+      left.appendChild(Utils.el('h3', { text: a.title }));
+      left.appendChild(Utils.el('p', { text: a.description }));
+      item.appendChild(left);
+      let right = Utils.el('div', { class: 'item-right' });
+      right.appendChild(Utils.el('span', { class: 'cat', text: a.category }));
+      right.appendChild(Utils.el('span', { text: Utils.formatDate(a.date) }));
+      right.appendChild(Utils.el('span', { text: a.readingTime }));
+      item.appendChild(right);
+      container.appendChild(item);
+    });
   }
 
   function renderProgressList(articles, container) {
+    Utils.clear(container);
     if (!articles.length) {
-      container.innerHTML = '<p style="color: var(--text-dim); padding: 12px 20px;">No upcoming articles planned.</p>';
+      container.appendChild(Utils.el('p', {
+        style: 'color: var(--text-dim); padding: 12px 20px;',
+        text: 'No upcoming articles planned.'
+      }));
       return;
     }
-    container.innerHTML = articles.map(function (a) {
-      return '<div class="in-progress-item">' +
-        '<h4>' + Utils.sanitize(a.title) + '</h4>' +
-        '<span class="eta">' + Utils.sanitize(a.category) + '</span>' +
-      '</div>';
-    }).join('');
+    articles.forEach(function (a) {
+      let item = Utils.el('div', { class: 'in-progress-item' });
+      item.appendChild(Utils.el('h4', { text: a.title }));
+      item.appendChild(Utils.el('span', { class: 'eta', text: a.category }));
+      container.appendChild(item);
+    });
   }
 
-  function setupSort(articles, container) {
-    var sortSelect = document.getElementById('sort-select');
+  function setupSort(articles, container) {    let sortSelect = document.getElementById('sort-select');
     if (!sortSelect) return;
 
     sortSelect.addEventListener('change', function () {
-      var sorted = [].concat(articles);
+      let sorted = [].concat(articles);
       switch (sortSelect.value) {
         case 'newest':
           sorted.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });

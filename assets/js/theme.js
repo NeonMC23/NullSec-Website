@@ -1,28 +1,44 @@
 /**
  * NullSec — Theme Manager
- * Handles dark/light mode toggle with localStorage persistence.
- * Dark mode is the default.
+ * Handles dark/light mode. The source of truth is the Settings service
+ * (theme: 'system' | 'dark' | 'light'). A resolved theme is also mirrored
+ * to Store (ns:theme) for backward compatibility.
  */
-
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'nullsec-theme';
   const THEME_DARK = 'dark';
   const THEME_LIGHT = 'light';
 
-  /** Apply the saved theme or fall back to dark. */
-  function applySavedTheme() {
-    const saved = localStorage.getItem(STORAGE_KEY) || THEME_DARK;
-    document.documentElement.setAttribute('data-theme', saved);
+  /** Resolve the effective theme from Settings (handles 'system'). */
+  function resolveTheme(pref) {
+    if (pref === THEME_DARK || pref === THEME_LIGHT) return pref;
+    let dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return dark ? THEME_DARK : THEME_LIGHT;
   }
 
-  /** Toggle between dark and light. */
+  /** Apply the saved theme (from Settings) to <html> and mirror to Store. */
+  function applySavedTheme() {
+    let pref = THEME_DARK;
+    if (window.Settings) {
+      let s = Settings.get();
+      pref = (s && s.theme) || THEME_DARK;
+    } else {
+      pref = Store.get(Store.keys.THEME) || THEME_DARK;
+    }
+    const theme = resolveTheme(pref);
+    document.documentElement.setAttribute('data-theme', theme);
+    Store.set(Store.keys.THEME, theme);
+    return theme;
+  }
+
+  /** Toggle between dark and light (persisted via Settings). */
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme') || THEME_DARK;
     const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
+    if (window.Settings) Settings.update({ theme: next });
+    Store.set(Store.keys.THEME, next);
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem(STORAGE_KEY, next);
     updateToggleIcon(next);
   }
 
@@ -37,15 +53,13 @@
 
   /** Initialise the theme system. */
   function init() {
-    applySavedTheme();
-    const current = document.documentElement.getAttribute('data-theme') || THEME_DARK;
+    const current = applySavedTheme();
     updateToggleIcon(current);
 
     const toggleBtn = document.getElementById('theme-toggle');
     if (toggleBtn) toggleBtn.addEventListener('click', toggleTheme);
   }
 
-  // Run on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

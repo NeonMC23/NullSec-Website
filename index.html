@@ -15,8 +15,14 @@
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/v2.css" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <link rel="stylesheet" href="assets/css/utilities.css" />
+  <link rel="stylesheet" href="assets/css/themes.css" />
+
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.svg" />
 </head>
@@ -31,6 +37,7 @@
         <a href="articles.html">Articles</a>
         <a href="community.html">Community</a>
         <a href="contribute.html">Contribute</a>
+        <a href="profile.html">Profile</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -47,6 +54,7 @@
     <a href="articles.html">Articles</a>
     <a href="community.html">Community</a>
     <a href="contribute.html">Contribute</a>
+    <a href="profile.html">Profile</a>
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
 
@@ -102,7 +110,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><a href="./" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research and tools for your digital life.</p></div>
-        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a><a href="profile.html">Profile</a></div>
         <div class="footer-col"><h4>Topics</h4><a href="tools.html?category=Privacy">Privacy</a><a href="tools.html?category=Security">Security</a><a href="tools.html?category=Linux">Linux</a><a href="tools.html?category=Open+Source">Open Source</a><a href="tools.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/NullSec-Community" target="_blank" rel="noopener">GitHub</a><a href="contribute.html">Contribute</a></div>
       </div>
@@ -118,62 +126,44 @@
       <div class="search-results" id="search-results"><div class="search-empty">Start typing to search articles...</div></div>
     </div>
   </div>
+    <script src="assets/js/store.js"></script>
+  <script src="assets/js/session-store.js"></script>
   <script src="assets/js/utils.js"></script>
+  <script src="assets/js/data-loader.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/repositories/identity-repository.js"></script>
+  <script src="assets/js/repositories/profile-repository.js"></script>
+  <script src="assets/js/repositories/progress-repository.js"></script>
+  <script src="assets/js/repositories/settings-repository.js"></script>
+  <script src="assets/js/repositories/country-repository.js"></script>
+  <script src="assets/js/country-service.js"></script>
+  <script src="assets/js/identity.js"></script>
+  <script src="assets/js/user-state.js"></script>
+  <script src="assets/js/progress-service.js"></script>
+  <script src="assets/js/user-profile.js"></script>
+  <script src="assets/js/recovery-key.js"></script>
+  <script src="assets/js/settings-service.js"></script>
+  <script src="assets/js/auth-service.js"></script>
+  <script src="assets/js/api-client.js"></script>
+  <script src="assets/js/sync-resolver.js"></script>
+  <script src="assets/js/sync-service.js"></script>
+  <script src="assets/js/session-service.js"></script>
+  <script src="assets/js/activity-service.js"></script>
+  <script src="assets/js/community-action-service.js"></script>
+  <script src="assets/js/community-service.js"></script>
+    <script src="assets/js/mission-discovery.js"></script>
+  <script src="assets/js/challenge-service.js"></script>
+  <script src="assets/js/community-ranking.js"></script>
+  <script src="assets/js/community-metrics.js"></script>
+  <script src="assets/js/statistics-service.js"></script>
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/navigation.js"></script>
   <script src="assets/js/fuse.min.js"></script>
   <script src="assets/js/search.js"></script>
   <script src="assets/js/modal.js"></script>
   <script src="assets/js/animations.js"></script>
-  <script>
-(function () {
-  "use strict";
-  async function loadHomeData() {
-    try {
-      var res = await fetch("data/articles.json");
-      var articles = await res.json();
-      var published = articles.filter(function (a) { return a.status === "published"; });
-      var featured = published[0];
-      var container = document.getElementById("featured-article");
-      if (container && featured) {
-        var featKey = 'ns-article-' + featured.url.replace('articles/', '').replace('.html', '');
-      var featRead = localStorage.getItem(featKey) === 'done';
-      container.innerHTML = '<a href="' + featured.url + '" class="featured-article' + (featRead ? ' read' : '') + '"><img src="' + (featured.cover || "assets/images/placeholder.svg") + '" alt="' + Utils.sanitize(featured.title) + '" class="featured-article-image" loading="lazy" /><div class="featured-article-body"><span class="badge">Latest</span><h3>' + Utils.sanitize(featured.title) + '</h3><p>' + Utils.sanitize(featured.description) + '</p><span class="article-card-meta"><span>' + Utils.formatDate(featured.date) + '</span><span class="dot"></span><span>' + featured.readingTime + '</span></span></div></a>';
-      }
+  <script src="assets/js/journey.js"></script>
+  <script src="assets/js/home.js"></script>
 
-      var mission = { title: "Invite 5 people to Discord", desc: "Invite 5 people to join the NullSec Discord server. Share the link with friends, family, and on social media. Every new member strengthens our community.", time: "varies", difficulty: 2, impact: 5, slug: "invite-5" };
-      var missionEl = document.getElementById("weekly-mission");
-      if (missionEl) {
-        var stars = "";
-        for (var i = 0; i < mission.difficulty; i++) stars += "★";
-        for (var i = mission.difficulty; i < 5; i++) stars += "☆";
-        var dots = '<span style="display:inline-flex;gap:3px;align-items:center;">';
-        for (var i = 0; i < mission.impact; i++) dots += '<span class="impact-dot filled" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);"></span>';
-        for (var i = mission.impact; i < 5; i++) dots += '<span class="impact-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);"></span>';
-        dots += "</span>";
-
-        var done = localStorage.getItem("ns-5-invites") === "done";
-        missionEl.innerHTML = '<div><span class="badge">Community Mission</span><h3>' + Utils.sanitize(mission.title) + '</h3><p>' + Utils.sanitize(mission.desc) + '</p><div class="weekly-mission-meta"><span class="meta-item">&#9200; <strong>' + mission.time + '</strong></span><span class="meta-item">Difficulty: <span class="stars">' + stars + '</span></span><span class="meta-item">Impact: ' + dots + '</span></div></div><div style="display:flex;gap:8px;align-items:start;justify-content:center;"><button class="' + (done ? "btn btn-secondary" : "btn btn-primary") + '" onclick="toggleInviteMission(this)">' + (done ? "✓ Completed" : "Mark as done") + '</button><a href="journey.html" class="btn btn-secondary" style="min-height:40px;display:inline-flex;align-items:center;">View all &#8594;</a></div>';
-      }
-    } catch (err) { console.error("Home error:", err); }
-  }
-
-  window.toggleInviteMission = function (btn) {
-    var done = localStorage.getItem("ns-5-invites") === "done";
-    if (done) {
-      localStorage.removeItem("ns-5-invites");
-      btn.innerHTML = "Mark as done";
-      btn.className = "btn btn-primary";
-    } else {
-      localStorage.setItem("ns-5-invites", "done");
-      btn.innerHTML = "✓ Completed";
-      btn.className = "btn btn-secondary";
-    }
-  };
-
-  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", loadHomeData); }
-  else { loadHomeData(); }
-})();
-  </script>
 </body>
 </html>

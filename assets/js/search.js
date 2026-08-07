@@ -10,11 +10,10 @@
   let fuseInstance = null;
   let articlesData = [];
 
-  /** Fetch articles.json and initialise Fuse. */
+  /** Fetch articles and initialise Fuse. */
   async function loadSearchIndex() {
     try {
-      const res = await fetch('data/articles.json');
-      articlesData = await res.json();
+      articlesData = await Data.loadArticles();
       fuseInstance = new Fuse(articlesData, {
         keys: [
           { name: 'title', weight: 0.5 },
@@ -35,29 +34,27 @@
     const container = document.getElementById('search-results');
     if (!container) return;
 
+    Utils.clear(container);
+
     if (!query || !fuseInstance) {
-      container.innerHTML =
-        '<div class="search-empty">Start typing to search articles...</div>';
+      container.appendChild(Utils.el('div', { class: 'search-empty', text: 'Start typing to search articles...' }));
       return;
     }
 
     const results = fuseInstance.search(query);
     if (results.length === 0) {
-      container.innerHTML =
-        '<div class="search-empty">No articles found. Try a different term.</div>';
+      container.appendChild(Utils.el('div', { class: 'search-empty', text: 'No articles found. Try a different term.' }));
       return;
     }
 
-    container.innerHTML = results
-      .map(
-        (result) => `
-          <a href="${result.item.url}" class="search-result-item">
-            <div class="title">${Utils.sanitize(result.item.title)}</div>
-            <div class="meta">${Utils.sanitize(result.item.category)} &middot; ${Utils.formatDate(result.item.date)}</div>
-          </a>
-        `
-      )
-      .join('');
+    results.forEach((result) => {
+      const item = Utils.el('a', { href: result.item.url, class: 'search-result-item' });
+      item.appendChild(Utils.el('div', { class: 'title', text: result.item.title }));
+      const meta = Utils.el('div', { class: 'meta' });
+      meta.appendChild(document.createTextNode(result.item.category + ' \u00b7 ' + Utils.formatDate(result.item.date)));
+      item.appendChild(meta);
+      container.appendChild(item);
+    });
   }
 
   /** Open the search modal. */
@@ -82,8 +79,8 @@
     if (input) input.value = '';
     const container = document.getElementById('search-results');
     if (container) {
-      container.innerHTML =
-        '<div class="search-empty">Start typing to search articles...</div>';
+      Utils.clear(container);
+      container.appendChild(Utils.el('div', { class: 'search-empty', text: 'Start typing to search articles...' }));
     }
   }
 

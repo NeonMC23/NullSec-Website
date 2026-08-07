@@ -25,13 +25,13 @@ const Utils = {
    */
   formatDate(isoString) {
     // Handle both '2026-07-27' and '2026-07-27T14:00:00' formats
-    var dateStr = isoString;
+    let dateStr = isoString;
     if (dateStr.indexOf('T') === -1) {
       dateStr += 'T00:00:00Z';
     } else {
       dateStr += 'Z';
     }
-    var date = new Date(dateStr);
+    let date = new Date(dateStr);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -43,11 +43,11 @@ const Utils = {
   },
 
   /**
-   * Get the current theme from localStorage.
+   * Get the current theme from the Store module.
    * @returns {'dark'|'light'}
    */
   getTheme() {
-    return localStorage.getItem('nullsec-theme') || 'dark';
+    return Store.get(Store.keys.THEME) || 'dark';
   },
 
   /**
@@ -55,7 +55,7 @@ const Utils = {
    * @param {'dark'|'light'} theme
    */
   setTheme(theme) {
-    localStorage.setItem('nullsec-theme', theme);
+    Store.set(Store.keys.THEME, theme);
     document.documentElement.setAttribute('data-theme', theme);
   },
 
@@ -84,6 +84,108 @@ const Utils = {
     const el = document.createElement('div');
     el.textContent = str;
     return el.innerHTML;
+  },
+
+  /**
+   * Return a safe external URL, or '#' if the scheme is not http/https.
+   * Prevents javascript:/data: injection through data fields.
+   * @param {string} url
+   * @returns {string}
+   */
+  safeUrl(url) {
+    if (typeof url !== 'string') return '#';
+    try {
+      const u = new URL(url, window.location.href);
+      return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '#';
+    } catch (e) {
+      return '#';
+    }
+  },
+
+  /** Remove all children of an element. */
+  clear(el) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    return el;
+  },
+
+  /**
+   * Simple deterministic string hash (FNV-1a 32-bit).
+   * @param {string} str
+   * @returns {number} unsigned 32-bit hash
+   */
+  hash(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h * 0x01000193) >>> 0;
+    }
+    return h;
+  },
+
+  /**
+   * Generate a deterministic SVG avatar (as an SVG string) from a seed.
+   * Fully local, no external services/libraries. Same seed → same output.
+   * @param {string} seed
+   * @returns {string} SVG markup
+   */
+  avatarSvg(seed) {
+    const s = typeof seed === 'string' ? seed : String(seed || '');
+    const h = this.hash(s);
+    const hue = h % 360;
+    const hue2 = (hue + 40) % 360;
+    const accent = 'hsl(' + hue + ',70%,55%)';
+    const accent2 = 'hsl(' + hue2 + ',70%,45%)';
+    const initial = (s.charAt(0) || 'A').toUpperCase();
+    const x = 10 + (h % 9);         // 10..18
+    const y = 10 + ((h >> 3) % 9);  // 10..18
+    // Deterministic diagonal split based on seed.
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="' + accent + '"/>' +
+      '<stop offset="1" stop-color="' + accent2 + '"/>' +
+      '</linearGradient></defs>' +
+      '<rect width="64" height="64" rx="32" fill="url(#g)"/>' +
+      '<text x="32" y="40" font-family="sans-serif" font-size="30" font-weight="700" ' +
+      'fill="rgba(255,255,255,0.95)" text-anchor="middle">' + initial + '</text>' +
+      '<circle cx="' + x + '" cy="' + y + '" r="4" fill="rgba(255,255,255,0.35)"/>' +
+      '</svg>';
+  },
+
+  /**
+   * Build a DOM element safely. All string values are set via textContent
+   * (auto-escaped), attribute names go through setAttribute. The only way
+   * to insert raw HTML is the explicit `html` attr (trusted content).
+   *
+   * @param {string} tag
+   * @param {object} [attrs]  { class, text, html(trusted), style, ...setAttribute }
+   * @param {...Node|string} children appended (strings become text nodes)
+   */
+  el(tag, attrs, ...children) {
+    const node = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach((k) => {
+        const v = attrs[k];
+        if (v === null || v === undefined) return;
+        if (k === 'class') node.className = v;
+        else if (k === 'text') node.textContent = v;
+        else if (k === 'html') node.innerHTML = v; // trusted HTML only
+        else if (k === 'style') node.style.cssText = v;
+        else if (k === 'dataset') {
+          Object.assign(node.dataset, v);
+        } else {
+          node.setAttribute(k, v);
+        }
+      });
+    }
+    children.forEach((c) => {
+      if (c === null || c === undefined) return;
+      if (typeof c === 'string' || typeof c === 'number') {
+        node.appendChild(document.createTextNode(String(c)));
+      } else {
+        node.appendChild(c);
+      }
+    });
+    return node;
   },
 };
 

@@ -1,0 +1,15 @@
+# Dependencies / build artifacts
+node_modules/
+dist/
+
+# Backend secrets — NEVER commit
+backend/.env
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+backend/supabase/.env

@@ -20,7 +20,14 @@
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/pages.css" />
+  <link rel="stylesheet" href="../assets/css/utilities.css" />
+  <link rel="stylesheet" href="../assets/css/themes.css" />
+
   <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg" />
   <script type="application/ld+json">
   {
@@ -46,6 +53,7 @@
         <a href="../articles.html">Articles</a>
         <a href="../community.html">Community</a>
         <a href="../contribute.html">Contribute</a>
+        <a href="../profile.html">Profile</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -62,6 +70,7 @@
     <a href="../articles.html">Articles</a>
     <a href="../community.html">Community</a>
     <a href="../contribute.html">Contribute</a>
+    <a href="../profile.html">Profile</a>
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
   <article class="article-page">
@@ -123,7 +132,7 @@
     </div>
     <!-- Mark as read -->
   <div style="text-align:center;margin-top:48px;padding-top:32px;border-top:1px solid var(--border);">
-    <button class="btn btn-secondary" id="mark-read-self-hosting-guide" class="btn btn-secondary btn-read" onclick="toggleArticleRead('self-hosting-guide')">Mark as read
+    <button class="btn btn-secondary btn-read" id="mark-read-self-hosting-guide">Mark as read
     </button>
     <span id="read-status-self-hosting-guide" style="display:none;margin-left:12px;font-size:0.875rem;color:#34D399;">&#10003; Read</span>
   </div>
@@ -139,7 +148,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><a href="../" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research and tools for your digital life.</p></div>
-        <div class="footer-col"><h4>Explore</h4><a href="../">Home</a><a href="../journey.html">Learning Journey</a><a href="../tools.html">Tools</a><a href="../articles.html">Articles</a><a href="../community.html">Community</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="../">Home</a><a href="../journey.html">Learning Journey</a><a href="../tools.html">Tools</a><a href="../articles.html">Articles</a><a href="../community.html">Community</a><a href="../profile.html">Profile</a></div>
         <div class="footer-col"><h4>Topics</h4><a href="../tools.html?category=Privacy">Privacy</a><a href="../tools.html?category=Security">Security</a><a href="../tools.html?category=Linux">Linux</a><a href="../tools.html?category=Open+Source">Open Source</a><a href="../tools.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/NullSec-Community" target="_blank" rel="noopener">GitHub</a><a href="../contribute.html">Contribute</a></div>
       </div>
@@ -160,46 +169,41 @@
       <div class="search-results" id="search-results"><div class="search-empty">Start typing to search articles...</div></div>
     </div>
   </div>
+    <script src="../assets/js/store.js"></script>
   <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/data-loader.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/repositories/identity-repository.js"></script>
+  <script src="../assets/js/repositories/profile-repository.js"></script>
+  <script src="../assets/js/repositories/progress-repository.js"></script>
+  <script src="../assets/js/repositories/settings-repository.js"></script>
+  <script src="../assets/js/repositories/country-repository.js"></script>
+  <script src="../assets/js/country-service.js"></script>
+  <script src="../assets/js/identity.js"></script>
+  <script src="../assets/js/user-state.js"></script>
+  <script src="../assets/js/progress-service.js"></script>
+  <script src="../assets/js/user-profile.js"></script>
+  <script src="../assets/js/recovery-key.js"></script>
+  <script src="../assets/js/settings-service.js"></script>
+  <script src="../assets/js/auth-service.js"></script>
+  <script src="../assets/js/api-client.js"></script>
+  <script src="../assets/js/sync-resolver.js"></script>
+  <script src="../assets/js/sync-service.js"></script>
+  <script src="../assets/js/activity-service.js"></script>
+  <script src="../assets/js/community-action-service.js"></script>
+  <script src="../assets/js/community-service.js"></script>
+    <script src="../assets/js/mission-discovery.js"></script>
+  <script src="../assets/js/challenge-service.js"></script>
+  <script src="../assets/js/community-ranking.js"></script>
+  <script src="../assets/js/community-metrics.js"></script>
+  <script src="../assets/js/statistics-service.js"></script>
   <script src="../assets/js/theme.js"></script>
   <script src="../assets/js/navigation.js"></script>
   <script src="../assets/js/fuse.min.js"></script>
   <script src="../assets/js/search.js"></script>
   <script src="../assets/js/modal.js"></script>
   <script src="../assets/js/animations.js"></script>
-  <script>
-  function toggleArticleRead(slug) {
-    var key = 'ns-article-' + slug;
-    var done = localStorage.getItem(key) === 'done';
-    var btn = document.getElementById('mark-read-' + slug);
-    var status = document.getElementById('read-status-' + slug);
-    if (done) {
-      localStorage.removeItem(key);
-      btn.innerHTML = 'Mark as read';
-      btn.className = 'btn btn-secondary btn-read';
-      if (status) status.style.display = 'none';
-    } else {
-      localStorage.setItem(key, 'done');
-      btn.innerHTML = '&#10003; Read';
-      btn.className = 'btn btn-secondary btn-read done';
-      if (status) {
-        status.style.display = 'inline';
-      }
-    }
-  }
-  // Restore state on page load
-  (function() {
-    var slug = 'self-hosting-guide';
-    var key = 'ns-article-' + slug;
-    var done = localStorage.getItem(key) === 'done';
-    var btn = document.getElementById('mark-read-' + slug);
-    var status = document.getElementById('read-status-' + slug);
-    if (done && btn) {
-      btn.innerHTML = '&#10003; Read';
-      btn.className = 'btn btn-secondary btn-read done';
-      if (status) status.style.display = 'inline';
-    }
-  })();
-  </script>
+  <script src="../assets/js/article-reader.js"></script>
+
 </body>
 </html>

@@ -1,33 +1,56 @@
 /**
  * NullSec — Modal System
  * Clean overlay modal for mission details, tool details, etc.
+ *
+ * `open(content)` accepts either a DOM Node (preferred, built safely by the
+ * caller) or an HTML string. A string is treated as trusted HTML — callers
+ * must only pass their own first-party markup, never user input.
+ *
+ * Returns the overlay element so callers can bind their own action buttons.
  */
-
 (function () {
   'use strict';
 
   window.Modal = {
-    open: function (html) {
-      var existing = document.querySelector('.modal-overlay');
+    open: function (content) {
+      let existing = document.querySelector('.modal-overlay');
       if (existing) {
         existing.classList.remove('open');
-        setTimeout(function() { existing.remove(); }, 200);
+        setTimeout(function () { existing.remove(); }, 200);
       }
 
-      var overlay = document.createElement('div');
+      let overlay = document.createElement('div');
       overlay.className = 'modal-overlay open';
-      overlay.innerHTML = '<div class="modal">' +
-        '<button class="modal-close" onclick="Modal.close()">&times;</button>' +
-        html +
-      '</div>';
+
+      let modal = document.createElement('div');
+      modal.className = 'modal';
+
+      let closeBtn = document.createElement('button');
+      closeBtn.className = 'modal-close';
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.textContent = '\u00d7';
+      closeBtn.addEventListener('click', function () {
+        window.Modal.close();
+      });
+      modal.appendChild(closeBtn);
+
+      if (typeof content === 'string') {
+        let wrapper = document.createElement('div');
+        wrapper.innerHTML = content; // trusted HTML
+        modal.appendChild(wrapper);
+      } else {
+        modal.appendChild(content);
+      }
+
+      overlay.appendChild(modal);
 
       overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) Modal.close();
+        if (e.target === overlay) window.Modal.close();
       });
 
       document.addEventListener('keydown', function onEscape(e) {
         if (e.key === 'Escape') {
-          Modal.close();
+          window.Modal.close();
           document.removeEventListener('keydown', onEscape);
         }
       });
@@ -36,10 +59,12 @@
       document.body.style.overflow = 'hidden';
       // Trigger animation by forcing reflow
       overlay.offsetHeight;
+
+      return overlay;
     },
 
     close: function () {
-      var overlay = document.querySelector('.modal-overlay');
+      let overlay = document.querySelector('.modal-overlay');
       if (overlay) {
         overlay.classList.remove('open');
         overlay.remove();

@@ -1,0 +1,24 @@
+# NullSec — Supabase project configuration
+
+project_id = "nullsec"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "https://neonmc23.github.io"
+# No email/password, no OAuth — only our Recovery Key flow via RPC.
+# (The legacy Express dev URL "http://localhost:3000" was removed in M16.)
+
+[api.swagger]
+enabled = false
+
+[analytics]
+enabled = false

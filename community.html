@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Community Projects &mdash; NullSec</title>
-  <meta name="description" content="Community projects, tools, and guides from NullSec. Open source and collaborative." />
+  <title>Community &mdash; NullSec</title>
+  <meta name="description" content="NullSec community: anonymous global movement statistics, Europe activity map, and open source projects." />
   <meta property="og:title" content="Community Projects &mdash; NullSec" />
   <meta property="og:description" content="Community projects, tools, and guides from NullSec. Open source and collaborative." />
   <meta property="og:type" content="website" />
@@ -15,8 +15,14 @@
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/v2.css" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <link rel="stylesheet" href="assets/css/utilities.css" />
+  <link rel="stylesheet" href="assets/css/themes.css" />
+
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.svg" />
 </head>
@@ -31,6 +37,7 @@
         <a href="articles.html">Articles</a>
         <a href="community.html" class="active">Community</a>
         <a href="contribute.html">Contribute</a>
+        <a href="profile.html">Profile</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -47,6 +54,7 @@
     <a href="articles.html">Articles</a>
     <a href="community.html">Community</a>
     <a href="contribute.html">Contribute</a>
+    <a href="profile.html">Profile</a>
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
 
@@ -54,7 +62,55 @@
   <section class="section community-page" style="padding-top: 120px;">
     <div class="container">
       <div class="section-header fade-in">
-        <h1>Community Projects</h1>
+        <h1>Community</h1>
+        <p>An anonymous overview of the NullSec movement across Europe and beyond. Privacy-first, aggregated, no tracking.</p>
+      </div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Global Impact</h2>
+      </div>
+      <div id="community-stats" class="fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Your participation</h2>
+      </div>
+      <div id="community-participation" class="fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Europe Activity</h2>
+        <p>Anonymous, aggregated community activity by country. No individual data is shown.</p>
+      </div>
+      <div id="community-map" class="community-map-container fade-in fade-in-delay-1"></div>
+      <div id="europe-country-panel" class="europe-country-panel fade-in fade-in-delay-1" style="display:none;"></div>
+      <div id="community-last-update" class="community-last-update fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Active Regions</h2>
+      </div>
+      <div id="community-regions" class="fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Mission Activity</h2>
+        <p>Countries ranked by mission completions — anonymous and aggregated.</p>
+      </div>
+      <div id="community-missions" class="fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Community Challenges</h2>
+        <p>Collective global goals — anonymous and aggregate-based.</p>
+      </div>
+      <div id="community-challenges" class="fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Country Ranking</h2>
+        <p>Countries by total mission completions — collective, never individual.</p>
+      </div>
+      <div id="community-ranking" class="fade-in fade-in-delay-1"></div>
+
+      <div id="community-privacy" class="fade-in fade-in-delay-2" style="margin-top:32px;"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Community Projects</h2>
         <p>Open source projects built by the NullSec community. Contributions welcome.</p>
       </div>
       <div class="projects-grid fade-in fade-in-delay-1">
@@ -92,6 +148,12 @@
           </div>
         </div>
       </div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Community Participation</h2>
+        <p>An explicit, optional action. Only recorded when you choose to contribute — never automatically, and never with personal data.</p>
+      </div>
+      <div id="community-action" class="fade-in fade-in-delay-1"></div>
     </div>
   </section>
   <section class="discord-section">
@@ -105,7 +167,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><a href="./" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research and tools for your digital life.</p></div>
-        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a><a href="profile.html">Profile</a></div>
         <div class="footer-col"><h4>Topics</h4><a href="tools.html?category=Privacy">Privacy</a><a href="tools.html?category=Security">Security</a><a href="tools.html?category=Linux">Linux</a><a href="tools.html?category=Open+Source">Open Source</a><a href="tools.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/NullSec-Community" target="_blank" rel="noopener">GitHub</a><a href="contribute.html">Contribute</a></div>
       </div>
@@ -121,12 +183,44 @@
       <div class="search-results" id="search-results"><div class="search-empty">Start typing to search articles...</div></div>
     </div>
   </div>
+    <script src="assets/js/store.js"></script>
+  <script src="assets/js/session-store.js"></script>
   <script src="assets/js/utils.js"></script>
+  <script src="assets/js/data-loader.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/repositories/identity-repository.js"></script>
+  <script src="assets/js/repositories/profile-repository.js"></script>
+  <script src="assets/js/repositories/progress-repository.js"></script>
+  <script src="assets/js/repositories/settings-repository.js"></script>
+  <script src="assets/js/repositories/country-repository.js"></script>
+  <script src="assets/js/identity.js"></script>
+  <script src="assets/js/user-state.js"></script>
+  <script src="assets/js/progress-service.js"></script>
+  <script src="assets/js/user-profile.js"></script>
+  <script src="assets/js/recovery-key.js"></script>
+  <script src="assets/js/settings-service.js"></script>
+  <script src="assets/js/auth-service.js"></script>
+  <script src="assets/js/api-client.js"></script>
+  <script src="assets/js/sync-resolver.js"></script>
+  <script src="assets/js/sync-service.js"></script>
+  <script src="assets/js/session-service.js"></script>
+  <script src="assets/js/activity-service.js"></script>
+  <script src="assets/js/community-action-service.js"></script>
+  <script src="assets/js/community-service.js"></script>
+  <script src="assets/js/country-service.js"></script>
+  <script src="assets/js/country-metrics.js"></script>
+  <script src="assets/js/europe-map.js"></script>
+  <script src="assets/js/mission-discovery.js"></script>
+  <script src="assets/js/challenge-service.js"></script>
+  <script src="assets/js/community-ranking.js"></script>
+  <script src="assets/js/community-metrics.js"></script>
+  <script src="assets/js/statistics-service.js"></script>
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/navigation.js"></script>
   <script src="assets/js/fuse.min.js"></script>
   <script src="assets/js/search.js"></script>
   <script src="assets/js/modal.js"></script>
   <script src="assets/js/animations.js"></script>
+  <script src="assets/js/community.js"></script>
 </body>
 </html>

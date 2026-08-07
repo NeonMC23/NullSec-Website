@@ -1,0 +1,25 @@
+/* NullSec — themes.css — themes layer (M0.4) */
+[data-theme="light"] {
+
+  --bg:              #FFFFFF;
+  --bg-card:         #F3F4F6;
+  --bg-elevated:     #E5E7EB;
+  --accent:          #E11D70;
+  --accent-hover:    #C01960;
+  --accent-subtle:   rgba(225, 29, 112, 0.08);
+  --border:          #D1D5DB;
+  --border-light:    #E5E7EB;
+  --text:            #111827;
+  --text-muted:      #6B7280;
+  --text-dim:        #9CA3AF;
+  --shadow-card:     0 1px 4px rgba(0,0,0,0.06);
+  --shadow-elevated: 0 4px 16px rgba(0,0,0,0.08);
+
+}
+
+[data-theme="light"] .navbar {
+
+  background: rgba(255, 255, 255, 0.85);
+
+}
+
