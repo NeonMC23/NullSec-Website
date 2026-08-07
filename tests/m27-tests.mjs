@@ -176,6 +176,10 @@ console.log('== 5. SQL static audit (STATIC) ==');
   ok(/community_activity/.test(m16), '0016 adds community_activity aggregate');
   ok(/REVOKE SELECT ON public\.v_country_metrics/.test(m16), '0016 keeps view non-public');
   ok(/communityActivity/.test(rpc), 'ns_country_metrics emits communityActivity');
+  // Column-order fix: community_activity is appended as the FINAL column, AFTER
+  // total_activity (CREATE OR REPLACE VIEW cannot insert a column in the middle).
+  ok(/total_activity[\s\S]*community_activity/.test(m16),
+    'community_activity comes after total_activity (appended at the end)');
 }
 
 /* ------------------------------------------------------------------ */

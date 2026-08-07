@@ -483,6 +483,27 @@ console.log('== 14. M24 activity pipeline ==');
     'totalActivity = mission + tool + community (three COALESCE sums)');
   ok(/REVOKE SELECT ON public\.v_country_metrics FROM anon, authenticated/.test(m16),
     '0016 keeps view non-public');
+
+  // Column ORDER constraint: CREATE OR REPLACE VIEW may only APPEND new columns
+  // at the END (existing columns keep name + position). 0013 defines
+  //   country_code, participants, mission_activity, tool_activity,
+  //   propagation, total_activity
+  // so community_activity must be the FINAL column, AFTER total_activity, and
+  // must never be inserted before it.
+  const m13src = migSrc['0013_country_metrics_view.sql'];
+  const view13 = m13src.slice(m13.indexOf('AS\nSELECT'), m13.indexOf('FROM public.countries'));
+  const view16 = m16.slice(m16.indexOf('AS\nSELECT'), m16.indexOf('FROM public.countries'));
+  const colRe = /AS\s+([a-z_]+)/g;
+  const cols13 = [...view13.matchAll(colRe)].map(m => m[1]);
+  const cols16 = [...view16.matchAll(colRe)].map(m => m[1]);
+  // Base prefix from 0013 must be a strict prefix of the 0016 column list.
+  ok(cols16.slice(0, cols13.length).join(',') === cols13.join(','),
+    '0016 preserves every 0013 column name+position (no reorder/rename)');
+  ok(cols16.length === cols13.length + 1 && cols16[cols16.length - 1] === 'community_activity',
+    'community_activity is appended as the FINAL column (after total_activity)');
+  ok(cols16.join(',') === 'country_code,participants,mission_activity,tool_activity,propagation,total_activity,community_activity',
+    'exact 0016 column order: country_code,participants,mission_activity,tool_activity,propagation,total_activity,community_activity');
+  ok(!/DROP VIEW[\s\S]*CASCADE/.test(m16), '0016 does not DROP VIEW CASCADE');
   ok(/communityActivity/.test(rpc), 'ns_country_metrics emits communityActivity');
   ok(/'communityActivity', true/.test(rpc), 'availability includes communityActivity');
 }

@@ -7,6 +7,16 @@
 -- activity. community_activity equals the community_propagation aggregate (which
 -- is incremented by ns_record_activity for 'community_action' events).
 --
+-- COLUMN-ORDER CONSTRAINT (deployment fix):
+--   CREATE OR REPLACE VIEW cannot reorder or insert columns into an existing
+--   view; it can only APPEND new columns at the END, keeping every existing
+--   column name and position identical. Migration 0013 already defines:
+--       country_code, participants, mission_activity, tool_activity,
+--       propagation, total_activity
+--   so `community_activity` MUST be appended as the FINAL column (after
+--   total_activity). It must NOT be inserted before total_activity, and
+--   total_activity must NOT be renamed or moved.
+--
 -- No duplicate tables. Keeps propagation for backward compatibility.
 -- Preserves SECURITY DEFINER RPCs, search_path = public, RLS, explicit grants,
 -- and private raw events.
@@ -20,8 +30,8 @@ SELECT
   COALESCE(m.total, 0)::bigint AS mission_activity,
   COALESCE(t.total, 0)::bigint AS tool_activity,
   COALESCE(p.total, 0)::bigint AS propagation,
-  COALESCE(p.total, 0)::bigint AS community_activity,
-  (COALESCE(m.total, 0) + COALESCE(t.total, 0) + COALESCE(p.total, 0))::bigint AS total_activity
+  (COALESCE(m.total, 0) + COALESCE(t.total, 0) + COALESCE(p.total, 0))::bigint AS total_activity,
+  COALESCE(p.total, 0)::bigint AS community_activity
 FROM public.countries c
 LEFT JOIN (
   SELECT country_code, SUM(completed_count)::bigint AS total
