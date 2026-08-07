@@ -1,6 +1,6 @@
 # NullSec — Supabase project configuration
 
-project_id = "nullsec"
+project_id = "kjgzfxviopkpykkowdbj"
 
 [api]
 enabled = true
