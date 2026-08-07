@@ -392,6 +392,12 @@ console.log('== 13. M21 final data model ==');
     '0010 adds updated_at');
   ok(/country_membership_user_unique UNIQUE \(user_id\)/.test(m10),
     'one active country per user');
+  // Deployment 42P07 fix: the country_membership constraints are DROPPED
+  // (IF EXISTS) before being re-created so 0010 is idempotent on a re-run.
+  ok(/DROP CONSTRAINT IF EXISTS country_membership_user_unique/.test(m10),
+    '0010 idempotently drops country_membership_user_unique');
+  ok(/DROP CONSTRAINT IF EXISTS country_membership_pkey/.test(m10),
+    '0010 idempotently drops country_membership_pkey');
   ok(/country_membership_country_check/.test(m9 || '') || /country_code ~ '\^\[A-Z\]\{2\}\$'/.test(m10),
     'ISO-3166 alpha-2 constraint');
   ok(/propagation_type TEXT NOT NULL DEFAULT 'campaign_participation'/.test(m10),

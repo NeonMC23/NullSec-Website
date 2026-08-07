@@ -55,5 +55,8 @@ node tests/m28-tests.mjs
 echo "== 17. Cloud-first deployment static checks =="
 node tests/m28-deploy-tests.mjs
 
+echo "== 18. Regression: 0009→0010 country_membership transition =="
+node tests/m29-regression-0009-0010.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

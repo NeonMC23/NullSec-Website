@@ -33,6 +33,21 @@ ALTER TABLE public.country_membership
 -- One active country per user (enforced by the existing user_id PK/UNIQUE).
 -- Re-declare the PK on `id` for a stable surrogate key while keeping
 -- user_id UNIQUE for the "one country per user" rule.
+--
+-- IDEMPOTENCY FIX (deployment 42P07): `ADD CONSTRAINT ... UNIQUE (user_id)`
+-- creates a unique index named `country_membership_user_unique`. If a prior
+-- run already created it (e.g. 0010 was partially applied and a later step
+-- failed), re-adding the same constraint fails with
+--  42P07: relation "country_membership_user_unique" already exists.
+-- DROP ... IF EXISTS before each ADD makes the transition safe on:
+--   - a FRESH database  (0001–0009 then 0010),
+--   - the CURRENT database (0001–0009 applied, user_unique absent),
+--   - a RE-RUN of 0010 (user_unique present).
+-- The dependency graph was verified: no view/RPC/index depends on
+-- country_membership_pkey or country_membership_user_unique, so dropping and
+-- re-creating them is safe.
+ALTER TABLE public.country_membership
+  DROP CONSTRAINT IF EXISTS country_membership_user_unique;
 ALTER TABLE public.country_membership
   DROP CONSTRAINT IF EXISTS country_membership_pkey;
 ALTER TABLE public.country_membership
@@ -86,6 +101,11 @@ BEGIN
     ALTER TABLE public.community_propagation DROP CONSTRAINT community_propagation_country_code_key;
   END IF;
 END $$;
+-- Same idempotency guard as country_membership above: DROP the target unique
+-- constraint (if a prior partial run left it behind) before re-adding it, to
+-- avoid 42P07 "relation ... already exists" on a re-deploy.
+ALTER TABLE public.community_propagation
+  DROP CONSTRAINT IF EXISTS community_propagation_country_type_unique;
 ALTER TABLE public.community_propagation
   ADD CONSTRAINT community_propagation_country_type_unique UNIQUE (country_code, propagation_type);
 
