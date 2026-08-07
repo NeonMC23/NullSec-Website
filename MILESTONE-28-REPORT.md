@@ -1,5 +1,5 @@
 # Milestone 28 Implementation Report
-### Production Deployment Preparation, Runtime Hardening & Final Integration Layer — NullSec Platform V2
+### Production Deployment Preparation, Runtime Hardening & Final Integration Layer (Cloud-First) — NullSec Platform V2
 
 > **Honesty statement** : No REAL SUPABASE or REAL BROWSER validation was performed.
 > All runtime claims are LOCAL / MOCKED / STATIC / BLOCKED. Nothing was deployed, no
@@ -9,76 +9,71 @@
 
 ## 1. Architecture changes
 
-- **Configuration explicite** : `Config.getConfigStatus()` retourne `CONFIGURED` /
-  `NOT_CONFIGURED` / `INVALID_CONFIGURATION` — état backend sans ambiguïté, aucun
-  fallback.
-- **ApiClient durci** : timeout de requête (12s via AbortController), normalisation
-  centralisée des erreurs, aucune fuite d'erreur SQL/secret.
-- **ActivityService** : protection anti-doublon (état `DUPLICATE`) + états
-  SUCCESS/OFFLINE/NOT_AUTHENTICATED/UNAVAILABLE/INVALID.
-- **Dashboard** : affiche `lastUpdate` (timestamp global, non individuel) + états
-  vide/partiel/indisponible sans confondre 0 et null.
+- **Cloud-first deployment** : GitHub est la source de vérité du déploiement backend.
+  Le workflow `.github/workflows/supabase-deploy.yml` applique migrations + RPC via la
+  **Supabase Management API** (curl + access token) — **aucun CLI local, aucun
+  `supabase link`** (le CLI échoue localement sur la récupération des clés).
+- Frontend inchangé : statique sur GitHub Pages, clé publique anon injectée au build.
+- Le pipeline runtime (M27) est conservé : `UI → ActivityService/CommunityActionService
+  → ApiClient → ns_record_activity → aggregation → ns_country_metrics → dashboard`.
 
 ## 2. Configuration changes
 
-- `config.js` : ajout de `getConfigStatus()` (validation URL publique + clé anon ;
-  aucune URL fallback, aucun secret). Testé (M28 §1).
+- `Config.getConfigStatus()` (M28, déjà en place) : `CONFIGURED` / `NOT_CONFIGURED` /
+  `INVALID_CONFIGURATION`.
+- Aucune URL fallback, aucun secret en frontend. Séparation d'environnement
+  documentée : Frontend (anon publique) / Backend (secrets GitHub + dashboard).
 
 ## 3. ApiClient hardening
 
-- `fetchWithTimeout` (AbortController, 12s) utilisé par `rpc` et `select`.
-- Classification d'erreurs déjà centralisée (OFFLINE/UNCONFIGURED/UNAUTHORIZED/
-  FORBIDDEN/NETWORK_ERROR/SERVER_ERROR).
-- Aucune fuite d'erreur DB brute vers l'utilisateur (testé M28 §2) ; aucun
-  console.log de secrets.
+- Timeout de requête 12s (AbortController), normalisation centralisée des erreurs,
+  aucune fuite d'erreur DB/secret vers l'utilisateur (testé M28 §2).
 
 ## 4. Authentication hardening
 
-- `session-service` : `Session.clearSessionRefused()` ajouté (reset du flag après
-  logout/login). Expiration/révocation/backend-unavailable/invalid token/logout
-  cleanup déjà gérés et testés (M28 §3). Aucune persistance d'authentification en
-  localStorage.
+- Expiration/révocation/backend-unavailable/invalid token/logout cleanup déjà
+  validés (M28 §3). `Session.clearSessionRefused()`. Aucune persistance
+  d'authentification en localStorage.
 
 ## 5. Activity pipeline hardening
 
-- `ActivityService` : `isDuplicate()` (fenêtre 1.5s par type) → état `DUPLICATE`.
-- États explicites : SUCCESS/OFFLINE/NOT_AUTHENTICATED/UNAVAILABLE/INVALID/DUPLICATE.
-- Aucun succès fabriqué, aucune file persistante, aucun tracking.
+- `ActivityService` : état `DUPLICATE` (anti-doublon 1.5s) + SUCCESS/OFFLINE/
+  NOT_AUTHENTICATED/UNAVAILABLE/INVALID. Aucun faux succès, aucune file persistante.
 
 ## 6. Dashboard readiness
 
-- `community.html` : élément `#community-last-update`.
-- `community.js` : `renderLastUpdate()` (timestamp global) ; états unavailable/empty/
-  partial déjà gérés (map, ranking, panneau, stats).
-- `country-metrics.js` : `lastUpdate` propagé depuis le RPC.
-- CSS : `.community-last-update`.
+- `lastUpdate` global (non individuel) + états unavailable/empty/partial sans confondre
+  0 et null.
 
-## 7. Database audit
+## 7. Database audit (cloud-first)
 
-- `tests/sql-audit.mjs` : 218/218 — migrations `0001→0016`, FK, index, contraintes,
-  RLS, grants, SECURITY DEFINER, search_path. `community_activity_events` reste privé.
-- Aucune table superflue ajoutée.
+- **16 migrations (0001→0016)** toutes transactionnelles (`BEGIN;…COMMIT;`), ordre
+  lexicographique, aucun `DROP TABLE` destructif, `IF NOT EXISTS`.
+- RLS activée, RPC `SECURITY DEFINER` + `search_path = public`, grants explicites,
+  `community_activity_events` privé. Aucun `service_role`/secret exposé.
+- Déployées via `deploy.sh` (Management API), fail-safe.
 
 ## 8. Security audit
 
-- Aucun `service_role`/secret en frontend ; aucun console.log de secrets ; aucune URL
-  fallback ; stockage centralisé (store.js / session-store.js) ; aucun accès aux
-  événements bruts ; aucun identifiant/pays/IP/GPS/device/analytics dans les payloads.
+- Aucun secret en frontend/scripts (vérifié STATIC : `${{ secrets.* }}` uniquement,
+  token jamais échoé).
+- Aucun identifiant/pays/IP/GPS/device/analytics dans les payloads.
+- Aucun console.log de secrets.
 
 ## 9. Files created
 
-- `tests/m28-tests.mjs`
-- `MILESTONE-28-REPORT.md`
+- `.github/workflows/supabase-deploy.yml`
+- `backend/supabase/scripts/apply-sql.sh`
+- `backend/supabase/scripts/deploy.sh`
+- `docs/cloud-deployment.md`
+- `docs/cloud-deployment-summary.md`
+- `tests/m28-deploy-tests.mjs`
 
 ## 10. Files modified
 
-- `assets/js/config.js`, `api-client.js`, `session-service.js`, `activity-service.js`,
-  `country-metrics.js`, `community.js`
-- `community.html`, `assets/css/pages.css`
-- `tests/run-all.sh`, `tests/run-tests.mjs`, `tests/README.md`
-- Docs : `deployment-guide.md`, `community-api.md`, `privacy-model.md`,
-  `supabase-architecture.md`, `javascript-architecture.md`, `supabase-runtime-validation.md`
-- `backend/supabase/README.md`
+- `backend/supabase/README.md` (déploiement cloud-first)
+- `docs/deployment-guide.md` (lien cloud-deployment)
+- `tests/run-all.sh`, `tests/README.md`
 
 ## 11. Tests executed
 
@@ -99,37 +94,31 @@
 | `tests/m26-tests.mjs` | LOCAL+MOCK+STATIC | ✅ 26/26 |
 | `tests/m27-tests.mjs` | LOCAL+MOCK+STATIC | ✅ 42/42 |
 | `tests/m28-tests.mjs` | LOCAL+MOCK+STATIC | ✅ 72/72 |
+| `tests/m28-deploy-tests.mjs` | STATIC (cloud) | ✅ 23/23 |
+| `bash -n` (apply-sql.sh, deploy.sh) | STATIC | ✅ |
+| `node --check` (tous JS) | STATIC | ✅ |
 
-**Total : 725 assertions vertes.** `node --check` sur tous les JS : **ALL OK**.
-
-M28 couvre : config states, ApiClient failures + no secret leak, session
-expiration/revocation/unavailable/invalid/logout, duplicate activity, dashboard
-unavailable + lastUpdate, architecture boundaries (UI sans ApiClient/fetch direct).
+**Total : 748 assertions vertes.**
 
 ## 12. Blocked validations
 
-- **REAL SUPABASE** : migrations 0001→0016 + RPC non exécutés ; RLS, auth réelle,
-  isolation cross-user, abuse testing, métriques réelles.
-- **REAL BROWSER** : rendu dashboard, session restoration réelle, responsive.
-- **Production metrics** : aucun événement réel enregistré.
+- **Déploiement réel** : aucun projet Supabase accessible / secrets non configurés.
+- **Exécution RPC réelle**, **RLS runtime**, **navigateur**, **métriques de
+  production** — tous non exécutés.
 
 ## 13. Remaining technical debt
 
-- Migrations/RPC non déployés (aucun vrai Supabase).
-- Le timeout ApiClient (12s) n'est pas testé avec un vrai réseau lent (testé en mock
-  via la classification d'erreurs uniquement).
-- `community_activity`/`propagation` partagent la même source (community_propagation) —
-  volontaire mais à clarifier si le produit veut les différencier.
+- Le premier déploiement réel reste à effectuer (configurer `SUPABASE_ACCESS_TOKEN` +
+  `SUPABASE_PROJECT_REF` sur un repo GitHub, puis pousser sur `main`).
+- Le workflow cible `environment: production` : à confirmer sur le repo réel.
 - Aucun rate-limiting applicatif.
 
 ## 14. Acceptance criteria
 
-✅ Migrations ordonnées (0001→0016) et audit SQL complet (218).
-✅ Configuration runtime explicite (CONFIGURED / NOT_CONFIGURED / INVALID_CONFIGURATION).
-✅ ApiClient durci (timeout, normalisation, pas de fuite DB).
-✅ Session expiration/révocation/backend-unavailable/invalid/logout gérés.
-✅ Activity pipeline : anti-doublon + états explicites.
-✅ Dashboard : lastUpdate + états unavailable/empty/partial.
-✅ Aucun secret/token/log en localStorage/console.
-✅ 725 assertions vertes + `node --check` OK.
-✅ Aucune validation REAL SUPABASE / REAL BROWSER prétendue.
+✅ No local Supabase CLI dependency (Management API + scripts).
+✅ GitHub is deployment source of truth (workflow on push to main).
+✅ Database migrations deploy from CI (0001→0016 + RPC).
+✅ Secrets only exist in GitHub/Supabase secrets (${{ secrets.* }}, never echoed).
+✅ Frontend remains static (GitHub Pages, public anon key only).
+✅ Privacy model unchanged (aggregation-only).
+✅ No fake production validation claims (all runtime BLOCKED).

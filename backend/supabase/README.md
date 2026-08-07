@@ -38,8 +38,13 @@ Règles : **jamais committer** les clés. Utiliser `.env` (hors git).
 
 ## 4. Migrations (ordre d'application)
 
+Déploiement **cloud-first** (voir `docs/cloud-deployment.md`) : le workflow
+`.github/workflows/supabase-deploy.yml` applique les migrations + RPC via la
+**Supabase Management API** (curl + `SUPABASE_ACCESS_TOKEN`), sans CLI local ni
+`supabase link`. Le script `backend/supabase/scripts/deploy.sh` orchestre le tout.
+
 ```bash
-# Via Supabase CLI (SQL Editor / supabase db push)
+# Ordre (0001 → 0016) :
 0001_schema.sql          # tables + contraintes + index + seed
 0002_rls.sql             # RLS + politiques + REVOKE
 0003_rls_functions.sql   # révoque EXECUTE sur ns_create_session
@@ -53,11 +58,8 @@ Règles : **jamais committer** les clés. Utiliser `.env` (hors git).
 0011_community_activity_events.sql  # table interne privée d événements (M24)
 0012_activity_event_privileges.sql  # EXECUTE ns_record_activity (M24)
 0013_country_metrics_view.sql  # vue d agrégation v_country_metrics (M24)
-
 0014_activity_trigger_support.sql  # index agrégation + re-affirmation RLS (M25)
-
 0015_community_action_support.sql  # index type/created + re-affirmation RLS (M26)
-
 0016_activity_metrics_refinement.sql  # community_activity dans la vue (M27)
 ```
 

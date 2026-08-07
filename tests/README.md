@@ -95,3 +95,9 @@ côté dashboard/CLI une fois un projet disponible.
   Infinity/oversize, champs inconnus, payload malformé/vide), intensité.
 - **Map** : lookup FR→France, DE→Germany, ES→Spain ; code inconnu sans crash.
 - **Offline** : 0 requête backend, aucune donnée d'activité fabriquée.
+
+## Cloud-first deployment (M28)
+
+- `tests/m28-deploy-tests.mjs` — STATIC : ordre des migrations (0001→0016), ordre RPC dans `deploy.sh`, aucun secret littéral, fail-safe.
+- Workflow : `.github/workflows/supabase-deploy.yml` (Management API, pas de CLI local).
+- Voir `docs/cloud-deployment.md`.

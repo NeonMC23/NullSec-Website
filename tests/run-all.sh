@@ -52,5 +52,8 @@ node tests/m27-tests.mjs
 echo "== 16. Milestone 28 suite (production prep + runtime hardening) =="
 node tests/m28-tests.mjs
 
+echo "== 17. Cloud-first deployment static checks =="
+node tests/m28-deploy-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

@@ -294,3 +294,15 @@ d'environnement requises (production, non commitées) :
 
 **Blocages sans projet réel** : déploiement, exécution RPC, RLS runtime, navigateur,
 métriques de production. Voir `supabase-runtime-validation.md`.
+
+---
+
+## Cloud-first deployment (M28)
+
+Le déploiement backend est **cloud-first** : GitHub Actions applique les migrations
++ RPC via la **Supabase Management API** (aucun CLI local, aucun `supabase link`).
+Voir **`docs/cloud-deployment.md`** pour l'architecture, les secrets GitHub requis,
+le flux de déploiement et la stratégie de rollback.
+
+Workflow : `.github/workflows/supabase-deploy.yml` (déclenché sur push vers `main`).
+Scripts : `backend/supabase/scripts/deploy.sh` + `apply-sql.sh`.

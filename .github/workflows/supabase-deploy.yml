@@ -1,0 +1,45 @@
+# NullSec — Cloud-first Supabase deployment (GitHub Actions)
+# ------------------------------------------------------------------
+# Deploys the Supabase backend (migrations + RPC) from GitHub on every push to
+# `main`. GitHub is the source of truth; the local machine is not required.
+#
+# Secrets (must be configured in the GitHub repo → Settings → Secrets → Actions):
+#   SUPABASE_ACCESS_TOKEN  — Supabase personal/CI access token.
+#   SUPABASE_PROJECT_REF   — the Supabase project reference (e.g. abcdefgh).
+#
+# Secrets never appear in logs: they are only referenced as ${{ secrets.* }}
+# and passed to the scripts via the environment.
+#
+# Frontend (GitHub Pages) is untouched here; this workflow only deploys the
+# backend database. Failures abort the run (fail-safe).
+
+name: supabase-deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/supabase/**'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Supabase migrations + RPC
+    runs-on: ubuntu-latest
+    # Restrict which branches/refs can trigger deployment.
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run cloud-first deployment (Management API, no CLI)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: bash backend/supabase/scripts/deploy.sh
+        # The script fails (set -e) on any failed migration/RPC → job fails safely.
+        # No secrets are echoed; env values are masked by GitHub.
