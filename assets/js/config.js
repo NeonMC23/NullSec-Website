@@ -63,7 +63,7 @@
       const hasKey = typeof boot.anonKey === 'string' && boot.anonKey.length > 0;
       if (hasUrl) CONFIG.supabaseUrl = boot.url;
       if (hasKey) CONFIG.supabaseAnonKey = boot.anonKey;
-      const active = hasUrl && hasKey && boot.enabled !== false;
+      const active = hasUrl && hasKey && boot.enabled === true;
       CONFIG.supabaseEnabled = active;
       CONFIG.authEnabled = active;
       CONFIG.backendEnabled = active;
