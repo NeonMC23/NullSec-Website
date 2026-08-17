@@ -1,0 +1,820 @@
+/**
+ * NullSec — Account page module
+ * ------------------------------------------------------------------
+ * Renders the private ACCOUNT page (not a social profile): authentication
+ * status, country, recovery key, progress summary, settings, and sign out.
+ * M31: no avatar, no public username, no bio. Uses DOM-safe rendering
+ * (Utils.el / textContent), no inline scripts. Reads/writes via the service
+ * layers (Settings, Progress, RecoveryKey) — never localStorage.
+ */
+(function () {
+  'use strict';
+
+  // UI sync state: 'idle' | 'syncing' | 'synced' | 'sync-error'
+  let syncStatus = 'idle';
+
+  /** Label for a sync state. */
+  function syncStatusLabel(s) {
+    if (s === 'syncing') return 'Syncing';
+    if (s === 'synced') return 'Synced';
+    if (s === 'sync-error') return 'Sync error';
+    return 'Not signed in';
+  }
+
+  /** Trigger a push and update the UI sync status. */
+  function runSyncAndRefresh() {
+    syncStatus = 'syncing';
+    renderAuthInfo();
+    // M35: use the full sync cycle (pull → resolve → push) so a returning user
+    // (same or different device) restores their server-side progression.
+    // Push-only would never load remote progress after sign-in.
+    const op = (Sync.sync && Sync.sync.bind(Sync)) ? Sync.sync() : Sync.push();
+    op.then(function () {
+      // Reflect any server-side progression into the in-memory Progress state.
+      if (window.Progress && Progress.reload) Progress.reload();
+      syncStatus = 'synced';
+      renderAll();
+    }).catch(function () {
+      syncStatus = 'sync-error';
+      renderAuthInfo();
+    });
+  }
+
+  /** Account summary (private — no username/avatar/public identity). */
+  function renderProfile(profile) {
+    let container = document.getElementById('profile-summary');
+    if (!container) return;
+    Utils.clear(container);
+
+    // M34: for a guest the Account page is a clear gateway, not a fake empty
+    // profile. For an authenticated user it shows the private username only.
+    if (!Auth.isAuthenticated()) {
+      let gate = Utils.el('div', { class: 'profile-info' });
+      gate.appendChild(Utils.el('h1', { text: 'Account' }));
+      gate.appendChild(Utils.el('p', {
+        class: 'profile-account-note',
+        text: 'Your NullSec account keeps your progression private and synchronized across devices.'
+      }));
+      let actions = Utils.el('div', { class: 'profile-gate-actions' });
+      let signIn = Utils.el('a', { class: 'btn btn-primary', href: 'profile.html', text: 'Sign in' });
+      let create = Utils.el('a', { class: 'btn btn-secondary', href: 'profile.html', text: 'Create account' });
+      actions.appendChild(signIn);
+      actions.appendChild(create);
+      gate.appendChild(actions);
+      container.appendChild(gate);
+      return;
+    }
+
+    let info = Utils.el('div', { class: 'profile-info' });
+    info.appendChild(Utils.el('h1', { text: 'Account' }));
+    let username = Auth.getUsername();
+    if (username) {
+      info.appendChild(Utils.el('p', {
+        class: 'profile-account-username',
+        text: '@' + username
+      }));
+    }
+    info.appendChild(Utils.el('p', {
+      class: 'profile-account-note',
+      text: 'A private container for your progression. No public profile, no avatar.'
+    }));
+    container.appendChild(info);
+  }
+
+  /* --- Statistics ------------------------------------------------------ */
+
+  function renderStats() {
+    let container = document.getElementById('profile-stats');
+    if (!container) return;
+    Utils.clear(container);
+
+    container.appendChild(Utils.el('p', {
+      style: 'color:var(--text-dim);padding:12px 0;',
+      text: 'Loading your statistics…'
+    }));
+
+    Statistics.get().then(function (stats) {
+      Utils.clear(container);
+      if (!container) return;
+
+      function stat(label, value) {
+        let card = Utils.el('div', { class: 'profile-stat' });
+        card.appendChild(Utils.el('strong', { text: value }));
+        card.appendChild(Utils.el('span', { text: label }));
+        return card;
+      }
+
+      let grid = Utils.el('div', { class: 'profile-stats-grid' });
+      grid.appendChild(stat('Missions', stats.missions_completed + '/' + stats.missions_total));
+      grid.appendChild(stat('Articles', stats.articles_read));
+      grid.appendChild(stat('Weekly', stats.weekly_completed));
+      grid.appendChild(stat('Completion', stats.completion_percent + '%'));
+      container.appendChild(grid);
+    }).catch(function () {
+      Utils.clear(container);
+      container.appendChild(Utils.el('p', {
+        style: 'color:var(--text-dim);',
+        text: 'Could not load statistics.'
+      }));
+    });
+  }
+
+  function renderCreated(profile) {
+    let el = document.getElementById('profile-created');
+    if (!el) return;
+    if (!profile) { el.textContent = ''; return; }
+    let date = new Date(profile.created_at);
+    let label = 'Created today';
+    if (!isNaN(date.getTime())) {
+      label = 'Created ' + date.toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric'
+      });
+    }
+    el.textContent = label;
+  }
+
+  /* --- Recovery key card ----------------------------------------------- */
+
+  function renderRecovery() {
+    let container = document.getElementById('profile-recovery');
+    if (!container) return;
+    Utils.clear(container);
+
+    // M32: recovery key is generated only at account creation (authd).
+    // A guest is never issued a recovery key just by visiting the page.
+    if (!Auth.isAuthenticated()) {
+      container.appendChild(Utils.el('p', {
+        class: 'profile-recovery',
+        style: 'color:var(--text-dim);',
+        text: 'Sign in to manage your recovery key.'
+      }));
+      return;
+    }
+    let key = RecoveryKey.get();
+    if (!key) key = RecoveryKey.ensure();
+
+    let card = Utils.el('div', { class: 'profile-recovery' });
+    card.appendChild(Utils.el('h3', { text: 'Recovery Key' }));
+
+    let display = Utils.el('span', { class: 'recovery-key-display', text: '\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022' });
+    card.appendChild(display);
+
+    card.appendChild(Utils.el('p', {
+      class: 'recovery-warning',
+      text: 'This recovery key is the only future way to recover your account. Store it securely.'
+    }));
+
+    let actions = Utils.el('div', { class: 'recovery-actions' });
+    let revealBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Reveal' });
+    let copyBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Copy' });
+    copyBtn.disabled = true;
+
+    revealBtn.addEventListener('click', function () {
+      let revealed = revealBtn.textContent === 'Hide';
+      if (revealed) {
+        display.textContent = '\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022';
+        revealBtn.textContent = 'Reveal';
+        copyBtn.disabled = true;
+      } else {
+        display.textContent = key;
+        revealBtn.textContent = 'Hide';
+        copyBtn.disabled = false;
+      }
+    });
+
+    copyBtn.addEventListener('click', function () {
+      if (!key) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(key).then(function () {
+          copyBtn.textContent = 'Copied';
+          setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1500);
+        }).catch(function () {});
+      }
+    });
+
+    actions.appendChild(revealBtn);
+    actions.appendChild(copyBtn);
+    card.appendChild(actions);
+    container.appendChild(card);
+  }
+
+  /* --- Settings section ------------------------------------------------ */
+
+  /** Render the Public Profile section (M38): enabled flag, bio, interests,
+   *  view/edit. Only the authenticated owner. */
+  function renderPublicProfile() {
+    let container = document.getElementById('profile-public');
+    if (!container) return;
+    Utils.clear(container);
+    if (!Auth.isAuthenticated()) return;
+
+    let username = Auth.getUsername();
+    let card = Utils.el('div', { class: 'public-profile-edit-card' });
+
+    // Public profile link (canonical URL).
+    let viewLink = Utils.el('a', {
+      href: PublicProfile.getUrl(username || ''),
+      class: 'btn btn-secondary',
+      text: 'View public profile'
+    });
+    card.appendChild(viewLink);
+
+    // Share (M39): native share / clipboard fallback.
+    let shareBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Share public profile' });
+    shareBtn.addEventListener('click', function () {
+      PublicProfile.share(username || '').then(function (res) {
+        if (res.ok && res.method === 'clipboard') shareBtn.textContent = 'Profile link copied.';
+        else if (res.ok && res.method === 'share') { /* native handled */ }
+        else {
+          shareBtn.textContent = 'Copy link';
+          let fallback = window.prompt('Copy this link:', PublicProfile.getUrl(username || ''));
+          if (fallback === null) shareBtn.textContent = 'Share public profile';
+        }
+      });
+    });
+    card.appendChild(shareBtn);
+
+    // Enabled toggle.
+    let enabledRow = Utils.el('label', { class: 'settings-row' });
+    enabledRow.appendChild(Utils.el('span', { text: 'Show my learning profile publicly' }));
+    let enabledCheck = Utils.el('input', { type: 'checkbox' });
+    enabledRow.appendChild(enabledCheck);
+    card.appendChild(enabledRow);
+
+    // Bio field.
+    let bioRow = Utils.el('label', { class: 'settings-row public-profile-field' });
+    bioRow.appendChild(Utils.el('span', { text: 'Public bio' }));
+    let bioInput = Utils.el('textarea', {
+      maxlength: '280', rows: '2',
+      placeholder: 'A short public description (280 chars max).'
+    });
+    bioRow.appendChild(bioInput);
+    card.appendChild(bioRow);
+
+    // Interests field.
+    let interestsRow = Utils.el('label', { class: 'settings-row public-profile-field' });
+    interestsRow.appendChild(Utils.el('span', { text: 'Learning interests' }));
+    let interestsInput = Utils.el('input', {
+      type: 'text',
+      placeholder: 'Comma-separated tags, e.g. privacy, linux, self-hosting (max 8)'
+    });
+    interestsRow.appendChild(interestsInput);
+    card.appendChild(interestsRow);
+
+    let status = Utils.el('span', { class: 'profile-edit-error', text: '' });
+    let saveBtn = Utils.el('button', { class: 'btn btn-primary', type: 'submit', text: 'Save public profile' });
+    let form = Utils.el('form', { class: 'auth-form', autocomplete: 'off' });
+    form.appendChild(card);
+    form.appendChild(status);
+    form.appendChild(saveBtn);
+
+    // Load the current owner's public profile to populate the form.
+    const token = Sync.getToken();
+    ApiClient.publicProfile(username).then(function (p) {
+      if (!p || p.enabled !== true) {
+        enabledCheck.removeAttribute('checked');
+      } else {
+        enabledCheck.setAttribute('checked', '');
+        bioInput.value = p.bio || '';
+        interestsInput.value = (p.learning_interests || []).join(', ');
+      }
+    }).catch(function () {
+      /* leave defaults */
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const interests = interestsInput.value.split(',').map(function (t) {
+        return t.trim();
+      }).filter(Boolean).slice(0, 8);
+      saveBtn.disabled = true;
+      ApiClient.updatePublicProfile(token, {
+        public_profile_enabled: enabledCheck.checked,
+        bio: bioInput.value.trim() || null,
+        learning_interests: interests.length ? interests : null
+      }).then(function (res) {
+        saveBtn.disabled = false;
+        if (res && res.updated === true) {
+          status.textContent = '';
+          alert('Public profile saved.');
+        } else {
+          status.textContent = 'Could not save the public profile.';
+        }
+      }).catch(function () {
+        saveBtn.disabled = false;
+        status.textContent = 'Could not save the public profile.';
+      });
+    });
+
+    container.appendChild(form);
+  }
+
+  function renderSettings() {
+    let container = document.getElementById('profile-settings');
+    if (!container) return;
+    Utils.clear(container);
+
+    let settings = Settings.get();
+
+    let card = Utils.el('div', { class: 'profile-settings' });
+
+    // Theme
+    let themeRow = Utils.el('label', { class: 'settings-row' });
+    themeRow.appendChild(Utils.el('span', { text: 'Theme' }));
+    let themeSel = Utils.el('select', { class: 'settings-select' });
+    ['system', 'dark', 'light'].forEach(function (v) {
+      let opt = Utils.el('option', { value: v, text: v.charAt(0).toUpperCase() + v.slice(1) });
+      if (v === settings.theme) opt.setAttribute('selected', '');
+      themeSel.appendChild(opt);
+    });
+    themeSel.addEventListener('change', function () {
+      Settings.update({ theme: themeSel.value });
+      applyThemeFromSettings();
+    });
+    themeRow.appendChild(themeSel);
+    card.appendChild(themeRow);
+
+    // Language (future-ready placeholder)
+    let langRow = Utils.el('label', { class: 'settings-row' });
+    langRow.appendChild(Utils.el('span', { text: 'Language' }));
+    let langSel = Utils.el('select', { class: 'settings-select' });
+    [['en', 'English'], ['fr', 'Français']].forEach(function (pair) {
+      let opt = Utils.el('option', { value: pair[0], text: pair[1] });
+      if (pair[0] === settings.language) opt.setAttribute('selected', '');
+      langSel.appendChild(opt);
+    });
+    langSel.addEventListener('change', function () {
+      Settings.update({ language: langSel.value });
+    });
+    langRow.appendChild(langSel);
+    card.appendChild(langRow);
+
+    // Offline mode indicator
+    let offlineRow = Utils.el('div', { class: 'settings-row' });
+    offlineRow.appendChild(Utils.el('span', { text: 'Offline mode' }));
+    let offlineBadge = Utils.el('span', {
+      class: 'settings-badge' + (Config.get().offlineMode ? ' on' : ''),
+      text: Config.get().offlineMode ? 'Local only' : 'Online'
+    });
+    offlineRow.appendChild(offlineBadge);
+    card.appendChild(offlineRow);
+
+    // Animations toggle
+    let animRow = Utils.el('label', { class: 'settings-row' });
+    animRow.appendChild(Utils.el('span', { text: 'Animations' }));
+    let animCheck = Utils.el('input', { type: 'checkbox' });
+    if (settings.appearance.animations) animCheck.setAttribute('checked', '');
+    animCheck.addEventListener('change', function () {
+      Settings.update({ appearance: { animations: animCheck.checked } });
+      if (!animCheck.checked) document.documentElement.setAttribute('data-motion', 'off');
+      else document.documentElement.removeAttribute('data-motion');
+    });
+    animRow.appendChild(animCheck);
+    card.appendChild(animRow);
+
+    // Privacy info
+    card.appendChild(Utils.el('p', {
+      class: 'settings-note',
+      text: 'Your account data lives in NullSec\u2019s backend. Your browser is only a client. No telemetry, no tracking.'
+    }));
+
+    container.appendChild(card);
+  }
+
+  /** Apply the theme stored in Settings (and persist legacy ns:theme). */
+  function applyThemeFromSettings() {
+    let s = Settings.get();
+    let theme = s.theme;
+    if (theme === 'system') {
+      let dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      theme = dark ? 'dark' : 'light';
+    }
+    Store.set(Store.keys.THEME, theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  /* --- Reset progress -------------------------------------------------- */
+
+  function renderResetProgress() {
+    let btn = document.getElementById('profile-reset');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      if (!Auth.isAuthenticated()) return;
+      // M36: reset is server-side. Confirm, call ns_reset_progress, then
+      // reload the (now empty) progression locally.
+      if (!confirm('Reset your progress? This permanently removes your completed missions from your account.')) return;
+      btn.disabled = true;
+      const token = Sync.getToken();
+      ApiClient.resetProgress(token).then(function (res) {
+        btn.disabled = false;
+        if (res && res.reset === true) {
+          Progress.reset();
+          if (window.Progress && Progress.reload) Progress.reload();
+          renderStats();
+          alert('Progress reset.');
+        } else {
+          alert('Could not reset progress. Please try again.');
+        }
+      }).catch(function () {
+        btn.disabled = false;
+        alert('Could not reset progress. Please try again.');
+      });
+    });
+    // M34/M36: only the authenticated owner can reset their own progression.
+    function syncResetVisibility() {
+      btn.style.display = Auth.isAuthenticated() ? '' : 'none';
+    }
+    syncResetVisibility();
+    if (window.Session && Session.ensureRestored) {
+      Session.ensureRestored().then(syncResetVisibility);
+    }
+  }
+
+  /** Render the account section (info + backend-gated actions). */
+  function renderAuthInfo() {
+    let container = document.getElementById('profile-auth');
+    if (!container) return;
+
+    let state = Auth.getState();
+    let mode = UserState.getMode();
+    let recoveryAvailable = !!RecoveryKey.get();
+    let offline = Config.get().offlineMode === true;
+    let backendEnabled = Config.get().backendEnabled === true;
+    let isAuth = mode === 'authenticated';
+    let sessionStatus = window.Session ? Session.getStatus() : 'local';
+
+    Utils.clear(container);
+
+    let card = Utils.el('div', { class: 'profile-auth' });
+    card.appendChild(Utils.el('h3', { text: 'Account' }));
+
+    let rows = Utils.el('div', { class: 'profile-auth-rows' });
+
+    // Use the normalized auth status (M20) for clear, explicit feedback.
+    let statusText, statusHint;
+    const authStatus = Auth.getAuthStatus();
+    if (authStatus === 'AUTHENTICATED') {
+      statusText = 'Authenticated · Supabase';
+    } else if (authStatus === 'AUTHENTICATING') {
+      statusText = 'Signing in…';
+    } else if (authStatus === 'BACKEND_UNAVAILABLE') {
+      statusText = 'Backend unavailable';
+      statusHint = 'Your session could not be checked right now. Retry when the backend is reachable.';
+    } else if (authStatus === 'SESSION_EXPIRED') {
+      statusText = 'Session expired';
+      statusHint = 'Your previous session is no longer valid. Sign in again with your recovery key.';
+    } else if (sessionStatus === 'checking' && backendEnabled) {
+      statusText = 'Checking session…';
+    } else {
+      statusText = 'Not authenticated';
+    }
+    let statusRow = Utils.el('div', { class: 'auth-row' });
+    statusRow.appendChild(Utils.el('span', { text: 'Status' }));
+    statusRow.appendChild(Utils.el('span', { class: 'auth-value', text: statusText }));
+    rows.appendChild(statusRow);
+    if (statusHint) {
+      let hintRow = Utils.el('div', { class: 'auth-row auth-hint' });
+      hintRow.appendChild(Utils.el('span', { class: 'auth-value', text: statusHint }));
+      rows.appendChild(hintRow);
+    }
+
+    let authRow = Utils.el('div', { class: 'auth-row' });
+    authRow.appendChild(Utils.el('span', { text: 'Authentication' }));
+    authRow.appendChild(Utils.el('span', {
+      class: 'auth-value',
+      text: backendEnabled ? 'Available' : 'Unavailable offline'
+    }));
+    rows.appendChild(authRow);
+
+    let recRow = Utils.el('div', { class: 'auth-row' });
+    recRow.appendChild(Utils.el('span', { text: 'Recovery' }));
+    recRow.appendChild(Utils.el('span', {
+      class: 'auth-value',
+      text: recoveryAvailable ? 'Available locally' : 'Not available'
+    }));
+    rows.appendChild(recRow);
+
+    // Sync status (only shown when backend is enabled).
+    if (backendEnabled) {
+      let syncRow = Utils.el('div', { class: 'auth-row' });
+      syncRow.appendChild(Utils.el('span', { text: 'Sync' }));
+      syncRow.appendChild(Utils.el('span', {
+        class: 'auth-value',
+        text: isAuth ? syncStatusLabel(syncStatus) : 'Not signed in'
+      }));
+      rows.appendChild(syncRow);
+    }
+
+    card.appendChild(rows);
+
+    card.appendChild(Utils.el('p', {
+      class: 'auth-note',
+      text: isAuth
+        ? 'You are signed in to your NullSec account. No data leaves your device beyond what you sync.'
+        : 'Authentication is not available in offline mode. No account is created and no data leaves your device.'
+    }));
+
+    // Backend-gated actions: forms (guest) or account controls (authenticated).
+    if (backendEnabled) {
+      card.appendChild(isAuth ? renderSignedInActions() : renderGuestForms());
+    }
+
+    container.appendChild(card);
+  }
+
+  /* --- Auth form helpers (M32: username + password, no email) -------- */
+
+  /** Build a labelled text/password input (DOM, no inline handlers). */
+  function formField(labelText, type, placeholder, value) {
+    let wrap = Utils.el('label', { class: 'auth-form-field' });
+    wrap.appendChild(Utils.el('span', { class: 'auth-form-label', text: labelText }));
+    let input = Utils.el('input', {
+      type: type,
+      placeholder: placeholder,
+      value: value || '',
+      autocomplete: type === 'password' ? 'current-password' : 'username'
+    });
+    wrap.appendChild(input);
+    return { wrap: wrap, input: input };
+  }
+
+  function formError(msg) {
+    return Utils.el('span', { class: 'auth-form-error', text: msg || '' });
+  }
+
+  /** Handle a successful auth: sync + refresh the account view. */
+  function onAuthSuccess() {
+    syncStatus = 'syncing';
+    renderAll();
+    runSyncAndRefresh();
+  }
+
+  /** Handle an auth failure with a human-safe message. */
+  function onAuthFailure(msg) {
+    renderAuthInfo();
+    alert(msg);
+  }
+
+  /** Authenticated controls: signed-in-as + actions. */
+  function renderSignedInActions() {
+    let actions = Utils.el('div', { class: 'profile-auth-actions' });
+    let signedIn = Utils.el('p', {
+      class: 'auth-signed-in',
+      text: 'Signed in as ' + (Auth.getUsername() || 'you')
+    });
+    actions.appendChild(signedIn);
+
+    let journeyLink = Utils.el('a', { href: 'journey.html', class: 'btn btn-primary', text: 'Open Learning Journey' });
+    actions.appendChild(journeyLink);
+
+    // M37: public learning profile (separate from the private Account).
+    let pubLink = Utils.el('a', {
+      href: PublicProfile.getUrl(Auth.getUsername() || ''),
+      class: 'btn btn-secondary',
+      text: 'View public profile'
+    });
+    actions.appendChild(pubLink);
+
+    let syncNowBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Sync now' });
+    syncNowBtn.addEventListener('click', function () { runSyncAndRefresh(); });
+    actions.appendChild(syncNowBtn);
+
+    let logoutBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Sign out' });
+    logoutBtn.addEventListener('click', function () {
+      Auth.logout();
+      syncStatus = 'idle';
+      renderAll();
+    });
+    actions.appendChild(logoutBtn);
+
+    // Change password (M36): only current + new password, confirmation client-side.
+    actions.appendChild(renderPasswordForm());
+
+    return actions;
+  }
+
+  /** Build the Change password form (authenticated, server-side). */
+  function renderPasswordForm() {
+    let card = Utils.el('div', { class: 'auth-form-card password-form' });
+    card.appendChild(Utils.el('h4', { text: 'Change password' }));
+    let cur = formField('Current password', 'password', 'Current password');
+    let nw = formField('New password', 'password', 'New password');
+    let cf = formField('Confirm new password', 'password', 'Confirm new password');
+    let err = formError();
+    let btn = Utils.el('button', { class: 'btn btn-primary', type: 'submit', text: 'Change password' });
+    let form = Utils.el('form', { class: 'auth-form', autocomplete: 'off' });
+    form.appendChild(cur.wrap); form.appendChild(nw.wrap); form.appendChild(cf.wrap);
+    form.appendChild(err); form.appendChild(btn);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (nw.input.value !== cf.input.value) { err.textContent = 'New passwords do not match.'; return; }
+      err.textContent = '';
+      btn.disabled = true;
+      Auth.changePassword(cur.input.value, nw.input.value).then(function (res) {
+        btn.disabled = false;
+        if (res && res.ok) {
+          err.textContent = '';
+          cur.input.value = ''; nw.input.value = ''; cf.input.value = '';
+          alert('Password updated.');
+        } else {
+          err.textContent = safeAuthReason(res);
+        }
+      }).catch(function () {
+        btn.disabled = false;
+        err.textContent = 'Password could not be changed.';
+      });
+    });
+    card.appendChild(form);
+    return card;
+  }
+
+  /** Guest forms: Sign in / Create account / Recover (username + password). */
+  function renderGuestForms() {
+    let forms = Utils.el('div', { class: 'profile-auth-forms' });
+
+    // --- Sign in ---
+    let signCard = Utils.el('div', { class: 'auth-form-card' });
+    signCard.appendChild(Utils.el('h4', { text: 'Sign in' }));
+    let su = formField('Username', 'text', 'Username');
+    let sp = formField('Password', 'password', 'Password');
+    let signErr = formError();
+    let signBtn = Utils.el('button', { class: 'btn btn-primary', type: 'submit', text: 'Sign in' });
+    let signForm = Utils.el('form', { class: 'auth-form', autocomplete: 'on' });
+    signForm.appendChild(su.wrap); signForm.appendChild(sp.wrap); signForm.appendChild(signErr); signForm.appendChild(signBtn);
+    signForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      Auth.setAuthenticating(true);
+      renderAuthInfo();
+      Auth.signIn(su.input.value, sp.input.value).then(function (res) {
+        Auth.setAuthenticating(false);
+        if (res && res.ok) onAuthSuccess();
+        else onAuthFailure('Sign in failed: ' + safeAuthReason(res));
+      }).catch(function () {
+        Auth.setAuthenticating(false);
+        onAuthFailure('Sign in failed: no response from the backend.');
+      });
+    });
+    signCard.appendChild(signForm);
+    forms.appendChild(signCard);
+
+    // --- Create account ---
+    let createCard = Utils.el('div', { class: 'auth-form-card' });
+    createCard.appendChild(Utils.el('h4', { text: 'Create account' }));
+    createCard.appendChild(Utils.el('p', { class: 'auth-form-hint', text: 'No email. Pick a username and password.' }));
+    let cu = formField('Username', 'text', 'Username');
+    let cp = formField('Password', 'password', 'Password');
+    let cc = formField('Confirm password', 'password', 'Confirm password');
+    let createErr = formError();
+    let createBtn = Utils.el('button', { class: 'btn btn-primary', type: 'submit', text: 'Create account' });
+    let createForm = Utils.el('form', { class: 'auth-form', autocomplete: 'off' });
+    createForm.appendChild(cu.wrap); createForm.appendChild(cp.wrap); createForm.appendChild(cc.wrap);
+    createForm.appendChild(createErr); createForm.appendChild(createBtn);
+    createForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const uname = cu.input.value;
+      const pass = cp.input.value;
+      const confirm = cc.input.value;
+      if (pass !== confirm) { createErr.textContent = 'Passwords do not match.'; return; }
+      Auth.setAuthenticating(true);
+      renderAuthInfo();
+      Auth.createAccount(uname, pass).then(function (res) {
+        Auth.setAuthenticating(false);
+        if (res && res.ok) {
+          showRecoveryKeyNotice(res.recovery_key);
+          onAuthSuccess();
+        } else {
+          onAuthFailure('Account creation failed: ' + safeAuthReason(res));
+        }
+      }).catch(function () {
+        Auth.setAuthenticating(false);
+        onAuthFailure('Account creation failed: no response from the backend.');
+      });
+    });
+    createCard.appendChild(createForm);
+    forms.appendChild(createCard);
+
+    // --- Recover account (M33: recovery is NOT a sign-in; it sets a new
+    // password, then the user signs in normally with username + password) ---
+    let recCard = Utils.el('div', { class: 'auth-form-card' });
+    recCard.appendChild(Utils.el('h4', { text: 'Recover account' }));
+    recCard.appendChild(Utils.el('p', {
+      class: 'auth-form-hint',
+      text: 'Use your recovery key to set a new password. You will then sign in normally.'
+    }));
+    let ru = formField('Username', 'text', 'Username');
+    let rk = formField('Recovery key', 'text', 'NSK1-XXXX-XXXX-XXXX-XXXX');
+    let rn = formField('New password', 'password', 'New password');
+    let rn2 = formField('Confirm new password', 'password', 'Confirm new password');
+    let recErr = formError();
+    let recBtn = Utils.el('button', { class: 'btn btn-secondary', type: 'submit', text: 'Recover account' });
+    let recForm = Utils.el('form', { class: 'auth-form', autocomplete: 'off' });
+    recForm.appendChild(ru.wrap); recForm.appendChild(rk.wrap); recForm.appendChild(rn.wrap);
+    recForm.appendChild(rn2.wrap); recForm.appendChild(recErr); recForm.appendChild(recBtn);
+    recForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (rn.input.value !== rn2.input.value) { recErr.textContent = 'Passwords do not match.'; return; }
+      Auth.setAuthenticating(true);
+      renderAuthInfo();
+      Auth.recoverAccount(ru.input.value, rk.input.value, rn.input.value).then(function (res) {
+        Auth.setAuthenticating(false);
+        if (res && res.ok) {
+          // Recovery sets a new password; prompt to sign in normally.
+          alert('Account recovered. Please sign in with your username and new password.');
+          renderAuthInfo();
+        } else onAuthFailure('Recovery failed: ' + safeAuthReason(res));
+      }).catch(function () {
+        Auth.setAuthenticating(false);
+        onAuthFailure('Recovery failed: no response from the backend.');
+      });
+    });
+    recCard.appendChild(recForm);
+    forms.appendChild(recCard);
+
+    return forms;
+  }
+
+  /** Show the recovery key once after account creation (never persisted). */
+  function showRecoveryKeyNotice(recoveryKey) {
+    if (!recoveryKey) return;
+    let notice = Utils.el('div', { class: 'auth-recovery-notice' });
+    notice.appendChild(Utils.el('h4', { text: 'Your recovery key' }));
+    let code = Utils.el('code', { class: 'auth-recovery-key', text: recoveryKey });
+    notice.appendChild(code);
+    notice.appendChild(Utils.el('p', {
+      class: 'auth-recovery-warning',
+      text: 'Save this recovery key somewhere safe. It is shown once and is never stored in localStorage.'
+    }));
+    notice.appendChild(Utils.el('button', {
+      class: 'btn btn-secondary', text: 'I have saved it'
+    }));
+    notice.querySelector('button').addEventListener('click', function () { notice.remove(); });
+    // Insert after the profile-auth card.
+    let target = document.getElementById('profile-auth');
+    if (target) target.appendChild(notice);
+  }
+
+  /** Human-safe, generic reason for an auth failure (no secrets/exceptions). */
+  function safeAuthReason(res) {
+    if (!res || !res.reason) return 'the backend is unavailable.';
+    const map = {
+      'authentication-unavailable-offline': 'authentication is not available offline.',
+      'crypto-unavailable': 'secure crypto is unavailable in this browser.',
+      'invalid_credentials': 'the username or password is not correct.',
+      'invalid_username': 'the username is invalid.',
+      'invalid_password_hash': 'the password is invalid.',
+      'username_taken': 'that username is already taken.',
+      'invalid_recovery_key': 'the recovery key was not accepted.',
+      'no-token': 'the server did not return a valid session.',
+      unauthorized: 'your credentials were not accepted.',
+      forbidden: 'you are not allowed to do this.',
+      network_error: 'a network error occurred.',
+      offline: 'the backend is offline.'
+    };
+    return map[res.reason] || 'the backend could not process the request.';
+  }
+
+  function renderAll() {
+    // M34: private account data (profile, stats, settings, recovery) is only
+    // shown to the authenticated owner. A guest sees the authentication gateway
+    // and the account forms.
+    const authd = Auth.isAuthenticated();
+    let profile = authd ? UserProfile.init() : null;
+    renderProfile(profile);
+    renderCreated(profile);
+    if (authd) {
+      renderStats();
+      renderSettings();
+      renderRecovery();
+      renderPublicProfile();
+    } else {
+      clearSection('profile-stats');
+      clearSection('profile-settings');
+      clearSection('profile-recovery');
+      clearSection('profile-public');
+    }
+    renderAuthInfo();
+    applyThemeFromSettings();
+  }
+
+  /** Empty a named section container (guest state). */
+  function clearSection(id) {
+    const el = document.getElementById(id);
+    if (el) Utils.clear(el);
+  }
+
+  function init() {
+    renderResetProgress();
+    renderAll();
+    // Render immediately (shows "Checking session…"), then re-render once the
+    // startup session restoration resolves so the account state is accurate.
+    Session.ensureRestored().then(function () {
+      renderAll();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

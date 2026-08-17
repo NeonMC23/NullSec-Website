@@ -1,0 +1,49 @@
+/* NullSec — utilities.css — utilities layer (M0.4) */
+.sr-only {
+
+  position: absolute;
+  width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); border: 0;
+
+}
+
+.accent {
+ color: var(--accent); 
+}
+
+.fade-in {
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+}
+
+.fade-in.visible {
+
+  opacity: 1;
+  transform: translateY(0);
+
+}
+
+.fade-in-delay-1 {
+ transition-delay: 0.1s; 
+}
+
+.fade-in-delay-2 {
+ transition-delay: 0.2s; 
+}
+
+.fade-in-delay-3 {
+ transition-delay: 0.3s; 
+}
+
+.skeleton {
+
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+
+}
+

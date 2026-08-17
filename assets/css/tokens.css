@@ -1,0 +1,32 @@
+/* NullSec — tokens.css — tokens layer (M0.4) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+
+  --bg:              #0B0B0F;
+  --bg-card:         #17171D;
+  --bg-elevated:     #1E1E28;
+  --accent:          #FF4FA3;
+  --accent-hover:    #FF70B5;
+  --accent-subtle:   rgba(255, 79, 163, 0.10);
+  --border:          #2A2A35;
+  --border-light:    #353540;
+  --text:            #F5F5F7;
+  --text-muted:      #9CA3AF;
+  --text-dim:        #6B7280;
+  --success:         #34D399;
+  --radius:          12px;
+  --radius-sm:       8px;
+  --radius-lg:       16px;
+  --max-width:       1200px;
+  --article-width:   800px;
+  --header-height:   64px;
+  --transition:      200ms ease;
+  --font-heading:    'Space Grotesk', sans-serif;
+  --font-body:       'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-code:       'JetBrains Mono', monospace;
+  --shadow-card:     0 2px 8px rgba(0,0,0,0.24);
+  --shadow-elevated: 0 8px 32px rgba(0,0,0,0.32);
+
+}
+

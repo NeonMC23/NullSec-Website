@@ -1,0 +1,312 @@
+/* NullSec — layout.css — layout layer (M0.4) */
+.container {
+
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+
+}
+
+.container-narrow {
+
+  max-width: var(--article-width);
+  margin: 0 auto;
+  padding: 0 24px;
+
+}
+
+.hero {
+
+  padding: 120px 0 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+}
+
+.hero::before {
+
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,79,163,0.06) 0%, transparent 70%);
+  transform: translate(-50%, -30%);
+  pointer-events: none;
+
+}
+
+.section {
+
+  padding: 80px 0;
+
+}
+
+.section-header {
+
+  margin-bottom: 48px;
+
+}
+
+.section-header h2 {
+
+  margin-bottom: 12px;
+
+}
+
+.section-header p {
+
+  color: var(--text-muted);
+  font-size: 1.0625rem;
+  max-width: 480px;
+
+}
+
+.section-header.centered {
+
+  text-align: center;
+
+}
+
+.section-header.centered p {
+
+  margin: 0 auto;
+
+}
+
+.articles-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+
+}
+
+.categories-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+
+}
+
+.resources-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+
+}
+
+.values-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 40px 0;
+
+}
+
+.footer-grid {
+
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+
+}
+
+@media (max-width: 1024px) {
+  .footer-grid {
+
+    grid-template-columns: 1fr 1fr;
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+ padding: 100px 0 60px; 
+  }
+}
+
+@media (max-width: 768px) {
+  .articles-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+
+    grid-template-columns: 1fr;
+    gap: 32px;
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .categories-grid {
+
+    grid-template-columns: repeat(2, 1fr);
+  
+  }
+}
+
+@media (max-width: 480px) {
+  .categories-grid {
+
+    grid-template-columns: repeat(2, 1fr);
+  
+  }
+}
+
+@media (max-width: 480px) {
+  .resources-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+.start-here-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+
+}
+
+.highlights-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+
+}
+
+.missions-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+
+}
+
+.tools-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+
+}
+
+.contribute-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+
+}
+
+.projects-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+
+}
+
+@media (max-width: 768px) {
+  .start-here-grid {
+
+    grid-template-columns: repeat(2, 1fr);
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .missions-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .tools-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+@media (max-width: 768px) {
+  .contribute-grid {
+
+    grid-template-columns: repeat(2, 1fr);
+  
+  }
+}
+
+@media (max-width: 480px) {
+  .start-here-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+@media (max-width: 480px) {
+  .contribute-grid {
+
+    grid-template-columns: 1fr;
+  
+  }
+}
+
+.articles-list, .tools-grid, .missions-grid, .articles-grid {
+
+  transition: opacity 0.3s ease;
+
+}
+
+.section {
+
+  animation: sectionFadeIn 0.5s ease;
+
+}
+
+.community-section .projects-grid {
+
+  margin-top: 8px;
+
+}
+
+.community-page .projects-grid {
+
+  gap: 24px;
+
+}
+
+.community-page .projects-grid {
+
+  gap: 20px;
+
+}
+
