@@ -66,10 +66,10 @@
    * unified progression, or create an empty one. Idempotent and safe to call
    * on every page load.
    *
-   * M20: the legacy per-key migration (ns:journey:progress / ns:weekly:progress
-   * / ns:article:read:{slug}) was removed. Those keys are purged by
-   * Store.migrate() on load and are account data — the progression now lives in
-   * memory (session) via ProgressRepository, with Supabase as source of truth.
+   * M31: progression is an account-only feature. There is no guest/local
+   * progression and no localStorage persistence. Progression lives in memory
+   * (session) via ProgressRepository and its source of truth is Supabase
+   * (synced via the Sync layer for an authenticated account).
    * @returns {object} the progress object
    */
   function init() {
@@ -90,6 +90,31 @@
   /** Return the current progress object (initialises if needed). */
   function get() {
     if (!state) init();
+    return state;
+  }
+
+  /**
+   * Re-load the progression from the repository (memory cache). M35: after a
+   * server sync pull, the Sync layer writes into ProgressRepository; calling
+   * reload() makes the in-memory Progress.state reflect the server data so a
+   * returning user (same or other device) sees their remote progression.
+   * @returns {object} the reloaded progress
+   */
+  function reload() {
+    let identity = resolveIdentity();
+    let progress = ProgressRepository.get();
+    if (progress && progress.version === VERSION) {
+      state = {
+        version: VERSION,
+        identity_id: identity.id,
+        missions: progress.missions || {},
+        articles: progress.articles || {},
+        weekly: progress.weekly || {},
+        updated_at: progress.updated_at || now()
+      };
+    } else {
+      state = createEmpty(identity.id);
+    }
     return state;
   }
 
@@ -150,8 +175,19 @@
     window.Sync.reportActivity(id, country, region);
   }
 
+  /**
+   * M30 (account-based progression): mission completion is a PRIVATE account
+   * feature. A guest must not complete a mission locally — there is no local
+   * progression fallback. Requires an authenticated session.
+   */
+  function canPersistProgression() {
+    return !!(window.Auth && window.Auth.isAuthenticated());
+  }
+
   function complete(id) {
     get(); // ensure state is initialized
+    // Guests must not save mission completion locally (M30).
+    if (!canPersistProgression()) return state;
     let map = targetMap(id);
     map[id] = { completed: true, completed_at: now() };
     state.updated_at = now();
@@ -164,6 +200,7 @@
   /** Unmark a mission (or weekly). Returns the progress. */
   function uncomplete(id) {
     get(); // ensure state is initialized
+    if (!canPersistProgression()) return state;
     let map = targetMap(id);
     if (map[id]) delete map[id];
     state.updated_at = now();
@@ -209,6 +246,7 @@
     init: init,
     get: get,
     save: save,
+    reload: reload,
     reset: reset,
     isCompleted: isCompleted,
     complete: complete,

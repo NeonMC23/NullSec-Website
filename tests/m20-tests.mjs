@@ -150,7 +150,7 @@ console.log('== 5. Storage policy (LOCAL) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   const ls = JSON.stringify(h.localBacking);
   ok(!ls.includes('ns:identity') && !ls.includes('ns:user:profile') &&
      !ls.includes('ns:progress') && !ls.includes('ns:settings') &&
@@ -234,7 +234,7 @@ console.log('== 8. Auth status states (LOCAL) ==');
   cfg(h2, BACKEND_ON);
   h2.W('RecoveryKey').ensure();
   h2.W('Identity').init();
-  await h2.W('Auth').register();
+  await h2.W('Auth').createAccount('tester', 'password123');
   await h2.W('Session').forceRecheck();
   eq(h2.W('Auth').getAuthStatus(), 'AUTHENTICATED', 'valid session → AUTHENTICATED');
 

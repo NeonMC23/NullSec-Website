@@ -17,7 +17,7 @@ import { makeHarness, LOAD_ORDER, ok, eq, summary } from './run-tests.mjs';
  * ------------------------------------------------------------------ */
 function makeSupabaseMock() {
   let idSeq = 0;
-  const users = new Map();   // identity_id -> { userId, profile, settings, progress }
+  const users = new Map();   // username -> { userId, password_hash, profile, settings, progress }
   const tokens = new Map();  // token -> userId
   const activity = { missions: {}, countries: {}, regions: {}, total: 0 };
 
@@ -25,23 +25,26 @@ function makeSupabaseMock() {
 
   return {
     register(body) {
-      if (users.has(body.p_identity_id)) throwHttp(400, 'account_already_exists');
+      const uname = String(body.p_username || '').toLowerCase();
+      if (users.has(uname)) throwHttp(400, 'username_taken');
       const userId = ++idSeq;
       const token = 'tok-u' + userId;
       tokens.set(token, userId);
-      users.set(body.p_identity_id, {
+      users.set(uname, {
         userId,
+        password_hash: body.p_password_hash,
         recovery_hash: body.p_recovery_hash,
-        profile: { username: body.p_username ?? 'Anonymous', avatar_seed: body.p_avatar_seed ?? '' },
+        profile: { username: uname },
         settings: {},
         progress: {}
       });
       return { token, user_id: userId };
     },
     login(body) {
-      const u = users.get(body.p_identity_id);
-      if (!u) throwHttp(400, 'account_not_found');
-      if (u.recovery_hash !== body.p_recovery_hash) throwHttp(400, 'invalid_recovery_key');
+      const uname = String(body.p_username || '').toLowerCase();
+      const u = users.get(uname);
+      if (!u) throwHttp(400, 'invalid_credentials');
+      if (u.password_hash !== body.p_password_hash) throwHttp(400, 'invalid_credentials');
       const token = 'tok-u' + u.userId;
       tokens.set(token, u.userId);
       return { token, user_id: u.userId };
@@ -113,30 +116,24 @@ console.log('== 1. Auth lifecycle (MOCKED) ==');
   h.W('Identity').init();
   const auth = h.W('Auth');
 
-  // register
-  let res = await auth.register();
+  // register (username + password)
+  let res = await auth.createAccount('tester', 'password123');
   ok(res.ok, 'register returns ok');
-  const iid = h.W('Identity').get().id;
-  ok(mock.users.has(iid), 'mock backend created user for identity');
+  ok(mock.users.has('tester'), 'mock backend created user for username');
   ok(auth.isAuthenticated(), 'authenticated after register');
 
-  // logout then re-login with the SAME identity + recovery key (same hash)
+  // logout then re-login with the SAME username + password
   await auth.logout();
   ok(!auth.isAuthenticated(), 'logout clears auth (MOCKED)');
-  res = await auth.loginWithRecoveryKey();
-  ok(res.ok, 'login with correct recovery hash succeeds (MOCKED)');
+  ok(ss(h) === null || ss(h).token === undefined, 'session cleared after logout (MOCKED)');
+  res = await auth.signIn('tester', 'password123');
+  ok(res.ok, 'login with correct password succeeds (MOCKED)');
   ok(auth.isAuthenticated(), 'authenticated after login (MOCKED)');
 
-  // tamper the transport hash -> failure
-  const origHash = h.W('RecoveryKey').hashForTransport;
-  h.W('RecoveryKey').hashForTransport = () => Promise.resolve('b'.repeat(64));
-  res = await auth.loginWithRecoveryKey();
-  ok(!res.ok, 'wrong recovery hash -> login fails (MOCKED)');
-  ok(/invalid_recovery|unauthorized/i.test(res.reason), 'reason indicates auth failure (MOCKED)');
-  h.W('RecoveryKey').hashForTransport = origHash;
-
-  // session cleared after logout
-  ok(ss(h) === null || ss(h).token === undefined, 'session cleared after logout (MOCKED)');
+  // wrong password -> failure (does not affect the existing valid session)
+  res = await auth.signIn('tester', 'wrongpassword');
+  ok(!res.ok, 'wrong password -> login fails (MOCKED)');
+  ok(res.reason !== 'authentication-unavailable-offline', 'failure is an auth rejection, not offline');
 }
 
 /* ================================================================== */
@@ -152,7 +149,7 @@ console.log('== 2. Cross-user isolation (MOCKED) ==');
   hA.load(LOAD_ORDER); cfg(hA, BACKEND_ON);
   hA.W('RecoveryKey').ensure();
   hA.global.Store.saveIdentity({ id: idA, version: 1 });
-  await hA.W('Auth').register();
+  await hA.W('Auth').createAccount('usera', 'password123');
   const tokenA = hA.W('Sync').getToken();
   ok(!!tokenA, 'A has a token');
 
@@ -161,7 +158,7 @@ console.log('== 2. Cross-user isolation (MOCKED) ==');
   hB.load(LOAD_ORDER); cfg(hB, BACKEND_ON);
   hB.W('RecoveryKey').ensure();
   hB.global.Store.saveIdentity({ id: idB, version: 1 });
-  await hB.W('Auth').register();
+  await hB.W('Auth').createAccount('userb', 'password123');
   const tokenB = hB.W('Sync').getToken();
   ok(!!tokenB && tokenB !== tokenA, 'B has a distinct token');
 
@@ -199,7 +196,7 @@ console.log('== 3. Sync isolation + errors (MOCKED) ==');
   h.load(LOAD_ORDER); cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   const token = h.W('Sync').getToken();
 
   // valid push/pull
@@ -274,7 +271,7 @@ console.log('== 5. Session restoration lifecycle (MOCKED) ==');
   h.load(LOAD_ORDER); cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   const token = h.W('Sync').getToken();
 
   // Restore valid session on "reload": seed sessionStorage with the token

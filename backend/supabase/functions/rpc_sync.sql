@@ -103,3 +103,33 @@ BEGIN
   END IF;
 END;
 $$;
+
+-- ---------- Reset progress (authenticated) --------------------------
+
+-- Reset the authenticated account's own progression to empty. Only touches
+-- the caller's user_progress row; never another user's data.
+CREATE OR REPLACE FUNCTION public.ns_reset_progress(p_token text)
+RETURNS json
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id bigint;
+BEGIN
+  IF p_token IS NULL OR p_token = '' THEN
+    RAISE EXCEPTION 'unauthorized';
+  END IF;
+  v_user_id := public.ns_validate_session(p_token);
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'unauthorized';
+  END IF;
+
+  UPDATE public.user_progress
+  SET progress_json = ('{"version":1,"missions":{},"articles":{},"weekly":{},"updated_at":"'||to_char(now(),'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')||'"}')::jsonb,
+      updated_at = now()
+  WHERE user_id = v_user_id;
+
+  RETURN json_build_object('reset', true, 'user_id', v_user_id);
+END;
+$$;

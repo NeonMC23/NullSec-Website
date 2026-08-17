@@ -1,12 +1,9 @@
 /**
  * NullSec — Settings Service
  * ------------------------------------------------------------------
- * Single source of truth for user preferences, plus local export/import
- * of all user data (identity, profile, progress, recovery, settings).
- *
- * Everything is 100% local. No backend, no network, no encryption, no cloud.
- * A future synchronization layer can replace the persistence underneath
- * without touching the UI.
+ * Source of truth for user preferences. M31: no local export/import, no
+ * local profile data — settings are account data (private, synced through the
+ * Sync layer to Supabase; held in memory for the session).
  *
  * Settings schema: see docs/settings-schema.md
  *
@@ -15,15 +12,11 @@
  *   Settings.get()         — current settings object
  *   Settings.update(data)  — deep-merge partial updates, bump updated_at
  *   Settings.reset()       — reset to defaults
- *   Settings.exportData()  — return { type, version, exported_at, data }
- *   Settings.importData(obj) — validate + restore (returns {ok, error})
- *   Settings.validateUsername(name) — trim/length checks
  */
 (function () {
   'use strict';
 
   const SCHEMA_VERSION = 1;
-  const EXPORT_VERSION = 1;
 
   function now() {
     return new Date().toISOString();
@@ -111,93 +104,12 @@
 
   /* --- Username validation -------------------------------------------- */
 
-  /**
-   * Validate a username.
-   * @param {string} name
-   * @returns {string|null} error message, or null if valid
-   */
-  function validateUsername(name) {
-    if (typeof name !== 'string') return 'Username must be a string.';
-    const trimmed = name.trim();
-    if (trimmed.length === 0) return 'Username cannot be empty.';
-    if (trimmed.length < 2) return 'Username must be at least 2 characters.';
-    if (trimmed.length > 32) return 'Username must be at most 32 characters.';
-    return null;
-  }
 
-  /* --- Export / Import of all local data ------------------------------ */
-
-  /**
-   * Collect all local user data into a portable object.
-   * Includes: identity, profile, progress, recovery, settings.
-   * @returns {object} { type, version, exported_at, data }
-   */
-  function exportData() {
-    const data = {
-      identity: Identity.get(),
-      profile: UserProfile.get(),
-      progress: Progress.get(),
-      recovery: RecoveryKey.get(),
-      settings: get()
-    };
-    return {
-      type: 'nullsec-export',
-      version: EXPORT_VERSION,
-      exported_at: now(),
-      data: data
-    };
-  }
-
-  /** Basic shape/version validation of an import payload. */
-  function validateImport(obj) {
-    if (!obj || typeof obj !== 'object') return 'Not a valid export object.';
-    if (obj.type !== 'nullsec-export') return 'Not a NullSec export file.';
-    if (obj.version !== EXPORT_VERSION) return 'Unsupported export version.';
-    if (!obj.data || typeof obj.data !== 'object') return 'Missing data section.';
-    return null;
-  }
-
-  /**
-   * Import previously exported local data. Validates, then restores.
-   * @param {object} obj
-   * @returns {{ok: boolean, error?: string}}
-   */
-  function importData(obj) {
-    const err = validateImport(obj);
-    if (err) return { ok: false, error: err };
-    const data = obj.data;
-
-    // Identity
-    if (data.identity && data.identity.id) {
-      IdentityRepository.save(data.identity);
-    }
-    // Profile (ensure identity link)
-    if (data.profile && data.profile.identity_id) {
-      ProfileRepository.save(data.profile);
-    }
-    // Progress
-    if (data.progress && data.progress.version && data.progress.identity_id) {
-      ProgressRepository.save(data.progress);
-    }
-    // Recovery (only if present and valid format) — session-scoped storage,
-    // never localStorage.
-    if (typeof data.recovery === 'string') {
-      RecoveryKey.importRaw(data.recovery);
-    }
-    // Settings
-    if (data.settings && data.settings.version) {
-      SettingsRepository.save(data.settings);
-    }
-    return { ok: true };
-  }
 
   window.Settings = {
     init: init,
     get: get,
     update: update,
-    reset: reset,
-    exportData: exportData,
-    importData: importData,
-    validateUsername: validateUsername
+    reset: reset
   };
 })();

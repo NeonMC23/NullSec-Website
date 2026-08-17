@@ -93,6 +93,8 @@ export function makeHarness(opts = {}) {
       readyState: 'complete',
       documentElement: { setAttribute() {}, removeAttribute() {} },
       getElementById: () => null,
+      querySelector: () => null,
+      querySelectorAll: () => [],
       createElement: () => makeShimElement(),
       createElementNS: (ns, tag) => makeShimElement(),
       createTextNode: (text) => ({ nodeType: 3, textContent: String(text) }),
@@ -127,11 +129,14 @@ export function makeHarness(opts = {}) {
       let body = {};
       try { body = JSON.parse((init && init.body) || '{}'); } catch (e) {}
       const routed = [
-        ['ns_register', 'register'], ['ns_login', 'login'], ['ns_validate_session', 'validate'],
+        ['ns_register', 'register'], ['ns_login', 'login'], ['ns_recover', 'recover'],
+        ['ns_validate_session', 'validate'],
         ['ns_logout', 'logout'], ['ns_sync_pull', 'syncPull'], ['ns_sync_push', 'syncPush'],
         ['ns_activity', 'activity'], ['ns_metrics', 'metrics'], ['ns_country_metrics', 'countryMetrics'],
         ['ns_tool_activity', 'toolActivity'], ['ns_update_profile', 'updateProfile'],
-        ['ns_record_activity', 'recordActivity']
+        ['ns_record_activity', 'recordActivity'],
+        ['ns_change_password', 'changePassword'], ['ns_reset_progress', 'resetProgress'],
+        ['ns_public_profile', 'publicProfile'], ['ns_update_public_profile', 'updatePublicProfile']
       ];
       for (const [tag, method] of routed) {
         if (u.indexOf(tag) !== -1) {

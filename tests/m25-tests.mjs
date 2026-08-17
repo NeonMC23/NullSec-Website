@@ -36,7 +36,7 @@ console.log('== 1. Activity service: valid + validation (LOCAL/MOCKED) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
 
   const svc = h.W('ActivityService');
@@ -89,7 +89,7 @@ console.log('== 3. Activity service: backend unavailable (MOCKED) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
   const res = await h.W('ActivityService').record('tool_used', 1);
   ok(res.ok === false && res.reason === 'backend_unavailable', 'backend failure → unavailable, no fabricated success');
@@ -103,7 +103,7 @@ console.log('== 4. Privacy: no user_id/country_code/identity in payload (MOCKED)
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
   await h.W('ActivityService').record('community_action', 1);
   const call = h.calls.fetch.filter(c => /ns_record_activity/.test(c.url)).pop();

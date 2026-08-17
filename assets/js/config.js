@@ -52,11 +52,23 @@
   // Optional, documented, PUBLIC-only injection point for static hosting.
   // Reads `window.__NULLSEC_SUPABASE__` (set by a deploy-time bootstrap that
   // is NOT committed). Only url + anonKey are consumed.
+  // M46: when a valid bootstrap (url + anonKey, enabled !== false) is present,
+  // the backend flags are activated and offlineMode is turned off. The default
+  // here stays fully offline, so the repository remains safe by default and
+  // the M45 invariant ("backend disabled by default") holds without a build.
   function inject() {
     const boot = window.__NULLSEC_SUPABASE__;
     if (boot && typeof boot === 'object') {
-      if (typeof boot.url === 'string' && boot.url.length > 0) CONFIG.supabaseUrl = boot.url;
-      if (typeof boot.anonKey === 'string' && boot.anonKey.length > 0) CONFIG.supabaseAnonKey = boot.anonKey;
+      const hasUrl = typeof boot.url === 'string' && boot.url.length > 0;
+      const hasKey = typeof boot.anonKey === 'string' && boot.anonKey.length > 0;
+      if (hasUrl) CONFIG.supabaseUrl = boot.url;
+      if (hasKey) CONFIG.supabaseAnonKey = boot.anonKey;
+      const active = hasUrl && hasKey && boot.enabled !== false;
+      CONFIG.supabaseEnabled = active;
+      CONFIG.authEnabled = active;
+      CONFIG.backendEnabled = active;
+      CONFIG.syncEnabled = active;
+      CONFIG.offlineMode = !active;
     }
   }
 

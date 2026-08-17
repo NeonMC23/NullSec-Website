@@ -123,35 +123,6 @@ const Utils = {
   },
 
   /**
-   * Generate a deterministic SVG avatar (as an SVG string) from a seed.
-   * Fully local, no external services/libraries. Same seed → same output.
-   * @param {string} seed
-   * @returns {string} SVG markup
-   */
-  avatarSvg(seed) {
-    const s = typeof seed === 'string' ? seed : String(seed || '');
-    const h = this.hash(s);
-    const hue = h % 360;
-    const hue2 = (hue + 40) % 360;
-    const accent = 'hsl(' + hue + ',70%,55%)';
-    const accent2 = 'hsl(' + hue2 + ',70%,45%)';
-    const initial = (s.charAt(0) || 'A').toUpperCase();
-    const x = 10 + (h % 9);         // 10..18
-    const y = 10 + ((h >> 3) % 9);  // 10..18
-    // Deterministic diagonal split based on seed.
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' +
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="' + accent + '"/>' +
-      '<stop offset="1" stop-color="' + accent2 + '"/>' +
-      '</linearGradient></defs>' +
-      '<rect width="64" height="64" rx="32" fill="url(#g)"/>' +
-      '<text x="32" y="40" font-family="sans-serif" font-size="30" font-weight="700" ' +
-      'fill="rgba(255,255,255,0.95)" text-anchor="middle">' + initial + '</text>' +
-      '<circle cx="' + x + '" cy="' + y + '" r="4" fill="rgba(255,255,255,0.35)"/>' +
-      '</svg>';
-  },
-
-  /**
    * Build a DOM element safely. All string values are set via textContent
    * (auto-escaped), attribute names go through setAttribute. The only way
    * to insert raw HTML is the explicit `html` attr (trusted content).

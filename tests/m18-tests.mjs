@@ -37,7 +37,7 @@ console.log('== 1. Storage policy (LOCAL) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
 
   const ls = JSON.stringify(h.localBacking);
   ok(!ls.includes('ns:identity') && !ls.includes('ns:user:profile') &&

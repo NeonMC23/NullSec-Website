@@ -88,11 +88,12 @@
     // --- 3. Validate server-side (the authoritative check). -------------
     return ApiClient.validateSession(saved.token).then(function (userId) {
       if (userId) {
-        // Identity may be absent (e.g. localStorage cleared but the short-lived
-        // session survived). Guard the optional identity link so restoration
-        // never throws on a null identity.
-        const localId = Identity.get() ? Identity.get().id : null;
-        Auth.applySession(saved.token, localId);
+        // Preserve the server username already stored in the short-lived
+        // session (never overwrite it with the local UUID). The username is
+        // private account data; the session token is server-authoritative.
+        const username = (saved && typeof saved.username === 'string' && saved.username.length)
+          ? saved.username : null;
+        Auth.applySession(saved.token, username);
         sessionRefused = false;
         status = 'authenticated';
         return 'authenticated';

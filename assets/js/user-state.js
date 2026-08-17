@@ -8,16 +8,13 @@
  * session mode are NEVER written to localStorage. The authoritative
  * authenticated flag lives in memory (Auth). A reload resets this view-state.
  *
- * The application state model is intentionally simple:
- *   - LOCAL / NOT AUTHENTICATED   (backend disabled or no session)
- *   - AUTHENTICATED / SUPABASE     (validated Supabase session)
- *   - BACKEND UNAVAILABLE          (enabled but unreachable → see Session)
- * There is no "local authenticated account".
+ * M31: there is no client-side account concept. A visitor is either anonymous
+ * (guest) or authenticated. There is no third "local" state.
  *
  * API:
  *   UserState.get()             — current view state (derived)
  *   UserState.isAuthenticated() — delegates to the authoritative Auth flag
- *   UserState.getMode()         — 'anonymous' | 'local' | 'authenticated'
+ *   UserState.getMode()         — 'anonymous' | 'authenticated'
  */
 (function () {
   'use strict';
@@ -32,12 +29,12 @@
   }
 
   /**
-   * Derive the current mode from the authoritative sources (never persisted).
-   * @returns {'anonymous'|'local'|'authenticated'}
+   * Derive the current mode from the authoritative auth source (never persisted).
+   * M31: only guest ('anonymous') or 'authenticated' — no client-side account state.
+   * @returns {'anonymous'|'authenticated'}
    */
   function getMode() {
-    if (window.Auth && Auth.isAuthenticated()) return 'authenticated';
-    return Identity.exists() ? 'local' : 'anonymous';
+    return (window.Auth && Auth.isAuthenticated()) ? 'authenticated' : 'anonymous';
   }
 
   /** Whether a validated session is active (delegates to the authoritative Auth). */

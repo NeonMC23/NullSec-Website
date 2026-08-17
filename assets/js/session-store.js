@@ -9,14 +9,14 @@
  *   - ns:session:recovery  — the local recovery key (NSK1-…). Kept out of
  *     long-lived localStorage: sessionStorage is cleared when the tab/session
  *     closes, so the raw key does not persist on disk across browser sessions.
- *   - ns:session:auth       — the restored session { token, expires_at }.
+ *   - ns:session:auth       — the restored session { token, username, expires_at }.
  *     token is the opaque server session token (SHA-256-hashed server-side);
- *     expires_at is informational only and is NEVER trusted as proof of
- *     validity (ns_validate_session is authoritative).
+ *     username is the private login identifier (displayed only on the private
+ *     Account page, never publicly); expires_at is informational only and is
+ *     NEVER trusted as proof of validity (ns_validate_session is authoritative).
  *
  * Explicitly NOT stored here or anywhere: recovery hash, password, full
- * profile, progress, sync payloads. Those stay in localStorage via Store
- * (non-secret user data) or in memory only.
+ * profile, progress, sync payloads. Those live in memory only.
  *
  * Privacy-first: no telemetry, no tracking, no analytics.
  *
@@ -64,7 +64,7 @@
 
   /**
    * Return the persisted session, or null.
-   * Structure: { token: string, expires_at: string|null }
+   * Structure: { token: string, username: string|null, expires_at: string|null }
    * NEVER contains the recovery key/hash, password, profile or progress.
    */
   function getSession() {
@@ -75,13 +75,15 @@
     return null;
   }
 
-  /** Persist a session object (token + optional expiration metadata). */
+  /** Persist a session object (token + optional username/expiration metadata). */
   function saveSession(session) {
     if (!session || typeof session !== 'object' ||
       typeof session.token !== 'string' || session.token.length === 0) {
       return;
     }
     const clean = { token: session.token };
+    // username is the private login identifier (session-scoped, not public).
+    if (typeof session.username === 'string' && session.username.length) clean.username = session.username;
     // expires_at is informational metadata only (server remains authoritative).
     if (typeof session.expires_at === 'string') clean.expires_at = session.expires_at;
     set(KEYS.AUTH, clean);

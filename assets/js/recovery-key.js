@@ -5,8 +5,8 @@
  * no backend, no sync, no encryption yet — purely local.
  *
  * A recovery key is a cryptographically random, human-readable, grouped
- * string. It is generated ONCE per local profile and stored separately from
- * the profile (never inside UserProfile). It is stored in sessionStorage
+ * string. It is generated ONCE per account and stored separately from account
+ * data (never inside UserProfile). It is stored in sessionStorage
  * (short-lived, per-tab) — never in long-lived localStorage — and is never
  * logged or printed.
  *

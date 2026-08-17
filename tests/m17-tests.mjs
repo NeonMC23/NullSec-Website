@@ -40,7 +40,7 @@ console.log('== 1. Storage: no account data in localStorage (LOCAL) ==');
   h.W('UserProfile').init();
   h.W('Settings').init();
   await h.W('Progress').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
 
   const keys = Object.keys(h.localBacking).join(',');
   ok(!keys.includes('ns:identity'), 'no identity in localStorage');
@@ -68,11 +68,17 @@ console.log('== 2. Session: no resurrection; unavailable not authenticated (LOCA
   h.load(LOAD_ORDER);
   cfg(h, BACKEND_OFF);
 
-  // The Store migrate() should have purged stale account data.
-  ok(h.localBacking['ns:identity'] === undefined, 'stale identity purged from localStorage');
-  ok(h.localBacking['ns:progress'] === undefined, 'stale progress purged from localStorage');
+  // M31: there is no permanent purge layer for the old local-profile
+  // architecture. The current app never READS those legacy keys, so stale
+  // account data can never resurrect an account or authenticate a user.
   ok(!h.W('Auth').isAuthenticated(), 'no authentication from cached data');
-  ok(h.W('UserState').getMode() !== 'authenticated', 'no local-account resurrection');
+  ok(h.W('UserState').getMode() === 'anonymous', 'no local-account resurrection (mode is anonymous)');
+  // The app must not write ANY account data into localStorage (only the two
+  // keys we seeded as a legacy simulation may exist; nothing else is added).
+  // Allow the migration marker + the device theme; no account/progression keys.
+  const keys = Object.keys(h.localBacking)
+    .filter(k => k !== 'ns:identity' && k !== 'ns:progress' && k !== 'ns:migrated:v1' && k !== 'ns:theme');
+  ok(keys.length === 0, 'app writes no account keys to localStorage (got: ' + keys.join(',') + ')');
 
   // Unavailable backend does not authenticate.
   await h.W('Session').forceRecheck();

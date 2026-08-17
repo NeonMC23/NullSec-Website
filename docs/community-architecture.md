@@ -1,85 +1,129 @@
-# NullSec — Community Architecture
+# Community — Aggregated Intelligence (Milestone 35)
 
-> **Couche communautaire anonyme (Milestone 9).** Un aperçu du mouvement NullSec
-> sans devenir un réseau social. Aucun profil public, aucun suivi, aucune donnée
-> personnelle exposée.
+> **Community does not expose users. It exposes aggregated community activity.**
 
----
-
-## 1. Principe
-
-NullSec veut montrer qu'il s'agit d'un **mouvement mondial actif**, en augmentant la
-motivation et le sentiment d'appartenance, **sans** transformer le site en réseau social.
-Toutes les métriques sont **agrégées et anonymes**.
-
-## 2. Architecture
+## Modèle
 
 ```
-Community UI (community.html)
-        │
-        ▼
-CommunityService (community-service.js)   — stats / map / missions / regions
-CommunityMap (community-map.js)           — carte SVG Europe
-Challenges (challenge-service.js)         — défis anonymes
-CommunityRanking (community-ranking.js)   — classement pays/régions (agrégé)
-CommunityMetrics (community-metrics.js)   — impact global (M12)
-MissionDiscovery (mission-discovery.js)   — découverte/filtres de missions
-        │
-        ├── online → ApiClient.community* + ApiClient.missions + ranking + challenges
-        └── offline → local static countries + missions (empty/statique state)
-        │
-        ▼
-Backend (PostgreSQL, agrégé, anonyme)
+Account
+  ↓
+Private progression (Supabase)
+  ↓
+Aggregated activity
+  ↓
+Community metrics
 ```
 
-### Flux de données
+- Les utilisateurs authentifiés produisent une **progression privée** (Supabase).
+- Des **événements d'activité** anonymes alimentent des **métriques agrégées**.
+- La page **Community** n'affiche que ces métriques agrégées.
+
+## Architecture de la page
+
 ```
-Backend (anonymous_global_stats, mission_activity, countries)
-   │  (agrégé, anonyme)
-   ▼
-GET /api/community/stats | /map | /countries
-   ▼
-ApiClient
-   ▼
-CommunityService
-   ▼
-Community page (stats cards + map + regions)
+Community
+├── Hero (title + explication « collective activity, never individual users »)
+├── Community Overview      (Total participants, Countries represented,
+│                             Missions completed, Community activity)
+├── Country Activity        (barres horizontales agrégées par pays)
+├── Activity Breakdown      (Missions / Tools / Community actions / Propagation)
+├── Europe Activity Map     (agrégat visuel par pays)
+├── Your participation      (état authentifié, contribution seulement)
+└── Privacy note
 ```
 
-## 3. Modèle de confidentialité
+## Data flow
 
-- **Aucune localisation utilisateur** (pas de GPS, pas d'adresse).
-- **Aucun stockage d'IP**, aucun fingerprinting.
-- **Aucune timeline personnelle**, aucun profil public.
-- **Aucun pixel de tracking**, aucune analytics.
-- **Aucune API de carte externe** (carte SVG intégrée).
-- Seules des **statistiques agrégées anonymes** sont calculées côté serveur.
+```
+community.js
+   ↓
+ApiClient / service (CommunityMetrics, CountryMetrics)
+   ↓
+public aggregate RPC (ns_country_metrics, ns_metrics)
+   ↓
+Supabase
+   ↓
+aggregated response
+   ↓
+Community UI
+```
 
-## 4. Agrégation
+- **1 requête / minimum raisonnable** : la page utilise `CountryMetrics.getData()`
+  (`ns_country_metrics`) comme source agrégée principale.
+- Les agrégations lourdes restent **côté PostgreSQL / RPC** (`json_object_agg`).
+- Le frontend **ne parcourt jamais** une liste d'utilisateurs pour calculer des statistiques.
 
-| Métrique | Source |
-|----------|--------|
-| `active_users` | `anonymous_global_stats.active_users` |
-| `completed_missions` | `anonymous_global_stats.completed_missions` |
-| `countries_active` | décompte des pays `active` |
-| `top_regions` | agrégation par pays/région depuis `mission_activity` |
-| activité par pays | `mission_activity` + `countries` |
-| classement pays/régions | agrégation `mission_activity` par pays/région |
-| défis | `community_challenges` + `challenge_progress` (compteurs anonymes) |
-| impact global (M12) | `anonymous_global_stats` + `country_activity` + `region_activity` |
+## Sources de données (backend existant, non modifié)
 
-## 5. Comportement offline
+| RPC | Données |
+|-----|---------|
+| `ns_country_metrics` | par pays : participants, missionActivity, toolActivity, communityActivity, propagation, totalActivity + lastUpdate |
+| `ns_metrics` | global : completedMissions, activeCountries, activeRegions, challenges |
 
-- Si le backend est désactivé/indisponible, `CommunityService` renvoie :
-  - des stats globales **vides** (0) ;
-  - une activité pays **locale** (missions disponibles, intensité `none`) depuis
-    `data/countries.json` ;
-  - les régions **inactives**.
-- Aucun crash, aucune requête réseau, la carte reste affichable.
+## Modèle de confidentialité
 
-## 6. Sécurité
+Interdit dans la couche Community (tests statiques) :
 
-- Endpoints publics **rate-limited**.
-- **Agrégation uniquement** — aucun accès à des données personnelles.
-- Caching court (pas de données sensibles).
-- Aucune donnée individuelle ne transite.
+```
+user_id
+identity_id
+username
+avatar
+password / password_hash
+recovery / recovery_key
+session token
+member lists / profile cards
+```
+
+- **Country ≠ profil utilisateur.** Un pays est un agrégat uniquement ;
+  aucune opération `France → liste des utilisateurs`.
+- Les identifiants techniques existent uniquement dans les couches backend
+  internes (pour le calcul des agrégats) et ne sont **jamais** retournés à l'UI.
+- Être connecté **n'ouvre aucun accès** aux données individuelles des autres.
+  La connexion permet seulement de contribuer (action communautaire explicite)
+  et de continuer son Journey.
+
+## États UI
+
+- **Loading** : « Loading… »
+- **Empty** : « No community statistics yet. » / « No country activity yet. »
+- **Error** : « Community statistics unavailable. Please try again later. »
+- **Offline / unavailable** : même état d'erreur — **jamais** une valeur fictive (0)
+  pour masquer un échec backend.
+
+## Sécurité
+
+- **RLS inchangée** (M31–M34 conservées).
+- RPC publics limités aux **agrégats** ; tables privées (`users`, `user_profiles`,
+  `user_progress`) jamais lues par le frontend.
+- `ns_country_metrics` : `SECURITY DEFINER` + `search_path` sécurisé.
+- Aucun service-role secret en frontend.
+- **Aucun stockage local** pour les statistiques communautaires.
+
+## Stockage
+
+Aucune nouvelle clé introduite :
+
+```
+localStorage:     ns:theme, ns:migrated:v1
+sessionStorage:   ns:session:auth, ns:session:recovery
+```
+
+## M38 — Profils personnalisés, Community toujours agrégée
+
+Même avec des profils publics personnalisables (bio, intérêts, achievements), Community reste
+**agrégée** : aucun username, aucune carte de profil, aucun classement individuel dans la
+Community. Les profils publics alimentent uniquement des agrégats.
+
+## M37 — Community reste agrégée (profils publics)
+
+Même avec des **profils publics** (voir `docs/public-profiles.md`), Community **ne devient pas
+un annuaire d'utilisateurs** :
+
+- aucune liste de usernames ;
+- aucun classement individuel ;
+- aucune carte de profil ;
+- aucune progression individuelle publique dans Community.
+
+Les profils publics peuvent alimenter des **agrégats** uniquement :
+`Public profiles → Aggregated metrics → Community`.

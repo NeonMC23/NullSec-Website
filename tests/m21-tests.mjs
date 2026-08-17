@@ -34,7 +34,7 @@ console.log('== 1. Storage: no account persistence, no token leakage (LOCAL) =='
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   const ls = JSON.stringify(h.localBacking);
   ok(!ls.includes('ns:identity') && !ls.includes('ns:user:profile') &&
      !ls.includes('ns:progress') && !ls.includes('ns:settings') &&

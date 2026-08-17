@@ -37,7 +37,7 @@ console.log('== 1. localStorage storage policy (LOCAL) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
 
   const keys = lsKeys(h).join(',');
   // No recovery key in localStorage (moved to sessionStorage in M13/M14).
@@ -62,7 +62,7 @@ console.log('== 2. sessionStorage only approved session data (LOCAL) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
 
   const sessKeys = Object.keys(h.sessionBacking);
   // Only the two approved keys may exist.
@@ -73,8 +73,8 @@ console.log('== 2. sessionStorage only approved session data (LOCAL) ==');
   const session = JSON.parse(h.sessionBacking['ns:session:auth'] || '{}');
   ok(typeof session.token === 'string' && session.token.length > 0,
     'session holds a token (temporary representation of a Supabase session)');
-  ok(Object.keys(session).every(k => k === 'token' || k === 'expires_at'),
-    'session object contains only token + optional expires_at');
+  ok(Object.keys(session).every(k => k === 'token' || k === 'expires_at' || k === 'username'),
+    'session object contains only token + optional expires_at/username (private, M32)');
 }
 
 /* ================================================================== */
@@ -91,7 +91,7 @@ console.log('== 3. Offline: no fake account, 0 backend requests (LOCAL) ==');
   eq(h.calls.fetch.filter(c => /rest\/v1/.test(c.url)).length, 0,
     '0 backend requests when Supabase disabled');
   // Auth reports backend unavailable, does not create an account.
-  const res = await h.W('Auth').register();
+  const res = await h.W('Auth').createAccount('tester', 'password123');
   eq(res.ok, false, 'register reports unavailable offline (no fake account)');
   ok(/authentication-unavailable-offline/.test(res.reason), 'reason is backend-unavailable');
   // No authentication flag is set.
@@ -110,7 +110,7 @@ console.log('== 4. Backend: account ops through ApiClient (MOCKED) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   ok(h.W('Auth').isAuthenticated(), 'authenticated via backend (MOCKED)');
   const calls = h.calls.fetch.map(c => c.url);
   ok(calls.some(u => /ns_register/.test(u)), 'registration went through ApiClient/RPC');

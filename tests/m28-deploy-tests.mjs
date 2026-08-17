@@ -27,19 +27,19 @@ const WF = join(ROOT, '.github/workflows/supabase-deploy.yml');
 console.log('== 1. Migration ordering ==');
 {
   const files = readdirSync(MIG).filter(f => f.endsWith('.sql')).sort();
-  const expected = Array.from({ length: 16 }, (_, i) => '00' + String(i + 1).padStart(2, '0') + '_').map(p => p.slice(1));
-  // Build expected names from 0001..0016
+  const expected = Array.from({ length: 17 }, (_, i) => '00' + String(i + 1).padStart(2, '0') + '_').map(p => p.slice(1));
+  // Build expected names from 0001..0019
   const names = [];
-  for (let i = 1; i <= 16; i++) {
+  for (let i = 1; i <= 18; i++) {
     const n = String(i).padStart(2, '0');
     names.push(readdirSync(MIG).find(f => f.startsWith('00' + n + '_')));
   }
   // Simpler: check count + lexicographic order + all prefix 0001..0016 present.
-  ok(files.length === 16, '16 migrations present (got ' + files.length + ')');
+  ok(files.length === 19, '19 migrations present (got ' + files.length + ')');
   ok(files.join('\n') === files.slice().sort().join('\n'), 'migrations lexicographically ordered');
   const nums = files.map(f => parseInt(f.slice(0, 4), 10));
-  ok(nums.join(',') === '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16',
-    'migration numbers are exactly 0001..0016');
+  ok(nums.join(',') === '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19',
+    'migration numbers are exactly 0001..0019');
 }
 
 /* 2. deploy.sh references migrations + RPC */
@@ -51,9 +51,9 @@ console.log('== 2. deploy.sh references ==');
   ok(/migrations\/\*\.sql/.test(deploy) && /sort/.test(deploy),
     'deploy.sh iterates migrations in lexicographic order');
   // RPC files in stable order.
-  const rpcs = ['rpc_auth', 'rpc_sync', 'rpc_activity', 'rpc_tool_activity', 'rpc_profile', 'rpc_activity_event', 'rpc_country_metrics', 'rpc_privileges'];
+  const rpcs = ['rpc_auth', 'rpc_sync', 'rpc_activity', 'rpc_tool_activity', 'rpc_profile', 'rpc_activity_event', 'rpc_country_metrics', 'rpc_public_profile', 'rpc_update_public_profile', 'rpc_privileges'];
   const re = new RegExp(rpcs.join('|'));
-  ok(rpcs.every(r => new RegExp(r + '\\.sql').test(deploy)), 'deploy.sh references all 8 RPC/hardening files');
+  ok(rpcs.every(r => new RegExp(r + '\\.sql').test(deploy)), 'deploy.sh references all 10 RPC/hardening files');
   // Order check: auth before sync before activity...
   const idxs = rpcs.map(r => deployCode.indexOf(r + '.sql'));
   ok(idxs.every((v, i) => i === 0 || v > idxs[i - 1]), 'RPC + hardening applied in stable dependency-safe order');
@@ -92,7 +92,7 @@ console.log('== 4. Fail-safe ==');
 /* 5. All RPC files exist */
 console.log('== 5. RPC files exist ==');
 {
-  const rpcs = ['rpc_auth.sql', 'rpc_sync.sql', 'rpc_activity.sql', 'rpc_tool_activity.sql', 'rpc_profile.sql', 'rpc_activity_event.sql', 'rpc_country_metrics.sql', 'rpc_privileges.sql'];
+  const rpcs = ['rpc_auth.sql', 'rpc_sync.sql', 'rpc_activity.sql', 'rpc_tool_activity.sql', 'rpc_profile.sql', 'rpc_activity_event.sql', 'rpc_country_metrics.sql', 'rpc_public_profile.sql', 'rpc_update_public_profile.sql', 'rpc_privileges.sql'];
   for (const r of rpcs) ok(readdirSync(FN).includes(r), r + ' exists');
 }
 

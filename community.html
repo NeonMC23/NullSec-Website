@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Community &mdash; NullSec</title>
-  <meta name="description" content="NullSec community: anonymous global movement statistics, Europe activity map, and open source projects." />
-  <meta property="og:title" content="Community Projects &mdash; NullSec" />
-  <meta property="og:description" content="Community projects, tools, and guides from NullSec. Open source and collaborative." />
+  <meta name="description" content="NullSec community: aggregated, anonymous statistics about collective activity. No individual profiles, no tracking." />
+  <meta property="og:title" content="Community &mdash; NullSec" />
+  <meta property="og:description" content="Aggregated, anonymous community statistics. Collective activity only." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/community.html" />
   <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/og-image.svg" />
@@ -37,7 +37,7 @@
         <a href="articles.html">Articles</a>
         <a href="community.html" class="active">Community</a>
         <a href="contribute.html">Contribute</a>
-        <a href="profile.html">Profile</a>
+        <a href="profile.html">Account</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -53,62 +53,59 @@
     <a href="tools.html">Tools</a>
     <a href="articles.html">Articles</a>
     <a href="community.html">Community</a>
+    <a href="about.html">About</a>
     <a href="contribute.html">Contribute</a>
-    <a href="profile.html">Profile</a>
+    <a href="profile.html">Account</a>
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
 
-
   <section class="section community-page" style="padding-top: 120px;">
     <div class="container">
-      <div class="section-header fade-in">
+
+      <!-- Hero -->
+      <div class="section-header community-hero fade-in">
         <h1>Community</h1>
-        <p>An anonymous overview of the NullSec movement across Europe and beyond. Privacy-first, aggregated, no tracking.</p>
+        <p>Collective activity across NullSec. These are aggregated statistics about the community as a whole — never individual users.</p>
       </div>
 
+      <!-- Community Overview -->
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Global Impact</h2>
+        <h2>Community Overview</h2>
       </div>
-      <div id="community-stats" class="fade-in fade-in-delay-1"></div>
+      <div id="community-overview" class="fade-in fade-in-delay-1"></div>
 
+      <!-- Country Activity -->
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Your participation</h2>
+        <h2>Country Activity</h2>
+        <p>Aggregated activity by country. Countries are shown as aggregates only — never as a list of users.</p>
       </div>
-      <div id="community-participation" class="fade-in fade-in-delay-1"></div>
+      <div id="country-activity" class="fade-in fade-in-delay-1"></div>
 
+      <!-- Activity Breakdown -->
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Europe Activity</h2>
-        <p>Anonymous, aggregated community activity by country. No individual data is shown.</p>
+        <h2>Activity Breakdown</h2>
+        <p>Collective activity by type — missions, tools, community actions and propagation.</p>
+      </div>
+      <div id="activity-breakdown" class="fade-in fade-in-delay-1"></div>
+
+      <!-- Europe map (kept as a visual aggregate) -->
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Europe Activity Map</h2>
       </div>
       <div id="community-map" class="community-map-container fade-in fade-in-delay-1"></div>
       <div id="europe-country-panel" class="europe-country-panel fade-in fade-in-delay-1" style="display:none;"></div>
       <div id="community-last-update" class="community-last-update fade-in fade-in-delay-1"></div>
 
+      <!-- Participation (authenticated, optional) -->
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Active Regions</h2>
+        <h2>Your participation</h2>
       </div>
-      <div id="community-regions" class="fade-in fade-in-delay-1"></div>
+      <div id="community-participation" class="fade-in fade-in-delay-1"></div>
 
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Mission Activity</h2>
-        <p>Countries ranked by mission completions — anonymous and aggregated.</p>
-      </div>
-      <div id="community-missions" class="fade-in fade-in-delay-1"></div>
-
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Community Challenges</h2>
-        <p>Collective global goals — anonymous and aggregate-based.</p>
-      </div>
-      <div id="community-challenges" class="fade-in fade-in-delay-1"></div>
-
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Country Ranking</h2>
-        <p>Countries by total mission completions — collective, never individual.</p>
-      </div>
-      <div id="community-ranking" class="fade-in fade-in-delay-1"></div>
-
+      <!-- Privacy note -->
       <div id="community-privacy" class="fade-in fade-in-delay-2" style="margin-top:32px;"></div>
 
+      <!-- Community projects (static) -->
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
         <h2>Community Projects</h2>
         <p>Open source projects built by the NullSec community. Contributions welcome.</p>
@@ -126,7 +123,7 @@
         <div class="project-card">
           <span class="status-tag active">Active</span>
           <h3>Learning Journey</h3>
-          <p>The interactive learning platform built into NullSec. Progressive stages, mission tracking, and local progress storage.</p>
+          <p>The interactive learning platform built into NullSec. Progressive stages and mission tracking. Create an account to save your progress.</p>
           <div class="project-links">
             <a href="journey.html">Website &#8599;</a>
           </div>
@@ -149,6 +146,7 @@
         </div>
       </div>
 
+      <!-- Community action (authenticated, optional) -->
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
         <h2>Community Participation</h2>
         <p>An explicit, optional action. Only recorded when you choose to contribute — never automatically, and never with personal data.</p>
@@ -167,7 +165,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><a href="./" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research and tools for your digital life.</p></div>
-        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a><a href="profile.html">Profile</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a><a href="about.html">About</a><a href="profile.html">Account</a></div>
         <div class="footer-col"><h4>Topics</h4><a href="tools.html?category=Privacy">Privacy</a><a href="tools.html?category=Security">Security</a><a href="tools.html?category=Linux">Linux</a><a href="tools.html?category=Open+Source">Open Source</a><a href="tools.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/NullSec-Community" target="_blank" rel="noopener">GitHub</a><a href="contribute.html">Contribute</a></div>
       </div>
@@ -187,7 +185,8 @@
   <script src="assets/js/session-store.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/data-loader.js"></script>
-  <script src="assets/js/config.js"></script>
+  <script src="assets/js/__supabase_bootstrap.js"></script>
+      <script src="assets/js/config.js"></script>
   <script src="assets/js/repositories/identity-repository.js"></script>
   <script src="assets/js/repositories/profile-repository.js"></script>
   <script src="assets/js/repositories/progress-repository.js"></script>
@@ -210,8 +209,6 @@
   <script src="assets/js/country-service.js"></script>
   <script src="assets/js/country-metrics.js"></script>
   <script src="assets/js/europe-map.js"></script>
-  <script src="assets/js/mission-discovery.js"></script>
-  <script src="assets/js/challenge-service.js"></script>
   <script src="assets/js/community-ranking.js"></script>
   <script src="assets/js/community-metrics.js"></script>
   <script src="assets/js/statistics-service.js"></script>

@@ -1994,6 +1994,237 @@
 
 }
 
+.journey-auth-cta {
+
+  grid-column: 1 / -1;
+  text-align: left;
+
+}
+
+.journey-auth-title {
+
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+
+}
+
+.journey-auth-text {
+
+  font-size: 0.9375rem;
+  color: var(--text-dim);
+  max-width: 60ch;
+
+}
+
+.journey-auth-actions {
+
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+
+}
+
+.journey-auth-signin {
+
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+
+}
+
+.journey-auth-signin a {
+
+  color: var(--accent);
+  text-decoration: underline;
+
+}
+
+/* --- Campaign Overview (M36) -------------------------------------- */
+
+.campaign-section-heading {
+
+  margin-bottom: 16px;
+
+}
+
+.campaign-section-heading h2 {
+
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--text);
+
+}
+
+.campaign-section-sub {
+
+  font-size: 0.9rem;
+  color: var(--text-dim);
+
+}
+
+.campaign-grid {
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+
+}
+
+.campaign-card {
+
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+
+}
+
+.campaign-card:hover {
+
+  border-color: var(--accent);
+  transform: translateY(-2px);
+
+}
+
+.campaign-icon {
+
+  font-size: 1.75rem;
+  display: block;
+  margin-bottom: 8px;
+
+}
+
+.campaign-card h3 {
+
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 6px;
+
+}
+
+.campaign-desc {
+
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+
+}
+
+.campaign-meta {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+
+}
+
+.campaign-status {
+
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 500;
+
+}
+
+.status-not-started { background: var(--bg-elevated); color: var(--text-dim); }
+.status-in-progress { background: rgba(251,191,36,0.12); color: #FBBF24; }
+.status-completed { background: rgba(52,211,153,0.12); color: #34D399; }
+.status-no-missions { background: var(--bg-elevated); color: var(--text-dim); }
+
+.campaign-count {
+
+  color: var(--text-dim);
+
+}
+
+.campaign-bar {
+
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+
+}
+
+.campaign-bar-fill {
+
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+
+}
+
+.campaign-pct {
+
+  display: block;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+
+}
+
+/* --- Next mission CTA (M36) --------------------------------------- */
+
+.next-mission-card {
+
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+}
+
+.next-mission-card.all-done {
+
+  border-color: rgba(52,211,153,0.4);
+
+}
+
+.next-mission-label {
+
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+
+}
+
+.next-mission-card h3 {
+
+  font-size: 1.2rem;
+  color: var(--text);
+
+}
+
+.next-mission-card p {
+
+  font-size: 0.9rem;
+  color: var(--text-dim);
+
+}
+
+.next-mission-card .btn {
+
+  align-self: flex-start;
+  margin-top: 6px;
+
+}
+
 .tools-header {
 
   display: flex;
@@ -3200,3 +3431,46 @@
 
 }
 
+
+/* --- Mission modal nav + completion (M40) ------------------------ */
+.modal-mission-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.mission-complete {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.mission-complete-icon {
+  font-size: 2.5rem;
+  color: #34D399;
+  margin-bottom: 8px;
+}
+
+.mission-complete h3 {
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.mission-complete .btn {
+  margin: 6px 4px 0;
+}
+
+.mission-campaign-tag {
+  color: #818CF8 !important;
+}
+
+/* --- M42: long-content safety (user text, campaign titles) --------- */
+.campaign-card h3,
+.mission-card h4,
+.modal h2,
+.next-mission-card h3,
+.public-profile-achievement strong {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}

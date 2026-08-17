@@ -58,5 +58,59 @@ node tests/m28-deploy-tests.mjs
 echo "== 18. Regression: 0009→0010 country_membership transition =="
 node tests/m29-regression-0009-0010.mjs
 
+echo "== 19. Milestone 30 suite (account-based progression & auth UX) =="
+node tests/m30-tests.mjs
+
+echo "== 20. Milestone 31 suite (legacy profile & local-state cleanup) =="
+node tests/m31-tests.mjs
+
+echo "== 21. Milestone 32 suite (username & password auth UX) =="
+node tests/m32-tests.mjs
+
+echo "== 22. Milestone 33 suite (authentication & session hardening) =="
+node tests/m33-tests.mjs
+
+echo "== 23. Milestone 34 suite (account & journey UX finalization) =="
+node tests/m34-tests.mjs
+
+echo "== 24. Milestone 35 suite (real account architecture + community dashboard) =="
+node tests/m35-tests.mjs
+
+echo "== 25. Milestone 36 suite (account lifecycle + campaign journey) =="
+node tests/m36-tests.mjs
+
+echo "== 26. Milestone 37 suite (account lifecycle + public profiles) =="
+node tests/m37-tests.mjs
+
+echo "== 27. Milestone 38 suite (public profile customization & learning identity) =="
+node tests/m38-tests.mjs
+
+echo "== 28. Milestone 39 suite (public profile discovery, sharing & identity UX) =="
+node tests/m39-tests.mjs
+
+echo "== 29. Milestone 40 suite (product completion audit & learning experience) =="
+node tests/m40-tests.mjs
+
+echo "== 30. Milestone 41 suite (deep product audit, UX polish & content completion) =="
+node tests/m41-tests.mjs
+
+echo "== 31. Milestone 42 suite (pre-deployment readiness & final hardening) =="
+node tests/m42-tests.mjs
+
+echo "== 32. Milestone 43 suite (final product gap analysis & functional completion) =="
+node tests/m43-tests.mjs
+
+echo "== 33. Milestone 44 suite (deployment readiness toolkit) =="
+node tests/m44-tests.mjs
+
+echo "== 34. Production preflight =="
+node tests/preflight-production.mjs
+
+echo "== 35. Milestone 45 release gate (release-candidate lock) =="
+node tests/m45-tests.mjs
+
+echo "== 36. Milestone 46 production-fix regressions (real-deploy fixes) =="
+node tests/m46-production-fixes.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

@@ -1,21 +1,21 @@
 /**
- * NullSec — Identity module
+ * NullSec — Account identity module
  * ------------------------------------------------------------------
- * Local-first anonymous identity management.
+ * Represents the account identity (a UUID that links to the Supabase
+ * account). M30/M31: the account is a PRIVATE progression container, NOT a
+ * social profile. This identity object carries NO username, display name or
+ * avatar — those legacy fields were removed. It only holds the
+ * id (UUID used as identity_id by the recovery-key auth) and timestamps.
  *
  * Works fully offline. No email, no password, no external auth, no
- * fingerprinting. The identity is a locally generated UUID persisted
- * through the Store module (see docs/identity-schema.md).
- *
- * Schema is versioned so it can later be migrated to a backend-compatible
- * format without breaking existing local identities.
+ * fingerprinting, no social fields. Held in memory (Store session cache);
+ * never persisted to localStorage.
  *
  * API:
  *   Identity.init()      — ensure an identity exists (create if missing)
  *   Identity.get()       — return the current identity (or null)
  *   Identity.create()    — generate + persist a new identity
- *   Identity.update(data) — merge metadata, bump updated_at, persist
- *   Identity.clear()     — delete the local identity
+ *   Identity.clear()     — delete the identity
  *   Identity.exists()    — boolean: does a valid identity exist?
  */
 (function () {
@@ -42,16 +42,14 @@
   }
 
   /**
-   * Build a fresh identity object.
+   * Build a fresh identity object. Carries only the account UUID + timestamps.
+   * No username/display_name/avatar (legacy fields — removed).
    * @returns {object}
    */
   function makeIdentity() {
     const ts = now();
     return {
       id: uuid(),
-      username: '',
-      display_name: '',
-      avatar: null,
       created_at: ts,
       updated_at: ts,
       version: SCHEMA_VERSION
@@ -80,25 +78,9 @@
   }
 
   /**
-   * Update identity metadata (merge allowed fields). The id and version are
-   * preserved; updated_at is bumped. Returns the updated identity.
-   * @param {object} data
+   * Delete the account identity. There is no profile object to update; the
+   * identity is a minimal UUID container.
    */
-  function update(data) {
-    const current = IdentityRepository.get() || makeIdentity();
-    const allowed = ['username', 'display_name', 'avatar'];
-    if (data && typeof data === 'object') {
-      allowed.forEach(function (key) {
-        if (data[key] !== undefined) current[key] = data[key];
-      });
-    }
-    current.updated_at = now();
-    current.version = SCHEMA_VERSION;
-    IdentityRepository.save(current);
-    return current;
-  }
-
-  /** Delete the local identity. */
   function clear() {
     IdentityRepository.clear();
   }
@@ -112,7 +94,6 @@
     init: init,
     get: get,
     create: create,
-    update: update,
     clear: clear,
     exists: exists
   };

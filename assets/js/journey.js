@@ -15,12 +15,20 @@
   let READY = false;
   let readyCallbacks = [];
 
-  let stages = [
-    { num: 1, name: 'Getting Started', count: 0 },
-    { num: 2, name: 'Build Better Habits', count: 0 },
-    { num: 3, name: 'Take Back Control', count: 0 },
-    { num: 4, name: 'Advanced', count: 0 }
+  // Campaigns are the organizational layer above missions (M36). They are
+  // derived from the existing stage metadata in missions.json — Campaign
+  // definitions are PUBLIC static content; progression is private user data.
+  let campaigns = [
+    { id: 'campaign-1', stage: 1, title: 'Getting Started', description: 'Foundational privacy and security basics you can set up today.', icon: '🚀' },
+    { id: 'campaign-2', stage: 2, title: 'Build Better Habits', description: 'Turn privacy into routine with sustainable daily habits.', icon: '🌱' },
+    { id: 'campaign-3', stage: 3, title: 'Take Back Control', description: 'Regain ownership of your data, devices and online accounts.', icon: '🔐' },
+    { id: 'campaign-4', stage: 4, title: 'Advanced', description: 'Advanced self-hosting and high-assurance privacy setups.', icon: '🧠' }
   ];
+
+  // Kept for backward compatibility with the mission grids.
+  let stages = campaigns.map(function (c) {
+    return { num: c.stage, name: c.title, count: 0 };
+  });
 
   /* ------------------------------------------------------------------
    * Data loading
@@ -67,12 +75,67 @@
     return Progress.isCompleted('weekly-community');
   }
 
+  /* ------------------------------------------------------------------
+   * Authentication gating (M30 — account-based progression)
+   * ------------------------------------------------------------------
+   * The Learning Journey is a PRIVATE account feature. Guests can browse the
+   * public mission content, but progression (completion state) is only
+   * available to an authenticated user and persisted server-side (Supabase).
+   * There is NO local/guest progression fallback.
+   */
+  function isAuthenticated() {
+    return !!(window.Auth && window.Auth.isAuthenticated());
+  }
+
+  /**
+   * Build the "create an account to start your journey" call-to-action shown
+   * to logged-out users instead of a private progression overview. Pure DOM;
+   * no inline handlers.
+   */
+  function buildAuthCTA() {
+    let wrap = Utils.el('div', { class: 'journey-auth-cta' });
+
+    let title = Utils.el('h2', { class: 'journey-auth-title', text: 'Your Learning Journey' });
+    wrap.appendChild(title);
+
+    let p = Utils.el('p', {
+      class: 'journey-auth-text',
+      text: 'Create an account to save your mission progress and continue your journey across devices.'
+    });
+    wrap.appendChild(p);
+
+    let actions = Utils.el('div', { class: 'journey-auth-actions' });
+    let createBtn = Utils.el('a', { class: 'btn btn-primary', href: 'profile.html', text: 'Create account' });
+    actions.appendChild(createBtn);
+    wrap.appendChild(actions);
+
+    let signInRow = Utils.el('p', { class: 'journey-auth-signin' });
+    signInRow.appendChild(Utils.el('span', { text: 'Already have an account? ' }));
+    signInRow.appendChild(Utils.el('a', { href: 'profile.html', text: 'Sign in' }));
+    wrap.appendChild(signInRow);
+
+    return wrap;
+  }
+
+  /** Render the auth CTA into the progress overview (logged-out state). */
+  function showAuthCTA() {
+    let progressEl = document.getElementById('progress-overview');
+    if (!progressEl) return;
+    Utils.clear(progressEl);
+    progressEl.appendChild(buildAuthCTA());
+  }
+
   function toggleMission(id) {
+    if (!isAuthenticated()) {
+      // Guests must not complete missions locally. Show the CTA and do nothing.
+      showAuthCTA();
+      return;
+    }
     const wasCompleted = Progress.isCompleted(id);
     if (wasCompleted) Progress.uncomplete(id);
     else Progress.complete(id);
     renderAll();
-    // M25: after successful LOCAL completion, trigger an anonymous community
+    // M25: after successful completion, trigger an anonymous community
     // activity event via the service layer (backend resolves the country).
     // Never fabricated success; offline is a no-op. Never sent on uncomplete.
     if (!wasCompleted && window.ActivityService) {
@@ -88,6 +151,168 @@
       if (missions[id] && missions[id].completed) n++;
     });
     return n;
+  }
+
+  /* ------------------------------------------------------------------
+   * Campaign model (M36 — derived from stage metadata + progression)
+   * ---------------------------------------------------------------- */
+
+  /** Missions belonging to a given campaign stage (deterministic order). */
+  function campaignMissions(stage) {
+    return MISSIONS.filter(function (m) {
+      return m.stage === stage && m.id !== 'weekly-community';
+    }).sort(function (a, b) {
+      return (a.order || 0) - (b.order || 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+    });
+  }
+
+  /** The mission that precedes a given mission in its Campaign, or null. */
+  function prevMission(id) {
+    const m = MISSIONS.find(function (x) { return x.id === id; });
+    if (!m) return null;
+    const list = campaignMissions(m.stage);
+    const idx = list.findIndex(function (x) { return x.id === id; });
+    return idx > 0 ? list[idx - 1] : null;
+  }
+
+  /** The mission that follows a given mission in its Campaign, or null. */
+  function nextMissionInCampaign(id) {
+    const m = MISSIONS.find(function (x) { return x.id === id; });
+    if (!m) return null;
+    const list = campaignMissions(m.stage);
+    const idx = list.findIndex(function (x) { return x.id === id; });
+    return (idx >= 0 && idx < list.length - 1) ? list[idx + 1] : null;
+  }
+
+  /** The Campaign a mission belongs to, or null. */
+  function campaignForMission(id) {
+    const m = MISSIONS.find(function (x) { return x.id === id; });
+    if (!m) return null;
+    return campaigns.find(function (c) { return c.stage === m.stage; }) || null;
+  }
+
+  /** Campaign completion stats derived from the authenticated progression. */
+  function campaignStats(campaign) {
+    const list = campaignMissions(campaign.stage);
+    let completed = 0;
+    list.forEach(function (m) {
+      if (Progress.isCompleted(m.id)) completed++;
+    });
+    const total = list.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    let status = 'Not started';
+    if (total === 0) status = 'No missions';
+    else if (completed >= total) status = 'Completed';
+    else if (completed > 0) status = 'In progress';
+    return { completed: completed, total: total, percentage: percentage, status: status };
+  }
+
+  /** The user's next mission: first incomplete mission of the first
+   *  non-completed Campaign. Derived — never stored separately. */
+  function nextMission() {
+    if (!isAuthenticated()) return null;
+    for (let i = 0; i < campaigns.length; i++) {
+      const c = campaigns[i];
+      const list = campaignMissions(c.stage);
+      for (let j = 0; j < list.length; j++) {
+        if (!Progress.isCompleted(list[j].id)) return list[j];
+      }
+    }
+    return null; // all campaigns completed
+  }
+
+  function allCampaignsCompleted() {
+    if (!isAuthenticated()) return false;
+    return campaigns.every(function (c) {
+      const s = campaignStats(c);
+      return s.total === 0 || s.completed >= s.total;
+    });
+  }
+
+  /** Campaign overview cards (authenticated only). */
+  function renderCampaignOverview() {
+    let container = document.getElementById('campaign-overview');
+    if (!container) return;
+    Utils.clear(container);
+    if (!isAuthenticated()) return;
+
+    let heading = Utils.el('div', { class: 'campaign-section-heading' });
+    heading.appendChild(Utils.el('h2', { text: 'Campaigns' }));
+    heading.appendChild(Utils.el('p', {
+      class: 'campaign-section-sub',
+      text: 'Your progress is saved to your account and synchronized across devices.'
+    }));
+    // M39: discrete, non-social link to the user's own public learning profile.
+    if (window.PublicProfile && window.Auth && Auth.getUsername()) {
+      let profileLink = Utils.el('a', {
+        href: PublicProfile.getUrl(Auth.getUsername()),
+        class: 'btn btn-secondary',
+        text: 'View your public learning profile'
+      });
+      heading.appendChild(profileLink);
+    }
+    container.appendChild(heading);
+
+    let grid = Utils.el('div', { class: 'campaign-grid' });
+    campaigns.forEach(function (c) {
+      const stats = campaignStats(c);
+      let card = Utils.el('div', { class: 'campaign-card', dataset: { stage: c.stage } });
+      card.appendChild(Utils.el('span', { class: 'campaign-icon', text: c.icon }));
+      card.appendChild(Utils.el('h3', { text: c.title }));
+      card.appendChild(Utils.el('p', { class: 'campaign-desc', text: c.description }));
+      let meta = Utils.el('div', { class: 'campaign-meta' });
+      meta.appendChild(Utils.el('span', {
+        class: 'campaign-status status-' + stats.status.toLowerCase().replace(/\s+/g, '-'),
+        text: stats.status
+      }));
+      meta.appendChild(Utils.el('span', {
+        class: 'campaign-count',
+        text: stats.completed + ' / ' + stats.total + ' missions'
+      }));
+      card.appendChild(meta);
+      if (stats.total > 0) {
+        let bar = Utils.el('div', { class: 'campaign-bar' });
+        bar.appendChild(Utils.el('div', {
+          class: 'campaign-bar-fill',
+          style: 'width:' + stats.percentage + '%'
+        }));
+        card.appendChild(bar);
+        card.appendChild(Utils.el('span', { class: 'campaign-pct', text: stats.percentage + '%' }));
+      }
+      // Clicking a campaign scrolls to its mission grid.
+      card.addEventListener('click', function () {
+        let gridEl = document.querySelector('.missions-grid[data-stage="' + c.stage + '"]');
+        if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  }
+
+  /** Next-mission CTA (authenticated only). */
+  function renderNextMission() {
+    let container = document.getElementById('next-mission');
+    if (!container) return;
+    Utils.clear(container);
+    if (!isAuthenticated()) return;
+
+    if (allCampaignsCompleted()) {
+      container.appendChild(Utils.el('div', {
+        class: 'next-mission-card all-done',
+        text: 'All campaigns completed. Great work!'
+      }));
+      return;
+    }
+    const nm = nextMission();
+    if (!nm) return;
+    let card = Utils.el('div', { class: 'next-mission-card' });
+    card.appendChild(Utils.el('span', { class: 'next-mission-label', text: 'Next mission' }));
+    card.appendChild(Utils.el('h3', { text: nm.icon + ' ' + nm.title }));
+    card.appendChild(Utils.el('p', { text: nm.desc }));
+    let btn = Utils.el('button', { class: 'btn btn-primary', text: 'Open mission' });
+    btn.addEventListener('click', function () { window.openMissionModal(nm.id); });
+    card.appendChild(btn);
+    container.appendChild(card);
   }
 
   /* ------------------------------------------------------------------
@@ -172,6 +397,17 @@
       tags.appendChild(catTag);
     }
 
+    // Campaign context (M40).
+    let camp = campaignForMission(id);
+    if (camp) {
+      let campTag = Utils.el('span', {
+        class: 'tldr-tag mission-campaign-tag',
+        style: 'display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:0.6875rem;font-weight:500;background:rgba(99,102,241,0.12);color:#818CF8;border-radius:100px;',
+        text: camp.icon + ' ' + camp.title
+      });
+      tags.appendChild(campTag);
+    }
+
     // Geographic availability tag (region + optional country)
     let geoLabel = (mission.region || 'Europe');
     if (mission.country) geoLabel += ' · ' + mission.country;
@@ -202,18 +438,50 @@
     } else {
       impactCount.textContent = '—';
     }
-    body.appendChild(renderGuide(mission.guide));
 
     let actions = Utils.el('div', { class: 'modal-actions' });
-    let completeBtn = Utils.el('button', {
-      class: 'btn ' + (done ? 'btn-secondary' : 'btn-primary'),
-      text: done ? '\u2713 Mark incomplete' : 'Mark as complete'
-    });
-    completeBtn.addEventListener('click', function () { completeFromModal(id); });
+    // Guests can read/learn but cannot complete: show a sign-in CTA instead of
+    // a dead "Mark as complete" button (M41 UX fix — no modal dead-end).
+    let authd = isAuthenticated();
+    let completeBtn;
+    if (!authd) {
+      completeBtn = Utils.el('a', {
+        href: 'profile.html',
+        class: 'btn btn-primary',
+        text: 'Create account to save progress'
+      });
+    } else {
+      completeBtn = Utils.el('button', {
+        class: 'btn ' + (done ? 'btn-secondary' : 'btn-primary'),
+        text: done ? '\u2713 Completed' : 'Mark as complete'
+      });
+      completeBtn.addEventListener('click', function () {
+        const wasDone = done;
+        completeFromModal(id);
+        // M40 completion feedback + next-mission CTA.
+        if (!wasDone) showMissionComplete(id);
+      });
+    }
     let closeBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Close' });
     closeBtn.addEventListener('click', function () { Modal.close(); });
     actions.appendChild(completeBtn);
     actions.appendChild(closeBtn);
+
+    // M40: prev/next mission navigation within the Campaign.
+    let nav = Utils.el('div', { class: 'modal-mission-nav' });
+    let prev = prevMission(id);
+    let next = nextMissionInCampaign(id);
+    if (prev) {
+      let prevBtn = Utils.el('button', { class: 'btn btn-secondary', text: '\u2190 Previous' });
+      prevBtn.addEventListener('click', function () { window.openMissionModal(prev.id); });
+      nav.appendChild(prevBtn);
+    }
+    if (next) {
+      let nextBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Next \u2192' });
+      nextBtn.addEventListener('click', function () { window.openMissionModal(next.id); });
+      nav.appendChild(nextBtn);
+    }
+    if (prev || next) actions.appendChild(nav);
 
     let content = Utils.el('div', {});
     content.appendChild(header);
@@ -227,6 +495,49 @@
   function completeFromModal(id) {
     toggleMission(id);
     Modal.close();
+  }
+
+  /** M40: show a completion confirmation with a next-mission CTA. */
+  function showMissionComplete(id) {
+    let content = Utils.el('div', { class: 'mission-complete' });
+    content.appendChild(Utils.el('div', { class: 'mission-complete-icon', text: '\u2713' }));
+    content.appendChild(Utils.el('h3', { text: 'Mission complete' }));
+    content.appendChild(Utils.el('p', {
+      class: 'text-dim',
+      text: 'Your progress is saved to your account and synchronized across devices.'
+    }));
+
+    // M43: when this was the last mission in its Campaign, acknowledge the
+    // Campaign completion (derived, never stored) with a clear badge.
+    let camp = campaignForMission(id);
+    let campaignJustCompleted = false;
+    if (camp) {
+      const st = campaignStats(camp);
+      campaignJustCompleted = st.total > 0 && st.completed >= st.total;
+    }
+    if (campaignJustCompleted) {
+      content.appendChild(Utils.el('div', {
+        class: 'mission-complete-campaign',
+        text: '\u2b50 ' + camp.title + ' complete'
+      }));
+    }
+
+    let next = nextMissionInCampaign(id);
+    let nextGlobal = nextMission();
+    let cta = next || nextGlobal;
+    if (cta) {
+      let btn = Utils.el('button', {
+        class: 'btn btn-primary',
+        text: 'Next: ' + cta.icon + ' ' + cta.title
+      });
+      btn.addEventListener('click', function () { window.openMissionModal(cta.id); });
+      content.appendChild(btn);
+    }
+    let closeBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Keep exploring' });
+    closeBtn.addEventListener('click', function () { Modal.close(); });
+    content.appendChild(closeBtn);
+
+    Modal.open(content);
   }
 
   /* ------------------------------------------------------------------
@@ -322,10 +633,14 @@
     let progressEl = document.getElementById('progress-overview');
     if (progressEl) {
       Utils.clear(progressEl);
-      let label = Utils.el('div', { class: 'progress-label', text: 'Your progress ' });
+      if (!isAuthenticated()) {
+        // Logged-out: no private progression. Show the account CTA instead.
+        progressEl.appendChild(buildAuthCTA());
+      } else {
+      let label = Utils.el('div', { class: 'progress-label', text: 'Your Progress ' });
       label.appendChild(Utils.el('span', {
         style: 'font-size:0.75rem;color:var(--text-dim);font-weight:400;',
-        text: '(stored locally, no account needed)'
+        text: '(saved to your account — resumes on any device)'
       }));
       let barTrack = Utils.el('div', { class: 'progress-bar-track' });
       barTrack.appendChild(Utils.el('div', {
@@ -352,7 +667,12 @@
       progressEl.appendChild(percent);
       progressEl.appendChild(barTrack);
       progressEl.appendChild(stats);
+      }
     }
+
+    // M36: campaign overview + next-mission CTA (authenticated only).
+    renderCampaignOverview();
+    renderNextMission();
 
     let weeklyGridEl = document.getElementById('weekly-mission-grid');
     if (weeklyGridEl) {
@@ -460,6 +780,18 @@
     },
     isWeeklyDone: function () { return isWeeklyDone(); },
     toggleWeekly: function () { toggleMission('weekly-community'); },
+    // M36 campaign model (derived; for tests/consumers).
+    getCampaigns: function () { return campaigns.slice(); },
+    getCampaignByStage: function (stage) {
+      return campaigns.find(function (c) { return c.stage === stage; }) || null;
+    },
+    campaignMissions: campaignMissions,
+    campaignStats: campaignStats,
+    nextMission: nextMission,
+    allCampaignsCompleted: allCampaignsCompleted,
+    prevMission: prevMission,
+    nextMissionInCampaign: nextMissionInCampaign,
+    campaignForMission: campaignForMission,
     renderWeekly: function (el) {
       if (!el) return;
       let m = MISSIONS.find(function (x) { return x.id === 'weekly-community'; });

@@ -70,11 +70,11 @@ console.log('== 2. Offline-first (supabase disabled) ==');
   const auth = h.W('Auth');
   ok(!auth.isAuthenticated(), 'not authenticated offline');
 
-  const reg = await auth.register();
+  const reg = await auth.createAccount('tester', 'password123');
   eq(reg.ok, false, 'register offline -> not ok');
   eq(reg.reason, 'authentication-unavailable-offline', 'register offline reason');
 
-  const login = await auth.loginWithRecoveryKey();
+  const login = await auth.signIn('tester', 'password123');
   eq(login.ok, false, 'login offline -> not ok');
   eq(login.reason, 'authentication-unavailable-offline', 'login offline reason');
   eq(h.calls.fetch.length, 0, 'still zero network after attempted auth offline');
@@ -127,13 +127,13 @@ console.log('== 4. Mocked backend auth flow ==');
   h.W('RecoveryKey').ensure();
   identity.init();
 
-  // login
-  const res = await auth.loginWithRecoveryKey();
+  // login (username + password)
+  const res = await auth.signIn('tester', 'password123');
   ok(res.ok, 'login succeeds against mock backend');
 
   const authBody = h.calls.fetch.find(c => /ns_login/.test(c.url));
-  ok(authBody && !JSON.stringify(authBody.init.body).includes(h.W('RecoveryKey').get()),
-    'raw recovery key is NOT in the login payload');
+  ok(authBody && !JSON.stringify(authBody.init.body).includes('password123'),
+    'raw password is NOT in the login payload');
 
   ok(auth.isAuthenticated(), 'authenticated after login');
   eq(h.W('Sync').getToken(), 'mock-token-123', 'session token in memory (Sync)');
@@ -155,7 +155,7 @@ console.log('== 4. Mocked backend auth flow ==');
   h.resetFetch();
   await h.W('Auth').logout();
   ok(!h.W('Auth').isAuthenticated(), 'logged out clears auth');
-  const reg = await h.W('Auth').register();
+  const reg = await h.W('Auth').createAccount('tester', 'password123');
   ok(reg.ok, 'register succeeds against mock backend');
   const regBody = h.calls.fetch.find(c => /ns_register/.test(c.url));
   ok(regBody && !JSON.stringify(regBody.init.body).includes(h.W('RecoveryKey').get()),
@@ -293,7 +293,7 @@ console.log('== 7. Unauthorized cleanup ==');
   const auth = h.W('Auth');
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await auth.loginWithRecoveryKey();
+  await auth.signIn('tester', 'password123');
   ok(auth.isAuthenticated(), 'authenticated before unauthorized event');
   await h.W('Session').ensureRestored();
 

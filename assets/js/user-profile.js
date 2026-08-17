@@ -1,13 +1,15 @@
 /**
- * NullSec — User Profile module
+ * NullSec — Account profile module
  * ------------------------------------------------------------------
- * Session-scoped user profile. Data access goes through ProfileRepository
- * (source of truth = Supabase; in-memory session cache while no backend is
- * live). Never touches localStorage. Linked to the local Identity
- * (identity_id must match Identity.get().id).
+ * Session-scoped account data (private, synced to Supabase). Data access goes
+ * through ProfileRepository (source of truth = Supabase; in-memory session
+ * cache while no backend is live). Never touches localStorage. Linked to the
+ * account identity (identity_id must match Identity.get().id).
  *
- * No external avatar service, no uploaded files. The avatar is deterministic
- * from a local random `avatar_seed` (usable later to pick a generated icon).
+ * M31: this is PRIVATE account data (not a public/social profile). The fields
+ * username/avatar_seed are retained only because the Supabase `user_profiles`
+ * table stores them; they are never exposed publicly and there is no
+ * username/avatar UI.
  *
  * Schema (see docs/identity-schema.md §profile):
  *   {
@@ -29,7 +31,7 @@
  *   UserProfile.get()    — current profile (or null)
  *   UserProfile.create() — create + persist a new profile
  *   UserProfile.update(data) — merge allowed fields, bump updated_at
- *   UserProfile.clear()  — delete the local profile
+ *   UserProfile.clear()  — delete the account profile
  *   UserProfile.exists() — boolean
  */
 (function () {
@@ -143,7 +145,7 @@
     return current;
   }
 
-  /** Delete the local profile. */
+  /** Delete the account profile. */
   function clear() {
     ProfileRepository.clear();
   }

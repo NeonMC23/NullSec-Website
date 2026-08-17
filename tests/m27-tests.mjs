@@ -82,7 +82,7 @@ console.log('== 2. Activity: all types + validation + offline (LOCAL/MOCKED) =='
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
   const svc = h.W('ActivityService');
 
@@ -110,7 +110,7 @@ console.log('== 2. Activity: all types + validation + offline (LOCAL/MOCKED) =='
   cfg(h3, BACKEND_ON);
   h3.W('RecoveryKey').ensure();
   h3.W('Identity').init();
-  await h3.W('Auth').register();
+  await h3.W('Auth').createAccount('tester', 'password123');
   await h3.W('Session').forceRecheck();
   const unav = await h3.W('ActivityService').record('mission_completed', 1);
   ok(unav.ok === false && unav.state === 'UNAVAILABLE', 'backend unavailable → UNAVAILABLE');
@@ -124,7 +124,7 @@ console.log('== 3. Privacy: no identity/country/tracking (LOCAL/MOCKED) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
   await h.W('ActivityService').record('community_action', 1);
   const call = h.calls.fetch.filter(c => /ns_record_activity/.test(c.url)).pop();

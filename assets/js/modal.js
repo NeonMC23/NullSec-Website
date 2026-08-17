@@ -21,6 +21,9 @@
 
       let overlay = document.createElement('div');
       overlay.className = 'modal-overlay open';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Dialog');
 
       let modal = document.createElement('div');
       modal.className = 'modal';
@@ -59,6 +62,12 @@
       document.body.style.overflow = 'hidden';
       // Trigger animation by forcing reflow
       overlay.offsetHeight;
+
+      // Basic focus management: move focus to the dialog on open so keyboard
+      // users land inside it (lightweight; not a full focus-trap).
+      if (closeBtn && closeBtn.focus) {
+        setTimeout(function () { closeBtn.focus(); }, 0);
+      }
 
       return overlay;
     },

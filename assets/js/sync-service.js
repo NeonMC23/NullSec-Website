@@ -94,6 +94,14 @@
       const local = collectPayload();
       const res = resolveConflicts(local, server);
       applyMerged(res.merged);
+      // M46 REAL-DEPLOY FIX (data-loss): applyMerged writes the merged (server)
+      // block into the repositories, but Progress.get() returns the in-memory
+      // `state`, which is NOT updated by ProgressRepository.save(). Without
+      // reloading before push, the push() below re-sends the still-empty
+      // in-memory progress and wipes the server's real progression on re-login
+      // from a fresh device. Reload in-memory state from the merged repository
+      // before pushing so we never send a stale empty default back to the server.
+      if (window.Progress && typeof Progress.reload === 'function') Progress.reload();
       return push().then(function () { return res; });
     });
   }

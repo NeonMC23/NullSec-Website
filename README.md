@@ -14,10 +14,10 @@ The official website for **NullSec**, a community focused on privacy, cybersecur
 | Page | Description |
 |------|-------------|
 | **Home** | Hero, Start Here cards, Weekly Mission, Latest Article |
-| **Learning Journey** | 30 interactive missions (29 across 4 stages + 1 weekly community mission). Progress saved locally. |
+| **Learning Journey** | 30 missions organized as Campaigns (4 progressive Campaigns + 1 weekly community mission). Progression is server-backed and synced across devices. |
 | **Tools Library** | 50+ curated privacy tools with search, category filters, and detail modals. |
 | **Articles** | In-depth research on privacy, cybersecurity, and digital rights. |
-| **Community Projects** | Open source projects built by the NullSec community. |
+| **Community** | Aggregated, anonymous community statistics (no user directory, no social features). |
 | **Contribute** | Ways to help: writing, translation, programming, design, testing, research. |
 | **About** | Mission, values, and community information. |
 
@@ -32,10 +32,11 @@ The official website for **NullSec**, a community focused on privacy, cybersecur
 
 ### Constraints
 
-- ✅ 100% static — no backend, no database
-- ✅ Works on **GitHub Pages** and **Cloudflare Pages**
-- ✅ **No build step** — upload files and it works
-- ✅ No React, Vue, Angular, Svelte, Node.js, PHP, or CMS
+- ✅ Frontend is 100% static and GitHub Pages / Cloudflare Pages friendly (relative paths, no server-side rendering).
+- ✅ **No build step required for the frontend** — upload files and it works.
+- ✅ No React, Vue, Angular, Svelte, Node.js, PHP, or CMS.
+- ✅ Server-backed account/progression lives in Supabase; the browser holds only a temporary session.
+- ℹ️ The Supabase backend (migrations 0001→0018 + 20 RPCs) is **prepared but not yet deployed** — see `docs/cloud-deployment.md` and `docs/deployment-guide.md`.
 
 ---
 

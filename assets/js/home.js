@@ -85,15 +85,26 @@
     left.appendChild(meta);
 
     let actions = Utils.el('div', { style: 'display:flex;gap:8px;align-items:start;justify-content:center;' });
-    let toggleBtn = Utils.el('button', {
-      class: done ? 'btn btn-secondary' : 'btn btn-primary',
-      text: done ? '\u2713 Completed' : 'Mark as done'
-    });
-    toggleBtn.addEventListener('click', function () {
-      if (!window.Journey) return;
-      Journey.toggleWeekly();
-      renderWeekly();
-    });
+    const authd = !!(window.Auth && window.Auth.isAuthenticated());
+    // M30: guests cannot save mission completion — show a sign-in CTA instead.
+    let toggleBtn;
+    if (!authd) {
+      toggleBtn = Utils.el('a', {
+        href: 'profile.html',
+        class: 'btn btn-primary',
+        text: 'Create account to track progress'
+      });
+    } else {
+      toggleBtn = Utils.el('button', {
+        class: done ? 'btn btn-secondary' : 'btn btn-primary',
+        text: done ? '\u2713 Completed' : 'Mark as done'
+      });
+      toggleBtn.addEventListener('click', function () {
+        if (!window.Journey) return;
+        Journey.toggleWeekly();
+        renderWeekly();
+      });
+    }
     let viewAll = Utils.el('a', {
       href: 'journey.html',
       class: 'btn btn-secondary',

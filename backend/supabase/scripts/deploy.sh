@@ -7,7 +7,7 @@
 #   3. RPC privilege hardening   (backend/supabase/functions/rpc_privileges.sql)
 #
 # Ordering is critical on a FRESH database:
-#   migrations 0001→0016  ->  RPC creation  ->  RPC privilege hardening
+#   migrations 0001→0019  ->  RPC creation  ->  RPC privilege hardening
 # Migrations must NOT contain REVOKE/GRANT EXECUTE ON FUNCTION statements
 # (the functions do not exist yet). Function-level EXECUTE controls live in
 # rpc_privileges.sql and are applied AFTER all rpc_*.sql files.
@@ -38,7 +38,20 @@ if [[ -z "$MIGRATIONS" ]]; then
   exit 1
 fi
 
-echo "::group::Applying migrations (0001..0016)"
+# M46 idempotency fix (real-deploy): v_country_metrics evolves across migrations
+# 0013 (6 columns) and 0016 (appends community_activity). CREATE OR REPLACE VIEW
+# cannot drop columns, so a SECOND deploy run on an existing DB failed at 0013
+# with 42P16 ("cannot drop columns from view"). Dropping the view first lets
+# migrations 0013→0016 recreate it cleanly on every run. The view is a read-only
+# projection (no data), so dropping is safe and loses nothing.
+echo "::group::Pre-migration cleanup"
+PRE="$(mktemp)"
+printf 'DROP VIEW IF EXISTS public.v_country_metrics;\n' > "$PRE"
+"$APPLY" "$PRE"
+rm -f "$PRE"
+echo "::endgroup::"
+
+echo "::group::Applying migrations (0001..0019)"
 for f in $MIGRATIONS; do
   "$APPLY" "$f"
 done
@@ -53,7 +66,9 @@ for f in \
   "$FUNCTIONS_DIR/rpc_tool_activity.sql" \
   "$FUNCTIONS_DIR/rpc_profile.sql" \
   "$FUNCTIONS_DIR/rpc_activity_event.sql" \
-  "$FUNCTIONS_DIR/rpc_country_metrics.sql"; do
+  "$FUNCTIONS_DIR/rpc_country_metrics.sql" \
+  "$FUNCTIONS_DIR/rpc_public_profile.sql" \
+  "$FUNCTIONS_DIR/rpc_update_public_profile.sql"; do
   if [[ -f "$f" ]]; then
     "$APPLY" "$f"
   fi

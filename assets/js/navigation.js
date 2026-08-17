@@ -56,10 +56,40 @@
     });
   }
 
+  /**
+   * Reflect the session state in the nav (M32): when authenticated, inject a
+   * "Sign out" control next to the Account link. Guests keep the static
+   * Account link (which hosts the Sign in / Create account forms).
+   */
+  function initSessionNav() {
+    if (!window.Auth || !Auth.isAuthenticated()) return;
+    const signOut = function () {
+      Auth.logout();
+      window.location.href = 'profile.html';
+    };
+    ['.navbar-links', '.mobile-menu'].forEach(function (sel) {
+      const container = document.querySelector(sel);
+      if (!container) return;
+      const accountLink = container.querySelector('a[href="profile.html"]');
+      if (!accountLink || accountLink.nextSibling && accountLink.nextSibling.nodeType === 1 &&
+        accountLink.nextSibling.classList.contains('nav-signout')) return;
+      const link = document.createElement('a');
+      link.className = 'nav-signout';
+      link.setAttribute('href', 'profile.html');
+      link.textContent = 'Sign out';
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        signOut();
+      });
+      accountLink.parentNode.insertBefore(link, accountLink.nextSibling);
+    });
+  }
+
   /** Initialise navigation. */
   function init() {
     highlightActiveLink();
     toggleMobileMenu();
+    initSessionNav();
   }
 
   if (document.readyState === 'loading') {

@@ -7,7 +7,7 @@ validation réelle reste **bloquée** tant qu'aucun projet Supabase n'est fourni
 ## Exécution
 
 ```bash
-bash tests/run-all.sh          # tout : syntaxe + audit SQL + M14..M28
+bash tests/run-all.sh          # tout : syntaxe + audit SQL + M14..M45 + preflight
 node tests/sql-audit.mjs       # audit statique SQL (migrations, RPC, RLS, EXECUTE)
 node tests/m14-tests.mjs       # suite M14 (session/persistence/offline)
 node tests/m15-tests.mjs       # suite M15 (auth/sync/cross-user/activity/offline)
@@ -23,6 +23,24 @@ node tests/m25-tests.mjs       # suite M25 (déclencheurs UI activité)
 node tests/m26-tests.mjs       # suite M26 (actions communautaires)
 node tests/m27-tests.mjs       # suite M27 (refinement métriques)
 node tests/m28-tests.mjs       # suite M28 (durcissement production)
+node tests/m29-regression-0009-0010.mjs  # régression transition 0009→0010
+node tests/m30-tests.mjs       # suite M30 (progression par compte + UX auth)
+node tests/m31-tests.mjs       # suite M31 (nettoyage profil legacy / état local)
+node tests/m32-tests.mjs       # suite M32 (auth username + password)
+node tests/m33-tests.mjs       # suite M33 (durcissement auth & session)
+node tests/m34-tests.mjs       # suite M34 (finalisation UX compte & journey)
+node tests/m35-tests.mjs       # suite M35 (vrai compte serveur + dashboard communautaire)
+node tests/m36-tests.mjs       # suite M36 (gestion compte + parcours par campagnes)
+node tests/m37-tests.mjs       # suite M37 (cycle de vie compte + profils publics)
+node tests/m38-tests.mjs       # suite M38 (personnalisation profil public & identité d'apprentissage)
+node tests/m39-tests.mjs       # suite M39 (découverte, partage & UX identité des profils publics)
+node tests/m40-tests.mjs       # suite M40 (audit complétion produit & finalisation expérience d'apprentissage)
+node tests/m41-tests.mjs       # suite M41 (audit produit profond, polish UX & complétion contenu)
+node tests/m42-tests.mjs       # suite M42 (pré-déploiement : audit de readiness & durcissement final)
+node tests/m43-tests.mjs       # suite M43 (analyse des écarts produit & complétion fonctionnelle)
+node tests/m44-tests.mjs       # suite M44 (toolkit de préparation au déploiement)
+node tests/preflight-production.mjs  # preflight pré-déploiement (structure, secrets, ordre)
+node tests/m45-tests.mjs       # suite M45 (verrou release-candidate)
 ```
 
 ## Catégories (transparence)

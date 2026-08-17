@@ -120,7 +120,7 @@ console.log('== 3. Session expiration/revocation/unavailable (LOCAL/MOCKED) ==')
   cfg(h4, BACKEND_ON);
   h4.W('RecoveryKey').ensure();
   h4.W('Identity').init();
-  await h4.W('Auth').register();
+  await h4.W('Auth').createAccount('tester', 'password123');
   await h4.W('Session').forceRecheck();
   ok(h4.W('Auth').isAuthenticated(), 'authenticated before logout');
   h4.W('Session').clearSessionRefused();
@@ -137,7 +137,7 @@ console.log('== 4. Duplicate activity protection (LOCAL/MOCKED) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
   const svc = h.W('ActivityService');
 

@@ -76,7 +76,10 @@
     'session_expired', 'session_revoked', 'invalid_token',
     'token_expired', 'token_revoked', 'login_required',
     'account_not_found', 'account_already_exists',
-    'invalid_identity', 'invalid_recovery_hash', 'invalid_recovery_key'
+    'invalid_identity', 'invalid_recovery_hash', 'invalid_recovery_key',
+    // M32/M33: username+password auth failures are also auth refusals.
+    'invalid_credentials', 'invalid_username', 'invalid_password_hash',
+    'username_taken', 'invalid_password'
   ];
 
   /** Optional callback invoked when an authenticated call is refused. */
@@ -142,8 +145,12 @@
     err.status = status;
     err.body = json || null;
     err.type = classifyHttp(status, json);
-    if (err.type === ERROR_TYPES.UNAUTHORIZED && typeof unauthorizedHandler === 'function') {
-      // Best-effort, non-blocking session cleanup (never re-triggers validation).
+    // M36: the session-cleanup handler fires only on a real session refusal
+    // (HTTP 401/403), NOT on a credentials failure (HTTP 400 like a wrong
+    // current password in ns_change_password) — a bad password must not
+    // force a logout.
+    if (err.type === ERROR_TYPES.UNAUTHORIZED && status !== 400 &&
+        typeof unauthorizedHandler === 'function') {
       try { unauthorizedHandler(); } catch (e) { /* ignore */ }
     }
     throw err;
@@ -251,21 +258,33 @@
 
     /* --- Auth (Recovery Key, via RPC) -------------------------------- */
 
-    /** Create a backend account from identity + SHA-256 key transport hash. */
+    /**
+     * Create a backend account from username + password (M32).
+     * Only SHA-256 transport hashes are sent; the raw password and raw
+     * recovery key never leave the browser. NO email is used.
+     */
     register: function (payload) {
       return rpc('ns_register', {
-        p_identity_id: payload.identity_id,
-        p_recovery_hash: payload.recovery_hash, // client SHA-256 transport hash
-        p_username: payload.profile && payload.profile.username,
-        p_avatar_seed: payload.profile && payload.profile.avatar_seed
+        p_username: payload.username,
+        p_password_hash: payload.password_hash, // client SHA-256 transport hash
+        p_recovery_hash: payload.recovery_hash || null // optional recovery
       });
     },
 
-    /** Authenticate with the recovery key transport hash. */
+    /** Sign in with username + password transport hash (M32). */
     login: function (payload) {
       return rpc('ns_login', {
-        p_identity_id: payload.identity_id,
-        p_recovery_hash: payload.recovery_hash
+        p_username: payload.username,
+        p_password_hash: payload.password_hash
+      });
+    },
+
+    /** Recover account access with username + recovery key + new password (M33). */
+    recover: function (payload) {
+      return rpc('ns_recover', {
+        p_username: payload.username,
+        p_recovery_hash: payload.recovery_hash,
+        p_new_password_hash: payload.new_password_hash
       });
     },
 
@@ -403,6 +422,43 @@
         p_token: token,
         p_activity_type: (payload && payload.activity_type) || null,
         p_amount: (payload && payload.amount) || 1
+      });
+    },
+
+    /** Change the authenticated account's password (M36). Only SHA-256
+     *  transport hashes are sent; the raw password never leaves the browser. */
+    changePassword: function (token, payload) {
+      if (!requireToken(token)) return Promise.reject(new Error('invalid_token'));
+      return rpc('ns_change_password', {
+        p_token: token,
+        p_current_password_hash: payload.current_password_hash,
+        p_new_password_hash: payload.new_password_hash
+      });
+    },
+
+    /** Reset the authenticated account's own progression (M36). Server-side. */
+    resetProgress: function (token) {
+      if (!requireToken(token)) return Promise.reject(new Error('invalid_token'));
+      return rpc('ns_reset_progress', { p_token: token });
+    },
+
+    /* --- Public profile (M37) ---------------------------------------- */
+
+    /** Fetch a public learning profile (anonymous-friendly, read-only).
+     *  Returns { username, completed_mission_ids } — public fields only. */
+    publicProfile: function (username) {
+      return rpc('ns_public_profile', { p_username: username });
+    },
+
+    /** Update the authenticated owner's explicit public profile fields (M38).
+     *  Identity is derived from the session; no client user_id. */
+    updatePublicProfile: function (token, payload) {
+      if (!requireToken(token)) return Promise.reject(new Error('invalid_token'));
+      return rpc('ns_update_public_profile', {
+        p_token: token,
+        p_public_profile_enabled: payload.public_profile_enabled,
+        p_bio: payload.bio || null,
+        p_learning_interests: payload.learning_interests || null
       });
     }
   };

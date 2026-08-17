@@ -5,17 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Profile — NullSec</title>
-  <meta name="description" content="Your local NullSec profile and learning statistics. Stored privately on your device." />
+  <title>Account — NullSec</title>
+  <meta name="description" content="Your private NullSec account: authentication, country, recovery key, and learning progress." />
 
-  <meta property="og:title" content="Profile — NullSec" />
-  <meta property="og:description" content="Your local NullSec profile and learning statistics. Stored privately on your device." />
+  <meta property="og:title" content="Account — NullSec" />
+  <meta property="og:description" content="Your private NullSec account: authentication, country, recovery key, and learning progress." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://neonmc23.github.io/NullSec-Website/profile.html" />
   <meta property="og:image" content="https://neonmc23.github.io/NullSec-Website/assets/images/placeholder.svg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Profile — NullSec" />
-  <meta name="twitter:description" content="Your local NullSec profile and learning statistics." />
+  <meta name="twitter:title" content="Account — NullSec" />
+  <meta name="twitter:description" content="Your private NullSec account." />
   <link rel="canonical" href="https://neonmc23.github.io/NullSec-Website/profile.html" />
   <meta name="theme-color" content="#0B0B0F" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,8 +40,9 @@
         <a href="tools.html">Tools</a>
         <a href="articles.html">Articles</a>
         <a href="community.html">Community</a>
+        <a href="about.html">About</a>
         <a href="contribute.html">Contribute</a>
-        <a href="profile.html" class="active">Profile</a>
+        <a href="profile.html" class="active">Account</a>
       </div>
       <div class="navbar-actions">
         <button class="icon-btn" id="search-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -58,51 +59,52 @@
     <a href="tools.html">Tools</a>
     <a href="articles.html">Articles</a>
     <a href="community.html">Community</a>
+    <a href="about.html">About</a>
     <a href="contribute.html">Contribute</a>
-    <a href="profile.html" class="active">Profile</a>
+    <a href="profile.html" class="active">Account</a>
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
 
   <section class="section" style="padding-top: 140px;">
     <div class="container">
       <div class="section-header fade-in">
-        <h1>Your Profile</h1>
-        <p>Everything here is stored privately on your device. Nothing is sent anywhere.</p>
+        <h1>Account</h1>
+        <p>Your private account. Authentication, country, recovery, and your learning progress.</p>
       </div>
 
       <div id="profile-summary" class="profile-summary fade-in fade-in-delay-1"></div>
 
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Your Progress</h2>
+        <h2>Authentication</h2>
+        <p>Sign in or create an account with your username and password. No email is used.</p>
       </div>
-      <div id="profile-stats" class="fade-in fade-in-delay-1"></div>
+      <div id="profile-auth" class="fade-in fade-in-delay-1"></div>
 
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Account Recovery</h2>
+        <h2>Recovery</h2>
+        <p>Your recovery key is for account recovery only. It is not your password.</p>
       </div>
       <div id="profile-recovery" class="fade-in fade-in-delay-1"></div>
 
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Authentication</h2>
+        <h2>Public Profile</h2>
+        <p>Your public learning identity. What other people can see — never account credentials.</p>
       </div>
-      <div id="profile-auth" class="fade-in fade-in-delay-1"></div>
+      <div id="profile-public" class="fade-in fade-in-delay-1"></div>
+
+      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
+        <h2>Your Progress</h2>
+        <p>Saved to your account and synced through NullSec's backend.</p>
+      </div>
+      <div id="profile-stats" class="fade-in fade-in-delay-1"></div>
+      <div class="fade-in fade-in-delay-1" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px;">
+        <button class="btn btn-secondary" id="profile-reset">Reset progress</button>
+      </div>
 
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
         <h2>Settings</h2>
       </div>
       <div id="profile-settings" class="fade-in fade-in-delay-1"></div>
-
-      <div class="section-header fade-in fade-in-delay-2" style="margin-top:48px;">
-        <h2>Your Data</h2>
-        <p>Export or import your local data. Everything stays on your device.</p>
-      </div>
-      <div class="fade-in fade-in-delay-2" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-        <button class="btn btn-primary" id="profile-export">Export data</button>
-        <button class="btn btn-secondary" id="profile-import">Import data</button>
-        <input type="file" id="profile-import-input" accept="application/json,.json" style="display:none;" />
-        <button class="btn btn-secondary" id="profile-reset">Reset progress</button>
-        <button class="btn btn-secondary" id="profile-reset-all" style="border-color:rgba(239,68,68,0.4);color:#EF4444;">Reset all local data</button>
-      </div>
 
       <div class="fade-in fade-in-delay-2" style="margin-top:24px;">
         <span id="profile-created" style="color:var(--text-dim);"></span>
@@ -114,7 +116,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><a href="./" class="navbar-brand"><span class="logo-dot"></span> NullSec</a><p>Independent research and tools for your digital life.</p></div>
-        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a><a href="profile.html">Profile</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="./">Home</a><a href="journey.html">Learning Journey</a><a href="tools.html">Tools</a><a href="articles.html">Articles</a><a href="community.html">Community</a><a href="about.html">About</a><a href="profile.html">Account</a></div>
         <div class="footer-col"><h4>Topics</h4><a href="tools.html?category=Privacy">Privacy</a><a href="tools.html?category=Security">Security</a><a href="tools.html?category=Linux">Linux</a><a href="tools.html?category=Open+Source">Open Source</a><a href="tools.html?category=Self+Hosting">Self Hosting</a></div>
         <div class="footer-col"><h4>Community</h4><a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a><a href="https://github.com/NullSec-Community" target="_blank" rel="noopener">GitHub</a><a href="contribute.html">Contribute</a></div>
       </div>
@@ -137,7 +139,8 @@
   <script src="assets/js/session-store.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/data-loader.js"></script>
-  <script src="assets/js/config.js"></script>
+  <script src="assets/js/__supabase_bootstrap.js"></script>
+      <script src="assets/js/config.js"></script>
   <script src="assets/js/repositories/identity-repository.js"></script>
   <script src="assets/js/repositories/profile-repository.js"></script>
   <script src="assets/js/repositories/progress-repository.js"></script>
@@ -169,6 +172,7 @@
   <script src="assets/js/search.js"></script>
   <script src="assets/js/modal.js"></script>
   <script src="assets/js/animations.js"></script>
+  <script src="assets/js/public-profile.js"></script>
   <script src="assets/js/profile.js"></script>
 </body>
 </html>

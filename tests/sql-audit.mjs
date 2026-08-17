@@ -31,11 +31,11 @@ function ok(cond, msg) {
   if (cond) passed++; else { failed++; failures.push(msg); console.error('  ✗ ' + msg); }
 }
 
-const migrationFiles = ['0001_schema.sql', '0002_rls.sql', '0003_rls_functions.sql', '0004_rls_privileges.sql', '0005_country_metrics_privileges.sql', '0006_challenge_semantics.sql', '0007_country_metrics_data.sql', '0008_country_metrics_privileges.sql', '0009_community_intelligence_tables.sql', '0010_community_data_model_final.sql', '0011_community_activity_events.sql', '0012_activity_event_privileges.sql', '0013_country_metrics_view.sql', '0014_activity_trigger_support.sql', '0015_community_action_support.sql', '0016_activity_metrics_refinement.sql'];
+const migrationFiles = ['0001_schema.sql', '0002_rls.sql', '0003_rls_functions.sql', '0004_rls_privileges.sql', '0005_country_metrics_privileges.sql', '0006_challenge_semantics.sql', '0007_country_metrics_data.sql', '0008_country_metrics_privileges.sql', '0009_community_intelligence_tables.sql', '0010_community_data_model_final.sql', '0011_community_activity_events.sql', '0012_activity_event_privileges.sql', '0013_country_metrics_view.sql', '0014_activity_trigger_support.sql', '0015_community_action_support.sql', '0016_activity_metrics_refinement.sql', '0017_auth_username_password.sql', '0018_public_profile.sql'];
 const migSrc = {};
 for (const f of migrationFiles) migSrc[f] = readFileSync(join(MIG, f), 'utf8');
 
-const rpcFiles = ['rpc_auth.sql', 'rpc_sync.sql', 'rpc_activity.sql', 'rpc_country_metrics.sql', 'rpc_tool_activity.sql', 'rpc_profile.sql', 'rpc_activity_event.sql'];
+const rpcFiles = ['rpc_auth.sql', 'rpc_sync.sql', 'rpc_activity.sql', 'rpc_country_metrics.sql', 'rpc_tool_activity.sql', 'rpc_profile.sql', 'rpc_activity_event.sql', 'rpc_public_profile.sql', 'rpc_update_public_profile.sql'];
 const rpcSrc = {};
 for (const f of rpcFiles) rpcSrc[f] = readFileSync(join(FN, f), 'utf8');
 
@@ -142,7 +142,8 @@ console.log('== 4. RLS (0002) ==');
 console.log('== 5. RPC SECURITY DEFINER + search_path ==');
 {
   const functions = [
-    'ns_register', 'ns_login', 'ns_logout', 'ns_validate_session', 'ns_create_session',
+    'ns_register', 'ns_login', 'ns_recover', 'ns_change_password', 'ns_reset_progress',
+    'ns_logout', 'ns_validate_session', 'ns_create_session',
     'ns_sync_pull', 'ns_sync_push', 'ns_activity', 'ns_metrics', 'ns_country_metrics'
   ];
   const allRpc = Object.values(rpcSrc).join('\n');
@@ -192,6 +193,11 @@ console.log('== 7. EXECUTE control ==');
   ok(!/GRANT EXECUTE ON FUNCTION public\.ns_create_session/.test(hardening),
     'ns_create_session is NEVER granted EXECUTE to anon/authenticated');
 
+  // M42: internal validation helpers are also never exposed to PUBLIC/anon/authenticated.
+  ok(/ns_valid_transport_hash\(text\) FROM PUBLIC, anon, authenticated/.test(hardening) &&
+    /ns_valid_username\(text\) FROM PUBLIC, anon, authenticated/.test(hardening),
+    'internal validation helpers revoked from PUBLIC/anon/authenticated');
+
   // Public API functions explicitly granted to anon + revoked from PUBLIC.
   const publicAPI = ['ns_register', 'ns_login', 'ns_logout', 'ns_validate_session',
     'ns_sync_pull', 'ns_sync_push', 'ns_activity', 'ns_metrics',
@@ -214,8 +220,11 @@ console.log('== 8. Frontend RPC arg-name match ==');
 {
   const allRpc = Object.values(rpcSrc).join('\n');
   const checks = [
-    ["rpc('ns_register', {", 'p_identity_id', 'p_recovery_hash', 'p_username', 'p_avatar_seed'],
-    ["rpc('ns_login', {", 'p_identity_id', 'p_recovery_hash'],
+    ["rpc('ns_register', {", 'p_username', 'p_password_hash', 'p_recovery_hash'],
+    ["rpc('ns_login', {", 'p_username', 'p_password_hash'],
+    ["rpc('ns_recover', {", 'p_username', 'p_recovery_hash', 'p_new_password_hash'],
+    ["rpc('ns_change_password', {", 'p_token', 'p_current_password_hash', 'p_new_password_hash'],
+    ["rpc('ns_reset_progress', {", 'p_token'],
     ["rpc('ns_logout', {", 'p_token'],
     ["rpc('ns_validate_session', {", 'p_token'],
     ["rpc('ns_sync_pull', {", 'p_token'],

@@ -32,8 +32,8 @@
 BEGIN;
 
 -- --- Revoke the default PUBLIC grant on every RPC ----------------------
-REVOKE EXECUTE ON FUNCTION public.ns_register(uuid, text, text, text) FROM PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.ns_login(uuid, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_register(text, text, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_login(text, text) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_logout(text) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_validate_session(text) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_sync_pull(text) FROM PUBLIC;
@@ -44,13 +44,29 @@ REVOKE EXECUTE ON FUNCTION public.ns_country_metrics() FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_tool_activity(text, text) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_update_profile(text, text, text) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_record_activity(text, text, bigint, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_recover(text, text, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_change_password(text, text, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_reset_progress(text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_public_profile(text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.ns_update_public_profile(text, boolean, text, text[]) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.ns_create_session(bigint) FROM PUBLIC;
 
+-- --- Internal helpers: NOT part of the public API -------------------
+-- These pure validation helpers are used only by SECURITY DEFINER auth
+-- functions. They must not be exposed to anon/authenticated/PUBLIC.
+REVOKE EXECUTE ON FUNCTION public.ns_valid_transport_hash(text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.ns_valid_username(text) FROM PUBLIC, anon, authenticated;
+
 -- --- Grant the intended public API to anon + authenticated ------------
-GRANT EXECUTE ON FUNCTION public.ns_register(uuid, text, text, text) TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.ns_login(uuid, text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_register(text, text, text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_login(text, text) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ns_logout(text) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ns_validate_session(text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_recover(text, text, text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_change_password(text, text, text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_reset_progress(text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_public_profile(text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.ns_update_public_profile(text, boolean, text, text[]) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ns_sync_pull(text) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ns_sync_push(text, json, json, json) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ns_activity(text, text, text) TO anon, authenticated;

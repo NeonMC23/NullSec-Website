@@ -59,7 +59,7 @@ console.log('== 2. Country selection + save (MOCKED) ==');
   cfg(h, BACKEND_ON);
   h.W('RecoveryKey').ensure();
   h.W('Identity').init();
-  await h.W('Auth').register();
+  await h.W('Auth').createAccount('tester', 'password123');
   await h.W('Session').forceRecheck();
 
   const cs = h.W('CountryService');
