@@ -125,7 +125,8 @@ console.log('== 8. No duplicate sync indicators ==');
   // Only the header indicator should construct a sync pill.
   const pillCount = prof.split('renderAccountSync').length - 1;
   ok2(/function renderAccountSync/.test(prof), 'header sync indicator exists');
-  ok2(!/let syncPill/.test(prof), 'no duplicate sync pill in signed-in actions');
+  ok2(!/let syncPill\b/.test(prof), 'no duplicate sync pill in signed-in actions');
+  ok2(/let syncPillRef/.test(prof), 'single canonical sync pill reference in header');
 }
 
 /* ============ 11. No duplicate auth state systems ============ */

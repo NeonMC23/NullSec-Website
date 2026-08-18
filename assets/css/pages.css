@@ -973,9 +973,24 @@
 .europe-map {
   width: 100%;
   height: auto;
+  /* Reserve the map's aspect ratio (viewBox 1613x1417) so the container does
+     not collapse/layout-shift while the real SVG loads. */
+  aspect-ratio: 1613 / 1417;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-card);
+}
+.europe-map--loading {
+  /* Visible, neutral placeholder while the real SVG markup is fetched. */
+  background:
+    linear-gradient(100deg, var(--bg-card, #1e2430) 40%, var(--bg-elevated, #2a2f3a) 50%, var(--bg-card, #1e2430) 60%);
+  background-size: 200% 100%;
+  animation: nsMapShimmer 1.2s infinite;
+  min-height: 320px;
+}
+@keyframes nsMapShimmer {
+  from { background-position: 120% 0; }
+  to { background-position: -80% 0; }
 }
 .europe-map path.country {
   stroke: var(--bg);
@@ -1190,7 +1205,10 @@
 .profile-stat span { font-size: 0.85rem; color: var(--text-dim, #9aa3b2); }
 .settings-label { display: flex; flex-direction: column; gap: 2px; }
 .settings-label-hint { font-size: 0.78rem; color: var(--text-dim, #9aa3b2); }
-.country-controls { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+.country-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 0; }
+@media (min-width: 561px) {
+  .country-controls { min-width: 220px; width: 220px; }
+}
 .country-status { font-size: 0.85rem; color: var(--text-dim, #9aa3b2); }
 .sync-status-pill {
   display: inline-flex; align-items: center; gap: 6px;
@@ -1261,6 +1279,13 @@
   .account-header, .account-card { padding: 18px 16px; }
   .account-header { flex-direction: column; }
   .account-sync { justify-content: flex-start; }
+  /* Let settings rows wrap on narrow screens so controls never overflow. */
+  .settings-row { flex-wrap: wrap; gap: 8px; }
+  .country-selector { align-items: stretch; }
+  .country-controls { width: 100%; }
+  .auth-form-card { max-width: 100%; }
+  .profile-auth-forms .auth-form-card,
+  .auth-form-card.password-form { width: 100%; }
 }
 
 /* M50: account identity card extras */

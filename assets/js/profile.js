@@ -85,17 +85,28 @@
   }
 
   /* --- Account sync status indicator (M49) ----------------------------- */
+  // M51: a SINGLE canonical sync-status subscription, added once at init.
+  // The previous code registered a new Sync.onStatusChange listener on every
+  // renderAll() call, accumulating duplicate listeners and stale references.
+  let syncPillRef = null;
   function renderAccountSync() {
     let host = document.getElementById('account-sync');
     if (!host) return;
     Utils.clear(host);
+    syncPillRef = null;
     if (!Auth.isAuthenticated()) return; // guests see no sync status
     const st = (window.Sync && Sync.getStatus) ? Sync.getStatus() : 'synced';
     let pill = Utils.el('span', { class: 'sync-status-pill', 'data-status': st, text: syncStatusLabel(st) });
+    syncPillRef = pill;
     host.appendChild(pill);
+  }
+  function wireSyncStatus() {
     if (window.Sync && Sync.onStatusChange) {
       Sync.onStatusChange(function (next) {
-        if (pill) { pill.textContent = syncStatusLabel(next); pill.setAttribute('data-status', next); }
+        if (syncPillRef && syncPillRef.isConnected) {
+          syncPillRef.textContent = syncStatusLabel(next);
+          syncPillRef.setAttribute('data-status', next);
+        }
       });
     }
   }
@@ -983,6 +994,7 @@
   function init() {
     renderResetProgress();
     wireCountrySelectorRefresh();
+    wireSyncStatus();
     renderAll();
     // Render immediately (shows "Checking session…"), then re-render once the
     // startup session restoration resolves so the account state is accurate.

@@ -319,6 +319,9 @@
         container.appendChild(buildLegend());
       }
       EuropeMap.applyActivity(europeSvg, data);
+      // M51: show a useful neutral state in the country panel from the start so
+      // the map area does not appear as an unexplained empty box until hover.
+      renderCountryPanel(null, true);
     }).catch(function () {
       Utils.clear(container);
       container.appendChild(Utils.el('p', { class: 'europe-map-empty', text: 'Activity data unavailable' }));

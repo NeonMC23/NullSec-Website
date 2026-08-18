@@ -48,6 +48,12 @@
   Object.keys(A2_TO_A3).forEach(function (code) { COUNTRY_PATHS[code] = code; });
 
   const UNKNOWN_CLASS = 'country--none';
+
+  // Safe class helpers: the test harness uses a minimal DOM shim that may lack
+  // Element.classList. Guard so the map never throws in that environment.
+  function elHasClass(el, name) { return !!(el && el.classList && el.classList.contains(name)); }
+  function elAddClass(el, name) { if (el && el.classList && el.classList.add) el.classList.add(name); }
+  function elRemoveClass(el, name) { if (el && el.classList && el.classList.remove) el.classList.remove(name); }
   const SVG_SRC = 'assets/images/europe-map.svg';
 
   /** Build the empty <svg> shell into the container. */
@@ -56,10 +62,11 @@
     if (svg) return svg;
     const NS = 'http://www.w3.org/2000/svg';
     svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('class', 'europe-map');
+    svg.setAttribute('class', 'europe-map europe-map--loading');
     svg.setAttribute('viewBox', '0 0 1613 1417');
     svg.setAttribute('role', 'img');
     svg.setAttribute('aria-label', 'NullSec Europe activity map');
+    svg.setAttribute('aria-busy', 'true');
     container.appendChild(svg);
     return svg;
   }
@@ -113,14 +120,23 @@
       const tmp = document.createElement('div');
       tmp.innerHTML = text;
       const src = tmp.querySelector('svg');
-      if (!src) { if (onError) onError(); return; }
+      if (!src) {
+        elRemoveClass(svg, 'europe-map--loading');
+        if (onError) onError();
+        return;
+      }
       const vb = src.getAttribute('viewBox');
       if (vb) svg.setAttribute('viewBox', vb);
       svg.innerHTML = src.innerHTML;
+      if (svg.removeAttribute) svg.removeAttribute('aria-busy');
+      elRemoveClass(svg, 'europe-map--loading');
       normalizeSvg(svg);
       bindInteractions(svg, opts || {});
       if (onReady) onReady(svg);
-    }).catch(function () { if (onError) onError(); });
+    }).catch(function () {
+      elRemoveClass(svg, 'europe-map--loading');
+      if (onError) onError();
+    });
   }
 
   /** Set the intensity class on a country (missing → 'none'). */

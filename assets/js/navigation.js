@@ -18,8 +18,10 @@
       const linkPath = href.replace(/\/$/, '');
       if (path === linkPath || path.endsWith(linkPath)) {
         link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
       } else {
         link.classList.remove('active');
+        link.removeAttribute('aria-current');
       }
     });
   }
@@ -33,6 +35,8 @@
     hamburger.addEventListener('click', () => {
       const isOpen = mobileMenu.classList.toggle('open');
       hamburger.classList.toggle('active');
+      // Accessibility: reflect menu open state on the toggle button.
+      hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       // Prevent body scroll when menu is open
       document.body.style.overflow = isOpen ? 'hidden' : '';
     });
@@ -42,6 +46,7 @@
       link.addEventListener('click', () => {
         mobileMenu.classList.remove('open');
         hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
       });
     });
@@ -51,6 +56,7 @@
       if (window.innerWidth > 768) {
         mobileMenu.classList.remove('open');
         hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
       }
     });
