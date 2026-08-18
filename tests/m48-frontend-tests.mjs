@@ -86,7 +86,10 @@ console.log('== 3. Country selector ==');
   ok(/renderCountrySelector\(\)/.test(prof), 'country selector rendered in settings');
   ok(/Prefer not to say/.test(prof), '"Prefer not to say" (no-country) option present');
   ok(/CountryService\.confirm\(\)/.test(prof), 'country save uses CountryService');
-  ok(/Sync\.scheduleSync\(\)/.test(prof), 'country save triggers auto-sync');
+  // Country save auto-sync is now handled in the canonical repository (M49):
+  // CountryRepository.setCountry → ApiClient.updateProfile → Sync.scheduleSync.
+  const cr = read(join(ROOT, 'assets/js/repositories/country-repository.js'));
+  ok(/Sync\.scheduleSync/.test(cr), 'country save triggers auto-sync (via repository)');
   ok(/loadCountriesAll/.test(prof), 'uses the full country list (no duplicate data)');
 }
 

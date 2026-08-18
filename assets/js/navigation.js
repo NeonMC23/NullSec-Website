@@ -62,27 +62,37 @@
    * Account link (which hosts the Sign in / Create account forms).
    */
   function initSessionNav() {
-    if (!window.Auth || !Auth.isAuthenticated()) return;
+    if (!window.Auth) return;
+    const authed = Auth.isAuthenticated();
     const signOut = function () {
       Auth.logout();
+      // M49: after logout, immediately clear any injected sign-out controls and
+      // go to the account page (which will show the guest gateway).
+      reconcileSessionNav();
       window.location.href = 'profile.html';
     };
-    ['.navbar-links', '.mobile-menu'].forEach(function (sel) {
-      const container = document.querySelector(sel);
-      if (!container) return;
-      const accountLink = container.querySelector('a[href="profile.html"]');
-      if (!accountLink || accountLink.nextSibling && accountLink.nextSibling.nodeType === 1 &&
-        accountLink.nextSibling.classList.contains('nav-signout')) return;
-      const link = document.createElement('a');
-      link.className = 'nav-signout';
-      link.setAttribute('href', 'profile.html');
-      link.textContent = 'Sign out';
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        signOut();
+    function reconcileSessionNav() {
+      // Always remove existing sign-out controls so a logout/expiry never leaves
+      // a stale "Sign out" on the page.
+      document.querySelectorAll('.nav-signout').forEach(function (el) { el.remove(); });
+      if (!authed) return;
+      ['.navbar-links', '.mobile-menu'].forEach(function (sel) {
+        const container = document.querySelector(sel);
+        if (!container) return;
+        const accountLink = container.querySelector('a[href="profile.html"]');
+        if (!accountLink) return;
+        const link = document.createElement('a');
+        link.className = 'nav-signout';
+        link.setAttribute('href', 'profile.html');
+        link.textContent = 'Sign out';
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          signOut();
+        });
+        accountLink.parentNode.insertBefore(link, accountLink.nextSibling);
       });
-      accountLink.parentNode.insertBefore(link, accountLink.nextSibling);
-    });
+    }
+    reconcileSessionNav();
   }
 
   /**

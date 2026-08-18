@@ -64,9 +64,16 @@
 
   /** Collect the local syncable payload (with timestamps). */
   function collectPayload() {
+    const profile = UserProfile.get();
+    // M49: surface the explicit country choice as part of the synced profile so
+    // it round-trips through the pull (ns_sync_pull returns country_code).
+    if (profile && typeof profile === 'object' &&
+        window.CountryRepository && CountryRepository.getCountry) {
+      profile.country_code = CountryRepository.getCountry() || null;
+    }
     return {
       identity_id: Identity.get() ? Identity.get().id : null,
-      profile: UserProfile.get(),
+      profile: profile,
       settings: Settings.get(),
       progress: Progress.get()
     };
@@ -127,6 +134,15 @@
       // from a fresh device. Reload in-memory state from the merged repository
       // before pushing so we never send a stale empty default back to the server.
       if (window.Progress && typeof Progress.reload === 'function') Progress.reload();
+      // M49: rehydrate the explicit country choice from the RAW server profile
+      // (country_code is authoritative server-side). Using the server value
+      // directly avoids a fresh local profile overriding/dropping it during the
+      // newest-wins merge, so Account/Community reflect the persisted selection
+      // after reload/login.
+      if (server && server.profile && window.CountryRepository &&
+          CountryRepository.rehydrate) {
+        CountryRepository.rehydrate(server.profile.country_code || null);
+      }
       return push().then(function () { return res; });
     });
   }

@@ -41,15 +41,22 @@ BEGIN
   END IF;
 
   IF p_country_code IS NOT NULL THEN
-    IF NOT (p_country_code ~ '^[A-Z]{2}$') THEN
-      RAISE EXCEPTION 'invalid_country_code';
+    IF p_country_code = '' THEN
+      -- Empty string = explicit "Prefer not to say": clear the country.
+      UPDATE public.user_profiles
+      SET country_code = NULL, updated_at = now()
+      WHERE user_id = v_user_id;
+    ELSE
+      IF NOT (p_country_code ~ '^[A-Z]{2}$') THEN
+        RAISE EXCEPTION 'invalid_country_code';
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM public.countries WHERE code = p_country_code) THEN
+        RAISE EXCEPTION 'unknown_country';
+      END IF;
+      UPDATE public.user_profiles
+      SET country_code = p_country_code, updated_at = now()
+      WHERE user_id = v_user_id;
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM public.countries WHERE code = p_country_code) THEN
-      RAISE EXCEPTION 'unknown_country';
-    END IF;
-    UPDATE public.user_profiles
-    SET country_code = p_country_code, updated_at = now()
-    WHERE user_id = v_user_id;
   END IF;
 END;
 $$;

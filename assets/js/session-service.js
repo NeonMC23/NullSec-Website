@@ -96,6 +96,17 @@
         Auth.applySession(saved.token, username);
         sessionRefused = false;
         status = 'authenticated';
+        // M49: after a valid restoration, pull the remote profile/progress into
+        // the memory caches so Journey/Account render the canonical account state
+        // (completed missions, campaigns, selected country) instead of an empty
+        // "all incomplete" default. This is fire-and-forget: the sync layer
+        // resolves conflicts and updates the caches, and pages re-render via the
+        // Auth.onAuthChange / ensureRestored mechanisms.
+        if (window.Sync && Sync.syncNow) {
+          Sync.syncNow().then(function () {
+            if (window.Progress && Progress.reload) Progress.reload();
+          }).catch(function () { /* best-effort */ });
+        }
         return 'authenticated';
       }
       // Invalid / expired / revoked → clean local fallback.

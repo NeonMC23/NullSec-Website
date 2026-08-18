@@ -1196,3 +1196,42 @@
 .sync-status-pill[data-status="pending"] { color: #fbbf24; }
 .sync-status-pill[data-status="offline"] { color: #f87171; }
 .sync-status-pill[data-status="synced"] { color: #34d399; }
+
+/* M49: persistent country info panel states */
+.panel-state {
+  font-size: 0.78rem;
+  color: var(--accent, #818CF8);
+  font-weight: 600;
+  margin-left: 6px;
+}
+.europe-country-panel p.metric {
+  display: block;
+  color: var(--text-dim, #9aa3b2);
+  border-bottom: 0;
+}
+
+/* --- M49: Account page redesign -------------------------------- */
+.account-section { min-height: 100vh; }
+.account-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.account-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.account-sync { display: flex; align-items: center; min-height: 24px; }
+.account-card {
+  background: var(--bg-card, #1e2430);
+  border: 1px solid var(--border, #2f3646);
+  border-radius: 14px;
+  padding: 24px;
+}
+.account-card-head h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.account-card-head p { margin: 0 0 14px; color: var(--text-dim, #9aa3b2); font-size: 0.88rem; }
+.account-reset-row { display: flex; margin-top: 14px; flex-wrap: wrap; gap: 10px; }
+.account-footer { padding: 4px 0 24px; text-align: center; }

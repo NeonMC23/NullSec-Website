@@ -84,6 +84,22 @@
     container.appendChild(info);
   }
 
+  /* --- Account sync status indicator (M49) ----------------------------- */
+  function renderAccountSync() {
+    let host = document.getElementById('account-sync');
+    if (!host) return;
+    Utils.clear(host);
+    if (!Auth.isAuthenticated()) return; // guests see no sync status
+    const st = (window.Sync && Sync.getStatus) ? Sync.getStatus() : 'synced';
+    let pill = Utils.el('span', { class: 'sync-status-pill', 'data-status': st, text: syncStatusLabel(st) });
+    host.appendChild(pill);
+    if (window.Sync && Sync.onStatusChange) {
+      Sync.onStatusChange(function (next) {
+        if (pill) { pill.textContent = syncStatusLabel(next); pill.setAttribute('data-status', next); }
+      });
+    }
+  }
+
   /* --- Statistics ------------------------------------------------------ */
 
   function renderStats() {
@@ -328,6 +344,25 @@
    * from IP/GPS/locale/timezone. "Prefer not to say" is a valid no-country state.
    * Saving persists via CountryService (→ updateProfile) and triggers auto-sync.
    */
+  // M49: re-render the country selector whenever auth state or sync state changes,
+  // so the Account UI reflects the persisted (server-rehydrated) country choice.
+  function wireCountrySelectorRefresh() {
+    if (window.Auth && Auth.onAuthChange) Auth.onAuthChange(renderAll);
+    if (window.Sync && Sync.onStatusChange) {
+      Sync.onStatusChange(function () {
+        const host = document.querySelector('.country-selector');
+        if (host) renderCountrySelectorRefresh(host);
+      });
+    }
+  }
+  function renderCountrySelectorRefresh() {
+    // Rebuild just the country selector container in place.
+    const host = document.querySelector('.country-selector');
+    if (host && host.parentNode) {
+      const fresh = renderCountrySelector();
+      host.parentNode.replaceChild(fresh, host);
+    }
+  }
   function renderCountrySelector() {
     let wrap = Utils.el('div', { class: 'settings-row country-selector' });
     let labelWrap = Utils.el('span', { class: 'settings-label' });
@@ -355,9 +390,8 @@
       if (window.CountryService) CountryService.reset();
       if (window.CountryRepository && CountryRepository.removeCountry) {
         CountryRepository.removeCountry().then(function () {
-          statusLine.textContent = 'No country selected.';
+          statusLine.textContent = 'No country selected (prefer not to say).';
           window.Modal.toast('Country removed.', 'success');
-          if (window.Sync) Sync.scheduleSync();
         });
       } else {
         statusLine.textContent = 'No country selected.';
@@ -371,12 +405,11 @@
         CountryService.confirm().then(function (st) {
           if (st && st.status === 'COUNTRY_SET') {
             const name = st.countryName || code;
-            statusLine.textContent = 'Selected: ' + name;
+            statusLine.textContent = 'Selected: ' + name + ' (saved)';
             window.Modal.toast('Country saved: ' + name, 'success');
-            if (window.Sync) Sync.scheduleSync();
           } else {
-            statusLine.textContent = 'Could not save the country.';
-            window.Modal.toast('Could not save the country.', 'error');
+            statusLine.textContent = 'Country saved — pending sync.';
+            window.Modal.toast('Country saved. It will sync automatically.', 'success');
           }
         });
       }
@@ -917,6 +950,8 @@
   }
 
   function renderAll() {
+    // M49: keep the account header sync indicator in sync with auth state.
+    renderAccountSync();
     // M34: private account data (profile, stats, settings, recovery) is only
     // shown to the authenticated owner. A guest sees the authentication gateway
     // and the account forms.
@@ -947,6 +982,7 @@
 
   function init() {
     renderResetProgress();
+    wireCountrySelectorRefresh();
     renderAll();
     // Render immediately (shows "Checking session…"), then re-render once the
     // startup session restoration resolves so the account state is accurate.

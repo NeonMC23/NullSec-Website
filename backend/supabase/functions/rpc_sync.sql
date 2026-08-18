@@ -23,7 +23,7 @@ BEGIN
   END IF;
 
   SELECT row_to_json(t) INTO v_profile FROM (
-    SELECT username, avatar_seed, updated_at FROM public.user_profiles WHERE user_id = v_user_id
+    SELECT username, avatar_seed, country_code, updated_at FROM public.user_profiles WHERE user_id = v_user_id
   ) t;
   SELECT settings_json INTO v_settings FROM public.user_settings WHERE user_id = v_user_id;
   SELECT progress_json INTO v_progress FROM public.user_progress WHERE user_id = v_user_id;

@@ -206,23 +206,44 @@
    * ---------------------------------------------------------------- */
   let europeData = { countries: {}, source: 'unavailable', unavailable: true };
   let europeSvg = null;
-  let selectedCountry = null;
+  let selectedCountry = null;      // clicked/selected country (persists)
+  let hoveredCountry = null;       // transient hover (does not clear selection)
 
   /** Show the aggregated info panel for a country (no individual data). */
-  function renderCountryPanel(code) {
+  function renderCountryPanel(code, hovered) {
     let panel = document.getElementById('europe-country-panel');
     if (!panel) return;
     Utils.clear(panel);
 
-    selectedCountry = code || null;
+    // A click persists the selection; a hover is transient.
+    if (!hovered) selectedCountry = code || null;
     if (europeSvg) EuropeMap.setSelected(europeSvg, selectedCountry);
 
-    if (!code || europeData.unavailable) { panel.style.display = 'none'; return; }
-    const row = europeData.countries[code];
+    if (europeData.unavailable) { panel.style.display = 'none'; return; }
+
+    const row = code ? europeData.countries[code] : null;
     const ref = CountryMetrics.getCountry(code);
-    if (!row) { panel.style.display = 'none'; return; }
+
+    if (!code || !row) {
+      // Persistent hint (not an empty/blank panel): show the last selection or a
+      // neutral message so leaving the map never erases useful information.
+      panel.style.display = 'block';
+      panel.appendChild(Utils.el('h4', { text: selectedCountry ? ((CountryMetrics.getCountry(selectedCountry) || {}).name || selectedCountry) : 'Europe Activity Map' }));
+      panel.appendChild(Utils.el('p', {
+        class: 'metric',
+        text: selectedCountry
+          ? 'Hover or select a country to view its aggregated activity.'
+          : 'Hover or select a country on the map to view its aggregated activity.'
+      }));
+      return;
+    }
+
     panel.style.display = 'block';
-    panel.appendChild(Utils.el('h4', { text: (ref && ref.name) || code }));
+    const title = Utils.el('h4', {});
+    title.appendChild(document.createTextNode((ref && ref.name) || code));
+    if (hovered) title.appendChild(Utils.el('span', { class: 'panel-state', text: ' · hovered' }));
+    else if (selectedCountry === code) title.appendChild(Utils.el('span', { class: 'panel-state', text: ' · selected' }));
+    panel.appendChild(title);
 
     function metric(label, value) {
       let m = Utils.el('div', { class: 'metric' });
@@ -270,7 +291,16 @@
       if (!europeSvg) {
         europeSvg = EuropeMap.render(container, {
           onSelect: renderCountryPanel,
-          onHover: function (code) { if (!code) renderCountryPanel(code); },
+          onHover: function (code) {
+            // Hover updates the panel. On leave, fall back to the last selected
+            // country (or show a "no selection" hint) instead of blanking it.
+            hoveredCountry = code || null;
+            if (code) {
+              renderCountryPanel(code, true);
+            } else {
+              renderCountryPanel(selectedCountry, true);
+            }
+          },
           // M48: the real SVG loads asynchronously; apply activity once ready.
           onReady: function (svg) { EuropeMap.applyActivity(svg, europeData); },
           onError: function () {

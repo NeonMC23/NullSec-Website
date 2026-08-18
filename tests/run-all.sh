@@ -118,5 +118,8 @@ node tests/m47-deploy-tests.mjs
 echo "== 38. Milestone 48 frontend/product pass (auth state, sync, country, map) =="
 node tests/m48-frontend-tests.mjs
 
+echo "== 39. Milestone 49 account persistence & state consistency =="
+node tests/m49-frontend-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

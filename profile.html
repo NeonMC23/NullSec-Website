@@ -65,20 +65,28 @@
     <a href="https://discord.com/invite/uTeCwQQtn" target="_blank" rel="noopener">Discord</a>
   </div>
 
-  <section class="section" style="padding-top: 140px;">
-    <div class="container">
-      <div class="section-header fade-in">
-        <h1>Account</h1>
-        <p>Your private account. Authentication, country, recovery, and your learning progress.</p>
+  <section class="section account-section" style="padding-top: 140px;">
+    <div class="container account-shell">
+      <div class="account-header fade-in">
+        <div id="profile-summary" class="profile-summary fade-in fade-in-delay-1"></div>
+        <div class="account-sync" id="account-sync"></div>
       </div>
 
-      <div id="profile-summary" class="profile-summary fade-in fade-in-delay-1"></div>
-
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Authentication</h2>
-        <p>Sign in or create an account with your username and password. No email is used.</p>
+      <div class="account-card fade-in fade-in-delay-1">
+        <div class="account-card-head">
+          <h2>Account</h2>
+          <p>Sign in or create an account with your username and password. No email is used.</p>
+        </div>
+        <div id="profile-auth"></div>
       </div>
-      <div id="profile-auth" class="fade-in fade-in-delay-1"></div>
+
+      <div class="account-card fade-in fade-in-delay-1">
+        <div class="account-card-head">
+          <h2>Recovery</h2>
+          <p>Your recovery key is for account recovery only. It is not your password.</p>
+        </div>
+        <div id="profile-recovery"></div>
+      </div>
 
       <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
         <h2>Recovery</h2>
@@ -86,28 +94,34 @@
       </div>
       <div id="profile-recovery" class="fade-in fade-in-delay-1"></div>
 
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Public Profile</h2>
-        <p>Your public learning identity. What other people can see — never account credentials.</p>
-      </div>
-      <div id="profile-public" class="fade-in fade-in-delay-1"></div>
-
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Your Progress</h2>
-        <p>Saved to your account and synced through NullSec's backend.</p>
-      </div>
-      <div id="profile-stats" class="fade-in fade-in-delay-1"></div>
-      <div class="fade-in fade-in-delay-1" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px;">
-        <button class="btn btn-secondary" id="profile-reset">Reset progress</button>
+      <div class="account-card fade-in fade-in-delay-1">
+        <div class="account-card-head">
+          <h2>Public Profile</h2>
+          <p>Your public learning identity. What other people can see — never account credentials.</p>
+        </div>
+        <div id="profile-public"></div>
       </div>
 
-      <div class="section-header fade-in fade-in-delay-1" style="margin-top:48px;">
-        <h2>Settings</h2>
-        <p>Theme, language, country and other preferences. Changes sync automatically.</p>
+      <div class="account-card fade-in fade-in-delay-1">
+        <div class="account-card-head">
+          <h2>Your Progress</h2>
+          <p>Saved to your account and synced through NullSec's backend.</p>
+        </div>
+        <div id="profile-stats"></div>
+        <div class="account-reset-row">
+          <button class="btn btn-secondary" id="profile-reset">Reset progress</button>
+        </div>
       </div>
-      <div id="profile-settings" class="fade-in fade-in-delay-1"></div>
 
-      <div class="fade-in fade-in-delay-2" style="margin-top:24px;">
+      <div class="account-card fade-in fade-in-delay-1">
+        <div class="account-card-head">
+          <h2>Settings</h2>
+          <p>Theme, language, country and other preferences. Changes sync automatically.</p>
+        </div>
+        <div id="profile-settings"></div>
+      </div>
+
+      <div class="fade-in fade-in-delay-2 account-footer">
         <span id="profile-created" style="color:var(--text-dim);"></span>
       </div>
     </div>

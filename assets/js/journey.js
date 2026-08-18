@@ -816,6 +816,17 @@
     if (window.Session && Session.ensureRestored) {
       Session.ensureRestored().then(function () { if (window.Progress) Progress.reload(); renderAll(); });
     }
+    // M49: also re-render when a sync pull completes (remote progress/account
+    // state loaded), so Journey shows the canonical completed missions/campaigns
+    // rather than a temporary empty default that never updates.
+    if (window.Sync && Sync.onStatusChange) {
+      Sync.onStatusChange(function (st) {
+        if (st === 'synced') {
+          if (window.Progress) Progress.reload();
+          renderAll();
+        }
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
