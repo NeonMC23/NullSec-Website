@@ -121,6 +121,7 @@
       tmp.innerHTML = text;
       const src = tmp.querySelector('svg');
       if (!src) {
+        if (svg.removeAttribute) svg.removeAttribute('aria-busy');
         elRemoveClass(svg, 'europe-map--loading');
         if (onError) onError();
         return;
@@ -134,6 +135,9 @@
       bindInteractions(svg, opts || {});
       if (onReady) onReady(svg);
     }).catch(function () {
+      // M57: always clear aria-busy on failure so the map never reports a
+      // permanent "busy" state to assistive technology.
+      if (svg.removeAttribute) svg.removeAttribute('aria-busy');
       elRemoveClass(svg, 'europe-map--loading');
       if (onError) onError();
     });
