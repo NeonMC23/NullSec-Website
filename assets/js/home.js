@@ -129,6 +129,17 @@
     if (window.Journey) {
       Journey.onReady(renderWeekly);
     }
+
+    // The weekly card is auth-aware (guests get a sign-in CTA, authenticated
+    // users get "Mark as done"). The startup session restore is async, so we
+    // re-render once it resolves and on any later auth change to avoid showing
+    // a logged-out CTA to a logged-in user after navigation.
+    if (window.Auth && Auth.onAuthChange) {
+      Auth.onAuthChange(renderWeekly);
+    }
+    if (window.Session && Session.ensureRestored) {
+      Session.ensureRestored().then(function () { renderWeekly(); });
+    }
   }
 
   if (document.readyState === 'loading') {

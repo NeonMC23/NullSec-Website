@@ -36,6 +36,22 @@
 
   let sessionToken = null;
 
+  // Sync status: 'synced' | 'syncing' | 'pending' | 'offline' | 'failed'.
+  // Shared, single source of truth for the account sync indicator.
+  let status = 'synced';
+  const statusListeners = [];
+
+  function setStatus(next) {
+    if (status === next) return;
+    status = next;
+    statusListeners.slice().forEach(function (cb) { try { cb(status); } catch (e) {} });
+  }
+  function getStatus() { return status; }
+  function onStatusChange(cb) {
+    if (typeof cb === 'function') statusListeners.push(cb);
+    return function () { const i = statusListeners.indexOf(cb); if (i !== -1) statusListeners.splice(i, 1); };
+  }
+
   function isEnabled() {
     const c = Config.get();
     return ApiClient.isBackendAvailable() && c.syncEnabled === true;
@@ -68,9 +84,18 @@
 
   /** Push local changes to the backend (no-op offline). */
   function push() {
-    if (!isEnabled() || !sessionToken) return Promise.resolve(null);
-    return ApiClient.sync(sessionToken, collectPayload()).catch(function () {
-      return null; // offline/network error → keep local
+    if (!isEnabled() || !sessionToken) {
+      setStatus(isEnabled() ? 'offline' : 'offline');
+      return Promise.resolve(false);
+    }
+    setStatus('syncing');
+    return ApiClient.sync(sessionToken, collectPayload()).then(function () {
+      setStatus('synced');
+      return true;
+    }).catch(function () {
+      // Offline/network error → keep local changes pending for a later retry.
+      setStatus('offline');
+      return false;
     });
   }
 
@@ -141,13 +166,55 @@
 
   /** Debounced push used as a sync trigger after local mutations. */
   let pendingTimer = null;
-  function notifyChanged() {
-    if (!isEnabled()) return;
-    if (pendingTimer) clearTimeout(pendingTimer);
-    pendingTimer = setTimeout(function () {
-      pendingTimer = null;
-      push();
+  let retryTimer = null;
+  let retryDelay = 1000;           // small backoff base (ms)
+  let syncInFlight = false;
+
+  /**
+   * M48: automatic sync. Local changes mark the state dirty/pending and queue a
+   * debounced push. If a push fails (offline), we keep the changes pending and
+   * retry with a small bounded backoff — never an infinite aggressive loop.
+   * @returns {boolean} whether work was queued
+   */
+  function scheduleSync() {
+    if (!isEnabled()) { setStatus('offline'); return false; }
+    if (syncInFlight) { setStatus('pending'); return false; }
+    if (retryTimer) clearTimeout(retryTimer);
+    retryTimer = setTimeout(function () {
+      retryTimer = null;
+      syncInFlight = true;
+      push().then(function (ok) {
+        syncInFlight = false;
+        if (ok) {
+          setStatus('synced');
+          retryDelay = 1000; // reset backoff after success
+        } else {
+          // Offline → stay pending, schedule a bounded retry.
+          setStatus('offline');
+          retryDelay = Math.min(retryDelay * 2, 30000);
+          retryTimer = setTimeout(function () { retryTimer = null; scheduleSync(); }, retryDelay);
+        }
+      });
     }, 400);
+    setStatus('pending');
+    return true;
+  }
+
+  function notifyChanged() {
+    return scheduleSync();
+  }
+
+  /** Immediately trigger a full pull→resolve→push cycle (manual "Sync now"). */
+  function syncNow() {
+    if (!isEnabled()) { setStatus('offline'); return Promise.resolve(false); }
+    setStatus('syncing');
+    return sync().then(function (res) {
+      setStatus('synced');
+      return !!res;
+    }).catch(function () {
+      setStatus('offline');
+      return false;
+    });
   }
 
   /**
@@ -187,6 +254,10 @@
     getToken: getToken,
     clearToken: clearToken,
     notifyChanged: notifyChanged,
+    syncNow: syncNow,
+    scheduleSync: scheduleSync,
+    getStatus: getStatus,
+    onStatusChange: onStatusChange,
     reportActivity: reportActivity
   };
 })();

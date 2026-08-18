@@ -85,11 +85,24 @@
     });
   }
 
-  /** Initialise navigation. */
+  /**
+   * Initialise navigation. The session nav reflects auth state; because the
+   * startup session restoration is ASYNC (ns_validate_session), we re-run it
+   * once restoration resolves AND on any later auth change (login/logout).
+   * This fixes the bug where a logged-in user saw the logged-out nav after
+   * navigating to a new page (the sync DOMContentLoaded check ran before the
+   * session was restored).
+   */
   function init() {
     highlightActiveLink();
     toggleMobileMenu();
     initSessionNav();
+    if (window.Auth && Auth.onAuthChange) {
+      Auth.onAuthChange(initSessionNav);
+    }
+    if (window.Session && Session.ensureRestored) {
+      Session.ensureRestored().then(function () { initSessionNav(); });
+    }
   }
 
   if (document.readyState === 'loading') {

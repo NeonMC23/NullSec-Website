@@ -15,8 +15,11 @@
 
   /** Label for a sync state. */
   function syncStatusLabel(s) {
-    if (s === 'syncing') return 'Syncing';
+    if (s === 'syncing') return 'Syncing…';
     if (s === 'synced') return 'Synced';
+    if (s === 'pending') return 'Pending changes';
+    if (s === 'offline') return 'Offline';
+    if (s === 'failed') return 'Sync failed';
     if (s === 'sync-error') return 'Sync error';
     return 'Not signed in';
   }
@@ -28,14 +31,14 @@
     // M35: use the full sync cycle (pull → resolve → push) so a returning user
     // (same or different device) restores their server-side progression.
     // Push-only would never load remote progress after sign-in.
-    const op = (Sync.sync && Sync.sync.bind(Sync)) ? Sync.sync() : Sync.push();
+    const op = (Sync.syncNow && Sync.syncNow.bind(Sync))
+      ? Sync.syncNow()
+      : ((Sync.sync && Sync.sync.bind(Sync)) ? Sync.sync() : Sync.push());
     op.then(function () {
       // Reflect any server-side progression into the in-memory Progress state.
       if (window.Progress && Progress.reload) Progress.reload();
-      syncStatus = 'synced';
       renderAll();
     }).catch(function () {
-      syncStatus = 'sync-error';
       renderAuthInfo();
     });
   }
@@ -226,9 +229,19 @@
         if (res.ok && res.method === 'clipboard') shareBtn.textContent = 'Profile link copied.';
         else if (res.ok && res.method === 'share') { /* native handled */ }
         else {
-          shareBtn.textContent = 'Copy link';
-          let fallback = window.prompt('Copy this link:', PublicProfile.getUrl(username || ''));
-          if (fallback === null) shareBtn.textContent = 'Share public profile';
+          // Clipboard fallback (no native share, no prompt). Non-intrusive toast.
+          const url = PublicProfile.getUrl(username || '');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function () {
+              shareBtn.textContent = 'Profile link copied.';
+            }).catch(function () {
+              window.Modal.toast('Could not copy the link automatically. Use the address bar.', 'warning');
+              shareBtn.textContent = 'Share public profile';
+            });
+          } else {
+            window.Modal.toast('Copy this link: ' + url, 'info');
+            shareBtn.textContent = 'Share public profile';
+          }
         }
       });
     });
@@ -296,7 +309,7 @@
         saveBtn.disabled = false;
         if (res && res.updated === true) {
           status.textContent = '';
-          alert('Public profile saved.');
+          window.Modal.toast('Public profile saved.', 'success');
         } else {
           status.textContent = 'Could not save the public profile.';
         }
@@ -307,6 +320,108 @@
     });
 
     container.appendChild(form);
+  }
+
+  /**
+   * M48: explicit country selector for the Account settings.
+   * The country is the user's OWN choice (ISO-3166 alpha-2) — never inferred
+   * from IP/GPS/locale/timezone. "Prefer not to say" is a valid no-country state.
+   * Saving persists via CountryService (→ updateProfile) and triggers auto-sync.
+   */
+  function renderCountrySelector() {
+    let wrap = Utils.el('div', { class: 'settings-row country-selector' });
+    let labelWrap = Utils.el('span', { class: 'settings-label' });
+    labelWrap.appendChild(Utils.el('span', { text: 'Country' }));
+    labelWrap.appendChild(Utils.el('span', {
+      class: 'settings-label-hint',
+      text: 'Choose a country for aggregated community activity. Never inferred from your device.'
+    }));
+    wrap.appendChild(labelWrap);
+
+    let controls = Utils.el('div', { class: 'country-controls' });
+    let searchInput = Utils.el('input', {
+      type: 'text',
+      placeholder: 'Search countries…',
+      autocomplete: 'off'
+    });
+    let select = Utils.el('select', { class: 'settings-select' });
+    let statusLine = Utils.el('span', { class: 'country-status', text: 'Loading countries…' });
+
+    // Current selection indicator.
+    let current = (window.CountryRepository && CountryRepository.getCountry) ? CountryRepository.getCountry() : null;
+
+    // Prefer not to say = valid no-country state (clears the choice).
+    function clearChoice() {
+      if (window.CountryService) CountryService.reset();
+      if (window.CountryRepository && CountryRepository.removeCountry) {
+        CountryRepository.removeCountry().then(function () {
+          statusLine.textContent = 'No country selected.';
+          window.Modal.toast('Country removed.', 'success');
+          if (window.Sync) Sync.scheduleSync();
+        });
+      } else {
+        statusLine.textContent = 'No country selected.';
+      }
+    }
+
+    function applyChoice(code) {
+      if (!code) return clearChoice();
+      if (window.CountryService) {
+        CountryService.select(code);
+        CountryService.confirm().then(function (st) {
+          if (st && st.status === 'COUNTRY_SET') {
+            const name = st.countryName || code;
+            statusLine.textContent = 'Selected: ' + name;
+            window.Modal.toast('Country saved: ' + name, 'success');
+            if (window.Sync) Sync.scheduleSync();
+          } else {
+            statusLine.textContent = 'Could not save the country.';
+            window.Modal.toast('Could not save the country.', 'error');
+          }
+        });
+      }
+    }
+
+    // Populate the select with all countries + a "prefer not to say" option.
+    Data.loadCountriesAll().then(function (list) {
+      let data = Array.isArray(list) ? list : [];
+      // Keep the current selection highlighted if it is in the list.
+      let currentName = null;
+      data.forEach(function (c) {
+        let opt = Utils.el('option', { value: c.code, text: c.name + ' (' + c.code + ')' });
+        if (c.code === current) { opt.setAttribute('selected', ''); currentName = c.name; }
+        select.appendChild(opt);
+      });
+      // "No country / Prefer not to say"
+      let noneOpt = Utils.el('option', { value: '', text: 'Prefer not to say' });
+      if (!current) noneOpt.setAttribute('selected', '');
+      select.insertBefore(noneOpt, select.firstChild);
+
+      searchInput.setAttribute('list', ''); // no native datalist; we filter via JS
+      // Simple client-side filter on the select options.
+      searchInput.addEventListener('input', function () {
+        const q = searchInput.value.trim().toLowerCase();
+        Array.prototype.forEach.call(select.options, function (opt) {
+          if (opt.value === '') { opt.style.display = ''; return; }
+          opt.style.display = opt.text.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
+        });
+      });
+
+      statusLine.textContent = currentName ? 'Selected: ' + currentName : (current ? 'Selected: ' + current : 'No country selected.');
+    }).catch(function () {
+      statusLine.textContent = 'Could not load the country list.';
+      // Still allow "prefer not to say".
+      let noneOpt = Utils.el('option', { value: '', text: 'Prefer not to say' });
+      noneOpt.setAttribute('selected', '');
+      select.appendChild(noneOpt);
+    });
+
+    select.addEventListener('change', function () { applyChoice(select.value); });
+    controls.appendChild(searchInput);
+    controls.appendChild(select);
+    controls.appendChild(statusLine);
+    wrap.appendChild(controls);
+    return wrap;
   }
 
   function renderSettings() {
@@ -372,6 +487,9 @@
     animRow.appendChild(animCheck);
     card.appendChild(animRow);
 
+    // Country (M48): explicit, privacy-respecting country selection.
+    card.appendChild(renderCountrySelector());
+
     // Privacy info
     card.appendChild(Utils.el('p', {
       class: 'settings-note',
@@ -402,7 +520,19 @@
       if (!Auth.isAuthenticated()) return;
       // M36: reset is server-side. Confirm, call ns_reset_progress, then
       // reload the (now empty) progression locally.
-      if (!confirm('Reset your progress? This permanently removes your completed missions from your account.')) return;
+      window.Modal.confirm({
+        title: 'Reset your progress?',
+        message: 'This permanently removes your completed missions from your account.',
+        confirmText: 'Reset progress',
+        cancelText: 'Cancel',
+        danger: true
+      }).then(function (confirmed) {
+        if (!confirmed) return;
+      runReset();
+      });
+    });
+    function runReset() {
+      if (!Auth.isAuthenticated()) return;
       btn.disabled = true;
       const token = Sync.getToken();
       ApiClient.resetProgress(token).then(function (res) {
@@ -411,15 +541,15 @@
           Progress.reset();
           if (window.Progress && Progress.reload) Progress.reload();
           renderStats();
-          alert('Progress reset.');
+          window.Modal.toast('Progress reset.', 'success');
         } else {
-          alert('Could not reset progress. Please try again.');
+          window.Modal.toast('Could not reset progress. Please try again.', 'error');
         }
       }).catch(function () {
         btn.disabled = false;
-        alert('Could not reset progress. Please try again.');
+        window.Modal.toast('Could not reset progress. Please try again.', 'error');
       });
-    });
+    }
     // M34/M36: only the authenticated owner can reset their own progression.
     function syncResetVisibility() {
       btn.style.display = Auth.isAuthenticated() ? '' : 'none';
@@ -552,7 +682,7 @@
   /** Handle an auth failure with a human-safe message. */
   function onAuthFailure(msg) {
     renderAuthInfo();
-    alert(msg);
+    window.Modal.toast(msg || 'Something went wrong.', 'error');
   }
 
   /** Authenticated controls: signed-in-as + actions. */
@@ -578,6 +708,19 @@
     let syncNowBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Sync now' });
     syncNowBtn.addEventListener('click', function () { runSyncAndRefresh(); });
     actions.appendChild(syncNowBtn);
+
+    // M48: subtle sync status indicator (Synced / Syncing… / Pending / Offline /
+    // Sync failed). Reads the canonical Sync.getStatus(); never intrusive.
+    let syncPill = Utils.el('span', { class: 'sync-status-pill', text: syncStatusLabel(Sync.getStatus ? Sync.getStatus() : 'synced') });
+    actions.appendChild(syncPill);
+    if (window.Sync && Sync.onStatusChange) {
+      Sync.onStatusChange(function (st) {
+        if (syncPill && syncPill.textContent !== undefined) {
+          syncPill.textContent = syncStatusLabel(st);
+          syncPill.setAttribute('data-status', st);
+        }
+      });
+    }
 
     let logoutBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Sign out' });
     logoutBtn.addEventListener('click', function () {
@@ -615,7 +758,7 @@
         if (res && res.ok) {
           err.textContent = '';
           cur.input.value = ''; nw.input.value = ''; cf.input.value = '';
-          alert('Password updated.');
+          window.Modal.toast('Password updated.', 'success');
         } else {
           err.textContent = safeAuthReason(res);
         }
@@ -719,7 +862,7 @@
         Auth.setAuthenticating(false);
         if (res && res.ok) {
           // Recovery sets a new password; prompt to sign in normally.
-          alert('Account recovered. Please sign in with your username and new password.');
+          window.Modal.toast('Account recovered. Please sign in with your username and new password.', 'success');
           renderAuthInfo();
         } else onAuthFailure('Recovery failed: ' + safeAuthReason(res));
       }).catch(function () {

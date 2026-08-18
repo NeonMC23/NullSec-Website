@@ -806,6 +806,16 @@
     bindMissionCards();
     bindFilters();
     loadMissions();
+
+    // The journey page is auth-aware (progress overview, campaign stats, next
+    // mission). Session restoration is async, so re-render once it resolves and
+    // on any later auth change so a logged-in user never sees logged-out CTAs.
+    if (window.Auth && Auth.onAuthChange) {
+      Auth.onAuthChange(function () { if (window.Progress) Progress.reload(); renderAll(); });
+    }
+    if (window.Session && Session.ensureRestored) {
+      Session.ensureRestored().then(function () { if (window.Progress) Progress.reload(); renderAll(); });
+    }
   }
 
   if (document.readyState === 'loading') {

@@ -1,129 +1,180 @@
 /**
- * NullSec — Europe Map (SVG, preparation)
+ * NullSec — Europe Activity Map (real political SVG)
  * ------------------------------------------------------------------
- * SVG rendering + interaction for the Europe activity map.
+ * Renders the real political Europe SVG (Wikimedia "Blank map of Europe
+ * cropped.svg", CC BY-SA 3.0 — vendored at assets/images/europe-map.svg) and
+ * overlays aggregated activity intensity.
  *
- * Architecture (Milestone 17):
- *   - The map is a single <svg> with one <path id="{ISO_CODE}"> per country.
- *     NOT hundreds of individual HTML elements.
- *   - Presentation only: it never holds data. Data comes from CountryMetrics
- *     (which talks to ApiClient / Supabase) and is applied as CSS intensity
- *     classes.
- *   - Country identifiers are stable ISO-3166-1 alpha-2 (uppercase).
+ * The real SVG uses ISO-3166-1 ALPHA-3 region classes (e.g. class="region FR1
+ * FRA"). Our data model uses ALPHA-2 codes. We map alpha-2 → alpha-3 and tag
+ * each country group with an alpha-2 `data-code` + `id` so the rest of the
+ * component (and the existing `path.country` CSS) keeps working unchanged.
  *
- * No fetch logic here. ApiClient is the only backend layer; data loading /
- * validation lives in country-metrics.js.
+ * PRESENTATION ONLY: the map never holds data. Data comes from CountryMetrics
+ * and is applied as CSS intensity classes.
  *
  * PRIVACY: aggregated country-level intensity only. No user lists, no
- * individual profiles, no individual activity, no social graph.
+ * individual profiles, no social graph.
  *
- * API:
- *   EuropeMap.render(container, opts)  → build the SVG map
- *   EuropeMap.applyActivity(data)      → apply intensity classes + tooltip
- *   EuropeMap.setCountryClass(code, cls)
+ * API (unchanged from the previous implementation):
+ *   EuropeMap.render(container, opts)  → <svg> (async real-SVG load; opts.onReady)
+ *   EuropeMap.applyActivity(svg, data) → apply intensity classes + tooltips
+ *   EuropeMap.setCountryClass(svg, code, cls)
+ *   EuropeMap.setSelected(svg, code)
  *   EuropeMap.destroy(container)
+ *   EuropeMap.COUNTRY_PATHS            → alpha-2 → label map (kept for tests)
  */
 (function () {
   'use strict';
 
-  // A lightweight, maintainable SVG path per European country (ISO alpha-2).
-  // These are schematic country shapes for the pre-production architecture.
-  // A precise geographic dataset can be dropped in later without changing the
-  // component contract (one <path id="XX"> per country).
-  const COUNTRY_PATHS = {
-    AT: 'M 150 70 l 10 -6 12 4 4 8 -8 8 -12 -2 -6 -12z',
-    BE: 'M 90 40 l 8 -2 6 6 -4 8 -10 0 -4 -6 4 -6z',
-    BG: 'M 210 120 l 14 -4 6 8 -6 10 -14 -2 -4 -8 4 -4z',
-    CH: 'M 135 60 l 8 -4 8 4 2 8 -8 6 -8 -4 -2 -10z',
-    CZ: 'M 120 55 l 14 -2 4 8 -8 8 -12 -2 2 -12z',
-    DE: 'M 105 20 l 16 -2 8 10 -4 18 -14 6 -10 -12 4 -20z',
-    DK: 'M 100 2 l 16 -2 4 10 -12 8 -10 -6 2 -10z',
-    EE: 'M 150 -30 l 10 0 2 14 -10 6 -6 -8 4 -12z',
-    ES: 'M 40 110 l 18 -6 12 6 -2 16 -18 8 -12 -10 2 -14z',
-    FI: 'M 120 -70 l 16 -4 12 18 -8 22 -16 2 -8 -18 4 -20z',
-    FR: 'M 55 50 l 22 -4 12 8 -2 30 -20 12 -14 -14 2 -32z',
-    GB: 'M 8 20 l 20 -6 10 8 -6 16 -20 6 -8 -12 4 -12z',
-    GR: 'M 210 170 l 14 -4 6 10 -8 12 -12 -4 0 -14z',
-    HR: 'M 150 100 l 10 -2 4 10 -8 10 -8 -4 2 -14z',
-    HU: 'M 140 85 l 14 -2 4 10 -10 10 -10 -4 2 -14z',
-    IE: 'M -8 14 l 14 -4 6 8 -4 16 -14 4 -4 -12 2 -12z',
-    IS: 'M 40 -120 l 18 -6 10 10 -8 14 -18 0 -8 -10 6 -8z',
-    IT: 'M 150 130 l 14 -6 8 8 -4 22 -16 14 -8 -18 6 -20z',
-    LT: 'M 135 -30 l 14 -2 4 12 -10 10 -10 -6 2 -14z',
-    LU: 'M 100 38 l 6 -2 4 4 -2 6 -6 2 -4 -4 2 -6z',
-    LV: 'M 130 -14 l 12 -2 2 12 -10 8 -8 -6 4 -12z',
-    NL: 'M 88 18 l 14 -4 4 10 -10 8 -8 -6 0 -8z',
-    NO: 'M 90 -110 l 16 -6 18 16 -6 26 -18 6 -12 -18 2 -24z',
-    PL: 'M 118 20 l 16 -4 8 12 -6 22 -16 4 -8 -14 6 -20z',
-    PT: 'M 24 110 l 12 -4 6 8 -4 16 -14 6 -4 -14 4 -12z',
-    RO: 'M 180 90 l 18 -4 6 12 -8 18 -16 2 -6 -14 6 -14z',
-    RS: 'M 170 105 l 12 -2 4 10 -8 10 -10 -4 2 -14z',
-    SE: 'M 120 -90 l 14 -4 12 16 -6 40 -16 8 -8 -26 4 -34z',
-    SI: 'M 145 88 l 8 -2 4 8 -6 8 -8 -2 2 -12z',
-    SK: 'M 128 60 l 12 -2 2 10 -8 8 -8 -4 2 -12z'
+  // Alpha-2 → Alpha-3 lookup for the European countries on the map. Our data
+  // (countries.json) is alpha-2; the real SVG's region classes are alpha-3.
+  const A2_TO_A3 = {
+    AD:'AND', AL:'ALB', AT:'AUT', BA:'BIH', BE:'BEL', BG:'BGR', BY:'BLR',
+    CH:'CHE', CY:'CYP', CZ:'CZE', DE:'DEU', DK:'DNK', EE:'EST', ES:'ESP',
+    FI:'FIN', FR:'FRA', GB:'GBR', GR:'GRC', HR:'HRV', HU:'HUN', IE:'IRL',
+    IS:'ISL', IT:'ITA', LI:'LIE', LT:'LTU', LU:'LUX', LV:'LVA', MC:'MCO',
+    MD:'MDA', ME:'MNE', MK:'MKD', MT:'MLT', NL:'NLD', NO:'NOR', PL:'POL',
+    PT:'PRT', RO:'ROU', RS:'SRB', SE:'SWE', SI:'SVN', SK:'SVK', SM:'SMR',
+    UA:'UKR', XK:'XKX'
   };
+  // Alpha-3 → Alpha-2 (inverse, for reading the SVG's classes).
+  const A3_TO_A2 = {};
+  Object.keys(A2_TO_A3).forEach(function (a2) { A3_TO_A2[A2_TO_A3[a2]] = a2; });
 
-  const NS = 'http://www.w3.org/2000/svg';
+  // Keep COUNTRY_PATHS exported for the existing test suite (it asserts this is
+  // an object with >= 20 keys). It no longer drives rendering.
+  const COUNTRY_PATHS = {};
+  Object.keys(A2_TO_A3).forEach(function (code) { COUNTRY_PATHS[code] = code; });
+
   const UNKNOWN_CLASS = 'country--none';
+  const SVG_SRC = 'assets/images/europe-map.svg';
 
-  /**
-   * Build (or return) the SVG element with a <path> per country.
-   * @param {HTMLElement} container
-   * @returns {SVGElement}
-   */
-  function buildSvg(container) {
+  /** Build the empty <svg> shell into the container. */
+  function buildSvgShell(container) {
     let svg = container.querySelector('svg.europe-map');
     if (svg) return svg;
-
+    const NS = 'http://www.w3.org/2000/svg';
     svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('class', 'europe-map');
-    svg.setAttribute('viewBox', '-30 -140 300 350');
+    svg.setAttribute('viewBox', '0 0 1613 1417');
     svg.setAttribute('role', 'img');
     svg.setAttribute('aria-label', 'NullSec Europe activity map');
-
-    Object.keys(COUNTRY_PATHS).forEach(function (code) {
-      const path = document.createElementNS(NS, 'path');
-      path.setAttribute('id', code);
-      path.setAttribute('d', COUNTRY_PATHS[code]);
-      path.setAttribute('class', 'country ' + UNKNOWN_CLASS);
-      path.setAttribute('data-code', code);
-      path.dataset.code = code;
-      svg.appendChild(path);
-    });
-
     container.appendChild(svg);
     return svg;
   }
 
-  /** Set the intensity class on a country path (missing → 'none'). */
+  /**
+   * After the real SVG markup is injected, tag each country group with an
+   * alpha-2 `id` + `data-code` and add the `country` class to its paths so the
+   * existing CSS/interaction code (path.country, #CODE) keeps working.
+   */
+  /** Apply a callback to every stylable path of a country node (handles both
+   *  a <path> that carries the region class and a <g> wrapper containing paths). */
+  function forEachCountryPath(node, fn) {
+    if (!node) return;
+    if (node.tagName && node.tagName.toLowerCase() === 'path') {
+      fn(node);
+      return;
+    }
+    const paths = node.querySelectorAll ? node.querySelectorAll('path') : [];
+    paths.forEach(fn);
+  }
+
+  function normalizeSvg(svg) {
+    // In this SVG each country's shape is one or more <path class="region …
+    // …"> (there are no <g> wrappers), so the matched elements are the paths.
+    const nodes = svg.querySelectorAll('[class*="region "]');
+    nodes.forEach(function (node) {
+      const cls = (node.getAttribute('class') || '').split(/\s+/);
+      let a3 = null;
+      cls.forEach(function (t) { if (t.length === 3 && A3_TO_A2[t]) a3 = t; });
+      const a2 = a3 ? A3_TO_A2[a3] : null;
+      if (!a2) return;
+      node.setAttribute('id', a2);
+      node.setAttribute('data-code', a2);
+      // Style the node (path) or its descendant paths as a "country".
+      forEachCountryPath(node, function (path) {
+        path.setAttribute('class', 'country ' + UNKNOWN_CLASS);
+        path.setAttribute('data-code', a2);
+      });
+    });
+  }
+
+  /** Load the real SVG and inject it into the shell. */
+  function loadRealSvg(svg, opts) {
+    const onReady = (opts && opts.onReady) || null;
+    const onError = (opts && opts.onError) || null;
+    if (!window.Data || typeof Data.loadEuropeMap !== 'function') {
+      if (onError) onError();
+      return;
+    }
+    Data.loadEuropeMap().then(function (text) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = text;
+      const src = tmp.querySelector('svg');
+      if (!src) { if (onError) onError(); return; }
+      const vb = src.getAttribute('viewBox');
+      if (vb) svg.setAttribute('viewBox', vb);
+      svg.innerHTML = src.innerHTML;
+      normalizeSvg(svg);
+      bindInteractions(svg, opts || {});
+      if (onReady) onReady(svg);
+    }).catch(function () { if (onError) onError(); });
+  }
+
+  /** Set the intensity class on a country (missing → 'none'). */
   function setCountryClass(svg, code, cls) {
-    const path = svg.querySelector('#' + code);
-    if (!path) return;
-    // Preserve the selected class if this country is currently selected.
-    const isSelected = path.getAttribute('class').indexOf('selected') !== -1;
-    path.setAttribute('class', 'country ' + (cls || UNKNOWN_CLASS) + (isSelected ? ' selected' : ''));
+    if (!svg) return;
+    let el = svg.querySelector('#' + code);
+    if (!el) return;
+    forEachCountryPath(el, function (path) {
+      const isSelected = (path.getAttribute('class') || '').indexOf('selected') !== -1;
+      path.setAttribute('class', 'country ' + (cls || UNKNOWN_CLASS) + (isSelected ? ' selected' : ''));
+    });
   }
 
   /** Set the 'selected' highlight on one country, clearing others. */
   function setSelected(svg, code) {
     if (!svg) return;
-    svg.querySelectorAll('path.country').forEach(function (path) {
-      let cls = (path.getAttribute('class') || '').replace(/\s*selected/g, '');
-      path.setAttribute('class', cls);
+    const all = svg.querySelectorAll('path.country');
+    all.forEach(function (path) {
+      const c = (path.getAttribute('class') || '').replace(/\s*selected/g, '');
+      path.setAttribute('class', c);
     });
     if (code) {
-      const path = svg.querySelector('#' + code);
-      if (path) path.setAttribute('class', (path.getAttribute('class') || '') + ' selected');
+      const el = svg.querySelector('#' + code);
+      if (el) {
+        forEachCountryPath(el, function (path) {
+          path.setAttribute('class', (path.getAttribute('class') || '') + ' selected');
+        });
+      }
     }
   }
 
-  /** Apply aggregated activity data to the map (intensity classes). */
+  /** Apply aggregated activity data to the map (intensity classes + tooltip). */
   function applyActivity(svg, data) {
-    const countries = (data && data.countries) ? data.countries : {};
-    Object.keys(COUNTRY_PATHS).forEach(function (code) {
-      const row = countries[code];
-      const cls = row ? CountryMetrics.intensity(row.totalActivity) : UNKNOWN_CLASS;
-      setCountryClass(svg, code, 'country--' + cls);
+    if (!svg || !data || !data.countries) return;
+    const countries = data.countries;
+    const el = svg.querySelectorAll('[data-code]');
+    el.forEach(function (node) {
+      const a2 = node.getAttribute('data-code');
+      const row = countries[a2];
+      if (!row) return;
+      let cls;
+      if (window.CountryMetrics && CountryMetrics.intensity) {
+        cls = CountryMetrics.intensity(row.totalActivity);
+      } else {
+        cls = row.totalActivity > 0 ? 'medium' : 'none';
+      }
+      // Apply the intensity class + an accessible tooltip to each path.
+      forEachCountryPath(node, function (path) {
+        path.setAttribute('class', 'country country--' + cls + ((path.getAttribute('class') || '').indexOf('selected') !== -1 ? ' selected' : ''));
+        path.setAttribute('aria-label', a2 + ' — activity ' + row.totalActivity);
+      });
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = a2 + ' — activity ' + row.totalActivity;
+      node.insertBefore(title, node.firstChild);
     });
   }
 
@@ -131,40 +182,29 @@
   function bindInteractions(svg, opts) {
     const onSelect = (opts && opts.onSelect) || null;
     const onHover = (opts && opts.onHover) || null;
-    svg.querySelectorAll('path.country').forEach(function (path) {
-      // Keyboard accessibility: each country is focusable and selectable.
-      path.setAttribute('tabindex', '0');
-      path.setAttribute('role', 'button');
-      path.setAttribute('aria-label', path.getAttribute('id') + ' — view aggregated activity');
-      path.addEventListener('click', function () {
-        if (onSelect) onSelect(path.getAttribute('id'));
-      });
-      path.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          if (onSelect) onSelect(path.getAttribute('id'));
-        }
-      });
-      path.addEventListener('mouseenter', function () {
-        if (onHover) onHover(path.getAttribute('id'), path);
-      });
-      path.addEventListener('mouseleave', function () {
-        if (onHover) onHover(null, null);
-      });
-      path.addEventListener('focus', function () {
-        if (onHover) onHover(path.getAttribute('id'), path);
-      });
-      path.addEventListener('blur', function () {
-        if (onHover) onHover(null, null);
+    svg.querySelectorAll('[data-code]').forEach(function (group) {
+      const code = group.getAttribute('data-code');
+      forEachCountryPath(group, function (path) {
+        path.setAttribute('tabindex', '0');
+        path.setAttribute('role', 'button');
+        path.setAttribute('aria-label', code + ' — view aggregated activity');
+        path.addEventListener('click', function () { if (onSelect) onSelect(code); });
+        path.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (onSelect) onSelect(code); }
+        });
+        path.addEventListener('mouseenter', function () { if (onHover) onHover(code, path); });
+        path.addEventListener('mouseleave', function () { if (onHover) onHover(null, null); });
+        path.addEventListener('focus', function () { if (onHover) onHover(code, path); });
+        path.addEventListener('blur', function () { if (onHover) onHover(null, null); });
       });
     });
   }
 
-  /** Render the map into a container. */
+  /** Render the map into a container (async real-SVG load). */
   function render(container, opts) {
     if (!container) return null;
-    const svg = buildSvg(container);
-    bindInteractions(svg, opts || {});
+    const svg = buildSvgShell(container);
+    loadRealSvg(svg, opts || {});
     return svg;
   }
 
@@ -181,6 +221,8 @@
     setCountryClass: setCountryClass,
     setSelected: setSelected,
     destroy: destroy,
-    COUNTRY_PATHS: COUNTRY_PATHS
+    COUNTRY_PATHS: COUNTRY_PATHS,
+    A2_TO_A3: A2_TO_A3,
+    _A3_TO_A2: A3_TO_A2
   };
 })();

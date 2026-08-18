@@ -26,7 +26,8 @@
     missions: 'data/missions.json',
     tools: 'data/tools.json',
     countries: 'data/countries.json',
-    'countries-all': 'data/countries-all.json'
+    'countries-all': 'data/countries-all.json',
+    'europe-map': 'assets/images/europe-map.svg'
   };
 
   let cache = {};    // name -> data (resolved)
@@ -79,11 +80,33 @@
     return inflight[name];
   }
 
+  /**
+   * Load a raw text asset (e.g. the vendored Europe SVG). Returns the text.
+   * Keeps fetch() inside this module (the single allowed fetch location).
+   */
+  function loadText(name) {
+    if (name in cache) return Promise.resolve(cache[name]);
+    if (name in inflight) return inflight[name];
+    inflight[name] = fetch(SOURCES[name])
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + SOURCES[name]);
+        return res.text();
+      })
+      .then(function (text) {
+        if (!text || text.length === 0) throw new Error('Empty asset ' + SOURCES[name]);
+        cache[name] = text;
+        return text;
+      })
+      .finally(function () { delete inflight[name]; });
+    return inflight[name];
+  }
+
   window.Data = {
     loadArticles: function () { return load('articles'); },
     loadMissions: function () { return load('missions'); },
     loadTools: function () { return load('tools'); },
     loadCountries: function () { return load('countries'); },
-    loadCountriesAll: function () { return load('countries-all'); }
+    loadCountriesAll: function () { return load('countries-all'); },
+    loadEuropeMap: function () { return loadText('europe-map'); }
   };
 })();

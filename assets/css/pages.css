@@ -1165,3 +1165,34 @@
 .public-profile-interests {
   max-width: 100%;
 }
+
+/* --- M48: account page polish -------------------------------------- */
+.profile-settings,
+.public-profile-edit-card,
+.profile-recovery-card,
+.profile-stat,
+.profile-auth,
+.profile-summary {
+  background: var(--bg-elevated, #1e2430);
+  border: 1px solid var(--border, #2f3646);
+  border-radius: 12px;
+  padding: 20px;
+}
+.profile-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.profile-stat { text-align: center; }
+.profile-stat strong { display: block; font-size: 1.4rem; color: var(--accent, #818CF8); }
+.profile-stat span { font-size: 0.85rem; color: var(--text-dim, #9aa3b2); }
+.settings-label { display: flex; flex-direction: column; gap: 2px; }
+.settings-label-hint { font-size: 0.78rem; color: var(--text-dim, #9aa3b2); }
+.country-controls { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+.country-status { font-size: 0.85rem; color: var(--text-dim, #9aa3b2); }
+.sync-status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.8rem; color: var(--text-dim, #9aa3b2);
+  border: 1px solid var(--border, #2f3646); border-radius: 999px;
+  padding: 4px 10px; background: var(--bg-elevated, #1e2430);
+}
+.sync-status-pill[data-status="syncing"] { color: #60a5fa; }
+.sync-status-pill[data-status="pending"] { color: #fbbf24; }
+.sync-status-pill[data-status="offline"] { color: #f87171; }
+.sync-status-pill[data-status="synced"] { color: #34d399; }

@@ -81,4 +81,80 @@
       document.body.style.overflow = '';
     }
   };
+
+  // --- Non-intrusive toast notification (Phase 5) -----------------------
+  window.Modal.toast = (function () {
+    let container = null;
+    function ensureContainer() {
+      if (!container) {
+        container = document.createElement('div');
+        container.className = 'ns-toast-container';
+        container.setAttribute('aria-live', 'polite');
+        document.body.appendChild(container);
+      }
+      return container;
+    }
+    return function (message, type) {
+      const kinds = ['success', 'info', 'warning', 'error'];
+      const kind = kinds.indexOf(type) !== -1 ? type : 'info';
+      const box = document.createElement('div');
+      box.className = 'ns-toast ns-toast--' + kind;
+      box.textContent = message;
+      box.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+      ensureContainer().appendChild(box);
+      requestAnimationFrame(function () { box.classList.add('ns-toast--show'); });
+      setTimeout(function () {
+        box.classList.remove('ns-toast--show');
+        setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 300);
+      }, 3500);
+      return box;
+    };
+  })();
+
+  // --- Confirmation dialog (destructive/confirm actions) ----------------
+  window.Modal.confirm = function (opts) {
+    const o = opts || {};
+    const title = o.title || 'Are you sure?';
+    const message = o.message || '';
+    const confirmText = o.confirmText || 'Confirm';
+    const cancelText = o.cancelText || 'Cancel';
+    const danger = o.danger === true;
+    return new Promise(function (resolve) {
+      let settled = false;
+      const settle = function (val) {
+        if (settled) return;
+        settled = true;
+        window.Modal.close();
+        resolve(val);
+      };
+      const overlay = window.Modal.open('');
+      overlay.className = 'modal-overlay open ns-confirm-overlay';
+      const modal = overlay.querySelector('.modal');
+      if (modal) {
+        Utils.clear(modal);
+        const body = Utils.el('div', { class: 'ns-confirm' });
+        body.appendChild(Utils.el('h3', { class: 'ns-confirm-title', text: title }));
+        if (message) body.appendChild(Utils.el('p', { class: 'ns-confirm-message', text: message }));
+        const actions = Utils.el('div', { class: 'ns-confirm-actions' });
+        const cancelBtn = Utils.el('button', { class: 'btn btn-secondary', text: cancelText });
+        const okBtn = Utils.el('button', { class: 'btn ' + (danger ? 'btn-danger' : 'btn-primary'), text: confirmText });
+        cancelBtn.addEventListener('click', function () { settle(false); });
+        okBtn.addEventListener('click', function () { settle(true); });
+        actions.appendChild(cancelBtn);
+        actions.appendChild(okBtn);
+        body.appendChild(actions);
+        modal.appendChild(body);
+      }
+      document.addEventListener('keydown', function onEscape(e) {
+        if (e.key === 'Escape') { document.removeEventListener('keydown', onEscape); settle(false); }
+      });
+      overlay.addEventListener('click', function onClick(e) {
+        if (e.target === overlay) { overlay.removeEventListener('click', onClick); settle(false); }
+      });
+      setTimeout(function () {
+        const ok = overlay.querySelector('.ns-confirm-actions .btn-danger, .ns-confirm-actions .btn-primary');
+        if (ok && ok.focus) ok.focus();
+      }, 0);
+    });
+  };
 })();

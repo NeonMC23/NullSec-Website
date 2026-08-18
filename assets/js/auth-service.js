@@ -53,6 +53,30 @@
   // Transient in-memory flag set while a sign-in/register request is in flight.
   let authenticating = false;
 
+  // Canonical auth-state change listeners. This is the SINGLE notification
+  // mechanism pages/nav use to re-render when the authenticated state changes
+  // (session restored, login, logout, session cleared). Pages subscribe via
+  // Auth.onAuthChange(cb) instead of reading Auth.isAuthenticated() once at
+  // DOMContentLoaded (which runs before the async session restore resolves).
+  let authListeners = [];
+
+  /** Register a listener; returns an unsubscribe function. */
+  function onAuthChange(cb) {
+    if (typeof cb === 'function') authListeners.push(cb);
+    return function () {
+      const i = authListeners.indexOf(cb);
+      if (i !== -1) authListeners.splice(i, 1);
+    };
+  }
+
+  /** Notify all listeners the auth state changed. Errors are swallowed so a
+   *  single consumer can never break the rest of the site. */
+  function notifyAuthChange() {
+    authListeners.slice().forEach(function (cb) {
+      try { cb(); } catch (e) { /* never let one consumer break others */ }
+    });
+  }
+
   /** Username rule: 3–32 chars, letters/digits/._- (matches backend). */
   function validateUsername(username) {
     if (typeof username !== 'string' || !username.trim()) return 'Username is required.';
@@ -160,6 +184,7 @@
       username: (typeof username === 'string' && username.length) ? username : null,
       expires_at: null
     });
+    notifyAuthChange();
   }
 
   /**
@@ -170,6 +195,7 @@
   function clearMemorySession() {
     authenticated = false;
     Sync.clearToken();
+    notifyAuthChange();
   }
 
   /**
@@ -180,6 +206,7 @@
     authenticated = false;
     Sync.clearToken();
     SessionStore.clearSession();
+    notifyAuthChange();
   }
 
   /** Backend availability guard shared by all auth actions. */
@@ -369,6 +396,7 @@
     authenticated = false;
     Sync.clearToken();
     SessionStore.clearSession();
+    notifyAuthChange();
     return init();
   }
 
@@ -390,6 +418,7 @@
     logout: logout,
     reset: reset,
     getAuthStatus: getAuthStatus,
-    setAuthenticating: setAuthenticating
+    setAuthenticating: setAuthenticating,
+    onAuthChange: onAuthChange
   };
 })();

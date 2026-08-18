@@ -115,5 +115,8 @@ node tests/m46-production-fixes.mjs
 echo "== 37. Milestone 47 canonical deployment system (static + mock API) =="
 node tests/m47-deploy-tests.mjs
 
+echo "== 38. Milestone 48 frontend/product pass (auth state, sync, country, map) =="
+node tests/m48-frontend-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

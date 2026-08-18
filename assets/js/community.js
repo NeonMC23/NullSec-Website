@@ -270,7 +270,13 @@
       if (!europeSvg) {
         europeSvg = EuropeMap.render(container, {
           onSelect: renderCountryPanel,
-          onHover: function (code) { if (!code) renderCountryPanel(code); }
+          onHover: function (code) { if (!code) renderCountryPanel(code); },
+          // M48: the real SVG loads asynchronously; apply activity once ready.
+          onReady: function (svg) { EuropeMap.applyActivity(svg, europeData); },
+          onError: function () {
+            Utils.clear(container);
+            container.appendChild(Utils.el('p', { class: 'europe-map-empty', text: 'Activity map could not be loaded.' }));
+          }
         });
         container.appendChild(buildLegend());
       }
