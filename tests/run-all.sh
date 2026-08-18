@@ -145,5 +145,8 @@ node tests/m56-frontend-tests.mjs
 echo "== 47. Milestone 57 resilience & error states =="
 node tests/m57-frontend-tests.mjs
 
+echo "== 48. Milestone 58 accessibility & interaction integrity =="
+node tests/m58-frontend-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

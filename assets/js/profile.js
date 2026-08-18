@@ -399,7 +399,10 @@
   }
   function renderCountrySelector() {
     let wrap = Utils.el('div', { class: 'settings-row country-selector' });
-    let labelWrap = Utils.el('span', { class: 'settings-label' });
+    // M58: use a real <label> so the select has an accessible name, and give the
+    // search input + select unique ids + aria-labels.
+    const uid = 'country-' + String(Math.random().toString(36).slice(2, 8));
+    let labelWrap = Utils.el('label', { class: 'settings-label', for: uid + '-select' });
     labelWrap.appendChild(Utils.el('span', { text: 'Country' }));
     labelWrap.appendChild(Utils.el('span', {
       class: 'settings-label-hint',
@@ -410,10 +413,16 @@
     let controls = Utils.el('div', { class: 'country-controls' });
     let searchInput = Utils.el('input', {
       type: 'text',
+      id: uid + '-search',
       placeholder: 'Search countries…',
-      autocomplete: 'off'
+      autocomplete: 'off',
+      'aria-label': 'Search countries'
     });
-    let select = Utils.el('select', { class: 'settings-select' });
+    let select = Utils.el('select', {
+      class: 'settings-select',
+      id: uid + '-select',
+      'aria-label': 'Select your country'
+    });
     let statusLine = Utils.el('span', { class: 'country-status', text: 'Loading countries…' });
 
     // Current selection indicator.
