@@ -3127,15 +3127,7 @@
 
 }
 
-.article-list-item .item-right .cat {
 
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-
-}
 
 @media (max-width: 768px) {
   .article-list-item {
@@ -3202,26 +3194,11 @@
 
 }
 
-.in-progress-toggle.open .arrow {
 
-  transform: rotate(90deg);
 
-}
 
-.in-progress-list {
 
-  display: none;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
 
-}
-
-.in-progress-list.open {
-
-  display: flex;
-
-}
 
 .in-progress-item {
 
@@ -3273,13 +3250,7 @@
 
 }
 
-.in-progress-item h4 {
 
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-muted);
-
-}
 
 .in-progress-item .eta {
 
