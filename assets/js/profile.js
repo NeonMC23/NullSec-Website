@@ -230,6 +230,30 @@
 
   /* --- Settings section ------------------------------------------------ */
 
+  // M54: the Account page renders twice during session restore (Auth.onAuthChange
+  // + ensureRestored), which made renderPublicProfile fetch ns_public_profile
+  // twice. Public profile is slow-changing, so cache the result AND the in-flight
+  // request for the page session (never localStorage, never cross-user). Both
+  // renders share one fetch.
+  let publicProfileCache = null;
+  let publicProfileInflight = null;
+
+  function loadPublicProfile(username, apply) {
+    if (publicProfileCache) { apply(publicProfileCache); return; }
+    if (publicProfileInflight) {
+      publicProfileInflight.then(function (p) { apply(p); });
+      return;
+    }
+    publicProfileInflight = ApiClient.publicProfile(username)
+      .then(function (p) {
+        publicProfileCache = p || null;
+        return publicProfileCache;
+      })
+      .catch(function () { return null; })
+      .finally(function () { publicProfileInflight = null; });
+    publicProfileInflight.then(function (p) { apply(p); });
+  }
+
   /** Render the Public Profile section (M38): enabled flag, bio, interests,
    *  view/edit. Only the authenticated owner. */
   function renderPublicProfile() {
@@ -309,8 +333,9 @@
     form.appendChild(saveBtn);
 
     // Load the current owner's public profile to populate the form.
+    // M54: dedupe concurrent renders via a shared in-flight request/cache.
     const token = Sync.getToken();
-    ApiClient.publicProfile(username).then(function (p) {
+    loadPublicProfile(username, function (p) {
       if (!p || p.enabled !== true) {
         enabledCheck.removeAttribute('checked');
       } else {
@@ -318,8 +343,6 @@
         bioInput.value = p.bio || '';
         interestsInput.value = (p.learning_interests || []).join(', ');
       }
-    }).catch(function () {
-      /* leave defaults */
     });
 
     form.addEventListener('submit', function (e) {
