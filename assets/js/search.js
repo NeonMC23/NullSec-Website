@@ -127,9 +127,15 @@
     }
   }
 
-  /** Initialise search. */
+  /** Initialise search.
+   *  M55: Fuse/search index is built LAZILY on first use (openSearch calls
+   *  loadSearchIndex() when the search modal opens). Previously the index was
+   *  built eagerly on every page load, fetching articles.json and building the
+   *  Fuse index even on pages that never open search (about, tools, contribute,
+   *  public-profile, etc.). This is a redundant fetch + main-thread cost on
+   *  those pages. Search behavior is unchanged: the modal still loads the index
+   *  when opened (lazy path in openSearch). */
   function init() {
-    loadSearchIndex();
     bindEvents();
   }
 
