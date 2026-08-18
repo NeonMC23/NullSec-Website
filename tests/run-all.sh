@@ -139,5 +139,8 @@ node tests/m54-frontend-tests.mjs
 echo "== 45. Milestone 55 runtime cost & loading efficiency =="
 node tests/m55-frontend-tests.mjs
 
+echo "== 46. Milestone 56 feature integrity & wiring =="
+node tests/m56-frontend-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"
