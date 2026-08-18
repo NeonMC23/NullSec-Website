@@ -130,5 +130,8 @@ node tests/m51-frontend-tests.mjs
 echo "== 42. Milestone 52 frontend architecture & CSS hygiene =="
 node tests/m52-frontend-tests.mjs
 
+echo "== 43. Milestone 53 performance & loading UX =="
+node tests/m53-frontend-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

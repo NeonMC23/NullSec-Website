@@ -38,6 +38,14 @@
   let countries = [];   // local ISO reference (offline-capable)
   let loaded = false;
 
+  // M53: cache the aggregated country-activity result for the page session and
+  // dedupe concurrent getData() calls. ns_country_metrics returns GLOBAL,
+  // aggregated, anonymous public statistics (not per-user data), so reusing the
+  // result is correct and safe. This eliminates the 4 duplicate RPC requests
+  // that the community page used to fire (one per render section).
+  let dataCache = null;      // resolved result
+  let dataInflight = null;   // shared in-flight promise (dedupes concurrent calls)
+
   /** Normalize an arbitrary total into an intensity class. */
   function intensity(total) {
     const n = Number(total);
@@ -148,33 +156,50 @@
    * @returns {Promise<{countries: object, source: string, unavailable: boolean}>}
    */
   function getData() {
-    return init().then(function () {
+    // M53: return the cached result if we already resolved it this session.
+    if (dataCache) return Promise.resolve(dataCache);
+    // Dedupe concurrent calls: all callers share one in-flight request.
+    if (dataInflight) return dataInflight;
+    dataInflight = init().then(function () {
       const online = ApiClient.isBackendAvailable();
       if (!online) {
-        return { countries: {}, source: 'unavailable', unavailable: true };
+        dataCache = { countries: {}, source: 'unavailable', unavailable: true };
+        return dataCache;
       }
       // Placeholder integration point: the production RPC (ns_country_metrics)
       // is implemented in a dedicated backend milestone. Until then, do NOT
       // invent values — return unavailable.
       if (typeof ApiClient.countryMetrics !== 'function') {
-        return { countries: {}, source: 'unavailable', unavailable: true };
+        dataCache = { countries: {}, source: 'unavailable', unavailable: true };
+        return dataCache;
       }
       return ApiClient.countryMetrics()
         .then(function (raw) {
           const normalized = normalize(raw);
-          // lastUpdate is a GLOBAL (non-individual) timestamp from the RPC.
           const lastUpdate = (raw && typeof raw.lastUpdate === 'string' && raw.lastUpdate) || null;
-          return { countries: normalized.countries, source: 'supabase', unavailable: false, lastUpdate: lastUpdate };
+          dataCache = { countries: normalized.countries, source: 'supabase', unavailable: false, lastUpdate: lastUpdate };
+          return dataCache;
         })
         .catch(function () {
-          return { countries: {}, source: 'unavailable', unavailable: true };
+          dataCache = { countries: {}, source: 'unavailable', unavailable: true };
+          return dataCache;
         });
+    }).finally(function () {
+      dataInflight = null; // allow a later refresh after the first resolution
     });
+    return dataInflight;
+  }
+
+  /** M53: clear the cached result (used on page reload / explicit refresh). */
+  function clearCache() {
+    dataCache = null;
+    dataInflight = null;
   }
 
   window.CountryMetrics = {
     init: init,
     getData: getData,
+    clearCache: clearCache,
     normalize: normalize,
     intensity: intensity,
     getCountry: getCountry
