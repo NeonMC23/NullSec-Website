@@ -64,8 +64,14 @@ BEGIN
   FROM public.country_membership
   WHERE user_id = v_user_id;
 
+  -- M50: a user with no selected country has nothing to aggregate. This is a
+  -- best-effort anonymous aggregation, so a country-less user is a silent no-op
+  -- (return success, no event written) rather than a hard error. This removes
+  -- spurious 400 "no_country" console noise while preserving privacy (no
+  -- fabricated country, no per-user data, no aggregation without an explicit
+  -- choice). Nothing is written when there is no country.
   IF v_country IS NULL THEN
-    RAISE EXCEPTION 'no_country';
+    RETURN;
   END IF;
 
   -- Append the internal event (aggregated downstream; never exposed raw).

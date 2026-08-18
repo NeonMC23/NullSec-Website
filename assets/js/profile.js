@@ -69,17 +69,17 @@
     }
 
     let info = Utils.el('div', { class: 'profile-info' });
-    info.appendChild(Utils.el('h1', { text: 'Account' }));
+    info.appendChild(Utils.el('span', { class: 'profile-info-eyebrow', text: 'ACCOUNT' }));
     let username = Auth.getUsername();
-    if (username) {
-      info.appendChild(Utils.el('p', {
-        class: 'profile-account-username',
-        text: '@' + username
-      }));
-    }
+    info.appendChild(Utils.el('h1', { class: 'profile-account-username', text: '@' + (username || 'you') }));
     info.appendChild(Utils.el('p', {
       class: 'profile-account-note',
       text: 'A private container for your progression. No public profile, no avatar.'
+    }));
+    // Small authentication state line (part of the identity card).
+    info.appendChild(Utils.el('p', {
+      class: 'profile-auth-state',
+      text: 'Authentication: signed in · private account'
     }));
     container.appendChild(info);
   }
@@ -398,18 +398,27 @@
       }
     }
 
+    // Remember the previously-confirmed valid selection so we can restore it if
+    // a new save fails (never leave a misleading "saved" state).
+    let confirmedCountry = current;
+
     function applyChoice(code) {
       if (!code) return clearChoice();
+      statusLine.textContent = 'Saving…';
       if (window.CountryService) {
         CountryService.select(code);
         CountryService.confirm().then(function (st) {
           if (st && st.status === 'COUNTRY_SET') {
+            confirmedCountry = code;
             const name = st.countryName || code;
             statusLine.textContent = 'Selected: ' + name + ' (saved)';
             window.Modal.toast('Country saved: ' + name, 'success');
           } else {
-            statusLine.textContent = 'Country saved — pending sync.';
-            window.Modal.toast('Country saved. It will sync automatically.', 'success');
+            // Save failed (offline, no_session, network, etc). Show a clear error
+            // and preserve the previously valid selection, reverting the select.
+            statusLine.textContent = 'Could not save the country. Your previous selection was kept.';
+            window.Modal.toast('Could not save the country.', 'error');
+            select.value = confirmedCountry || '';
           }
         });
       }
@@ -742,18 +751,9 @@
     syncNowBtn.addEventListener('click', function () { runSyncAndRefresh(); });
     actions.appendChild(syncNowBtn);
 
-    // M48: subtle sync status indicator (Synced / Syncing… / Pending / Offline /
-    // Sync failed). Reads the canonical Sync.getStatus(); never intrusive.
-    let syncPill = Utils.el('span', { class: 'sync-status-pill', text: syncStatusLabel(Sync.getStatus ? Sync.getStatus() : 'synced') });
-    actions.appendChild(syncPill);
-    if (window.Sync && Sync.onStatusChange) {
-      Sync.onStatusChange(function (st) {
-        if (syncPill && syncPill.textContent !== undefined) {
-          syncPill.textContent = syncStatusLabel(st);
-          syncPill.setAttribute('data-status', st);
-        }
-      });
-    }
+    // M50: the canonical sync status pill lives in the account header
+    // (renderAccountSync → #account-sync), so there is exactly ONE sync
+    // indicator on the page (no duplication).
 
     let logoutBtn = Utils.el('button', { class: 'btn btn-secondary', text: 'Sign out' });
     logoutBtn.addEventListener('click', function () {

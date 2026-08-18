@@ -42,10 +42,12 @@ BEGIN
 
   IF p_country_code IS NOT NULL THEN
     IF p_country_code = '' THEN
-      -- Empty string = explicit "Prefer not to say": clear the country.
+      -- Empty string = explicit "Prefer not to say": clear the country from both
+      -- the profile and the activity country_membership source.
       UPDATE public.user_profiles
       SET country_code = NULL, updated_at = now()
       WHERE user_id = v_user_id;
+      DELETE FROM public.country_membership WHERE user_id = v_user_id;
     ELSE
       IF NOT (p_country_code ~ '^[A-Z]{2}$') THEN
         RAISE EXCEPTION 'invalid_country_code';
@@ -56,6 +58,13 @@ BEGIN
       UPDATE public.user_profiles
       SET country_code = p_country_code, updated_at = now()
       WHERE user_id = v_user_id;
+      -- M50: keep country_membership (the aggregation pipeline's country source)
+      -- in sync with the account country selector so ns_record_activity / the
+      -- country map reflect the user's explicit choice. One country per user.
+      INSERT INTO public.country_membership (user_id, country_code, created_at, updated_at)
+      VALUES (v_user_id, p_country_code, now(), now())
+      ON CONFLICT (user_id) DO UPDATE
+        SET country_code = EXCLUDED.country_code, updated_at = now();
     END IF;
   END IF;
 END;

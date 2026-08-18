@@ -219,7 +219,15 @@
     if (!hovered) selectedCountry = code || null;
     if (europeSvg) EuropeMap.setSelected(europeSvg, selectedCountry);
 
-    if (europeData.unavailable) { panel.style.display = 'none'; return; }
+    if (europeData.unavailable) {
+      panel.style.display = 'block';
+      panel.appendChild(Utils.el('h4', { text: 'Europe Activity Map' }));
+      panel.appendChild(Utils.el('p', {
+        class: 'metric metric-panel-empty',
+        text: 'Activity data is currently unavailable.'
+      }));
+      return;
+    }
 
     const row = code ? europeData.countries[code] : null;
     const ref = CountryMetrics.getCountry(code);
@@ -230,10 +238,10 @@
       panel.style.display = 'block';
       panel.appendChild(Utils.el('h4', { text: selectedCountry ? ((CountryMetrics.getCountry(selectedCountry) || {}).name || selectedCountry) : 'Europe Activity Map' }));
       panel.appendChild(Utils.el('p', {
-        class: 'metric',
+        class: 'metric metric-panel-empty',
         text: selectedCountry
           ? 'Hover or select a country to view its aggregated activity.'
-          : 'Hover or select a country on the map to view its aggregated activity.'
+          : 'Select a country on the map to view its aggregated activity.'
       }));
       return;
     }

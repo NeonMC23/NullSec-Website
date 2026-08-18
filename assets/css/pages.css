@@ -1034,21 +1034,27 @@
   border-radius: var(--radius);
 }
 .europe-country-panel {
-  margin-top: 12px;
-  padding: 16px;
+  margin-top: 14px;
+  padding: 18px 20px;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 14px;
   font-size: 0.9rem;
 }
-.europe-country-panel h4 { margin: 0 0 8px; }
+.europe-country-panel h4 { margin: 0 0 12px; font-size: 1.1rem; }
 .europe-country-panel .metric {
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
+  align-items: baseline;
+  padding: 7px 0;
   border-bottom: 1px solid var(--border);
 }
 .europe-country-panel .metric:last-child { border-bottom: 0; }
+.europe-country-panel .metric strong { font-size: 1rem; color: var(--accent, #818CF8); }
+.europe-country-panel .metric-panel-empty {
+  color: var(--text-dim, #9aa3b2);
+  font-style: italic;
+}
 
 /* M28: global last-update label (non-individual). */
 .community-last-update {
@@ -1210,28 +1216,59 @@
   border-bottom: 0;
 }
 
-/* --- M49: Account page redesign -------------------------------- */
+/* --- M49/M50: Account page redesign ----------------------------- */
 .account-section { min-height: 100vh; }
 .account-shell {
-  max-width: 720px;
+  max-width: 820px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 .account-header {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--bg-card, #1e2430);
+  border: 1px solid var(--border, #2f3646);
+  border-radius: 16px;
+  padding: 22px 24px;
 }
-.account-sync { display: flex; align-items: center; min-height: 24px; }
+.account-header .profile-info { flex: 1 1 300px; min-width: 0; }
+.account-sync {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 24px;
+  flex: 0 0 auto;
+}
 .account-card {
   background: var(--bg-card, #1e2430);
   border: 1px solid var(--border, #2f3646);
-  border-radius: 14px;
-  padding: 24px;
+  border-radius: 16px;
+  padding: 22px 24px;
 }
-.account-card-head h2 { margin: 0 0 4px; font-size: 1.15rem; }
-.account-card-head p { margin: 0 0 14px; color: var(--text-dim, #9aa3b2); font-size: 0.88rem; }
-.account-reset-row { display: flex; margin-top: 14px; flex-wrap: wrap; gap: 10px; }
+.account-card-head h2 { margin: 0 0 4px; font-size: 1.2rem; }
+.account-card-head p { margin: 0 0 16px; color: var(--text-dim, #9aa3b2); font-size: 0.88rem; line-height: 1.5; }
+.account-reset-row { display: flex; margin-top: 16px; flex-wrap: wrap; gap: 10px; }
 .account-footer { padding: 4px 0 24px; text-align: center; }
+
+@media (max-width: 560px) {
+  .account-shell { padding: 0 14px; }
+  .account-header, .account-card { padding: 18px 16px; }
+  .account-header { flex-direction: column; }
+  .account-sync { justify-content: flex-start; }
+}
+
+/* M50: account identity card extras */
+.profile-info-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim, #9aa3b2);
+}
+.profile-account-username { font-size: 1.6rem; margin: 4px 0; }
+.profile-auth-state { font-size: 0.82rem; color: var(--text-dim, #9aa3b2); margin-top: 6px; }
