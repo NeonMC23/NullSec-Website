@@ -112,5 +112,8 @@ node tests/m45-tests.mjs
 echo "== 36. Milestone 46 production-fix regressions (real-deploy fixes) =="
 node tests/m46-production-fixes.mjs
 
+echo "== 37. Milestone 47 canonical deployment system (static + mock API) =="
+node tests/m47-deploy-tests.mjs
+
 echo ""
 echo "All local/static/mock suites passed. (Real Supabase tests are BLOCKED.)"

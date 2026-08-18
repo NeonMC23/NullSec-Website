@@ -104,7 +104,7 @@ console.log('== 2. Deployment readiness (STATIC shell) ==')
 {
   const deploy = readFileSync(join(ROOT, 'backend/supabase/scripts/deploy.sh'), 'utf8');
   const apply = readFileSync(join(ROOT, 'backend/supabase/scripts/apply-sql.sh'), 'utf8');
-  ok(/set -euo pipefail/.test(deploy) && /set -euo pipefail/.test(apply), 'scripts use set -euo pipefail');
+  ok(/set -E?euo pipefail/.test(deploy) && /set -E?euo pipefail/.test(apply), 'scripts use set -E?euo pipefail');
   ok(/SUPABASE_ACCESS_TOKEN/.test(deploy) && /SUPABASE_PROJECT_REF/.test(deploy), 'deploy requires secrets');
   ok(/rpc_privileges\.sql/.test(deploy), 'deploy applies privilege hardening');
   ok(!/=eyJ|service_role|sbad|yoursupabase/.test(deploy + apply), 'no literal secrets in scripts');

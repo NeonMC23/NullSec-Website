@@ -108,7 +108,7 @@ console.log('== 6. Deployment scripts fail-safe (STATIC) ==')
 {
   for (const s of ['deploy.sh', 'apply-sql.sh']) {
     const src = readFileSync(join(ROOT, 'backend/supabase/scripts', s), 'utf8');
-    ok(/set -euo pipefail/.test(src), s + ' uses set -euo pipefail');
+    ok(/set -E?euo pipefail/.test(src), s + ' uses set -E?euo pipefail');
     ok(/SUPABASE_ACCESS_TOKEN/.test(src), s + ' references access token');
     ok(/SUPABASE_PROJECT_REF/.test(src), s + ' references project ref');
     ok(/exit 1/.test(src), s + ' fails with non-zero');

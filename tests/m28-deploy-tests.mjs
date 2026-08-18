@@ -84,7 +84,7 @@ console.log('== 3. No secret leakage ==');
 console.log('== 4. Fail-safe ==');
 {
   const apply = readFileSync(join(SCRIPTS, 'apply-sql.sh'), 'utf8');
-  ok(/set -euo pipefail/.test(apply), 'apply-sql uses set -euo pipefail');
+  ok(/set -E?euo pipefail/.test(apply), 'apply-sql uses set -E?euo pipefail');
   ok(/exit 1/.test(apply), 'apply-sql exits non-zero on failure');
   ok(/SQL_FILE="\$\{1:?/.test(apply), 'apply-sql requires a SQL file argument');
 }

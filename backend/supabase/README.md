@@ -27,25 +27,31 @@ backend/supabase/
 
 ## 3. Environnement
 
-| Variable | Rôle |
-|----------|------|
-| `SUPABASE_URL` | URL du projet Supabase. |
-| `SUPABASE_ANON_KEY` | Clé publique (frontend). |
-| `SUPABASE_SERVICE_KEY` | Clé service (déploiement uniquement, **jamais** en frontend). |
-| `NODE_ENV` | `development` / `production`. |
+| Variable | Rôle | Déploiement |
+|----------|------|-------------|
+| `SUPABASE_URL` | URL du projet Supabase. | Non |
+| `SUPABASE_ANON_KEY` | Clé publique (frontend). | Non (publique, jamais utilisée pour l'auth de déploiement) |
+| `SUPABASE_SERVICE_KEY` | Clé service-role. | **Jamais** pour le déploiement |
+| `SUPABASE_ACCESS_TOKEN` | Token Supabase (Management API). | **Oui (requis)** |
+| `SUPABASE_PROJECT_REF` | Référence du projet. | **Oui (requis)** |
+| `SUPABASE_API_BASE_URL` | Base API, défaut `https://api.supabase.com`. | Optionnel |
+| `NODE_ENV` | `development` / `production`. | Non |
 
 Règles : **jamais committer** les clés. Utiliser `.env` (hors git).
+Le déploiement n'utilise **ni** la clé service-role **ni** la clé anon.
 
 ## 4. Migrations (ordre d'application)
 
 Déploiement **cloud-first** (voir `docs/cloud-deployment.md`) : le workflow
-`.github/workflows/supabase-deploy.yml` applique les migrations + RPC via la
+`.github/workflows/supabase-deploy.yml` appelle **`backend/supabase/scripts/deploy.sh`**
+(point d'entrée **unique**), qui applique les migrations + RPC via la
 **Supabase Management API** (curl + `SUPABASE_ACCESS_TOKEN`), sans CLI local ni
-`supabase link`. Le script `backend/supabase/scripts/deploy.sh` orchestre le tout.
+`supabase link`. `apply-sql.sh` est un helper interne de `deploy.sh`.
 
 ```bash
 # Ordre de déploiement (critical sur base vierge) :
-#   migrations 0001→0016  ->  RPC creation  ->  RPC privilege hardening
+#   migrations 0001→0019  ->  RPC creation  ->  RPC privilege hardening
+# deploy.sh exécute aussi un preflight et une vérification post-déploiement.
 # Les migrations ne doivent PAS contenir de REVOKE/GRANT EXECUTE ON FUNCTION
 # (les fonctions n'existent pas encore à ce stade). Ces contrôles vivent dans
 # rpc_privileges.sql, appliqué APRÈS la création des RPC.
@@ -66,19 +72,37 @@ Déploiement **cloud-first** (voir `docs/cloud-deployment.md`) : le workflow
 0014_activity_trigger_support.sql  # index agrégation + re-affirmation RLS (M25)
 0015_community_action_support.sql  # index type/created + re-affirmation RLS (M26)
 0016_activity_metrics_refinement.sql  # community_activity dans la vue (M27)
+0017_auth_username_password.sql  # username + password (M32)
+0018_public_profile.sql          # profils publics opt-in (M38)
+0019_auth_identity_nullable.sql  # identity_id nullable (fix déploiement M46)
 ```
 
 Après les migrations puis les RPC (`rpc_auth` → `rpc_sync` → `rpc_activity` →
-`rpc_tool_activity` → `rpc_profile` → `rpc_activity_event` → `rpc_country_metrics`),
-`deploy.sh` applique **en dernier** `rpc_privileges.sql` : il révoque le grant
-`PUBLIC` par défaut sur toutes les fonctions, GRANT les fonctions publiques à
-`anon, authenticated`, et révoque `ns_create_session` (helper interne) de
-`anon/authenticated`. C'est l'étape de **RPC privilege hardening**.
+`rpc_tool_activity` → `rpc_profile` → `rpc_activity_event` → `rpc_country_metrics`
+→ `rpc_public_profile` → `rpc_update_public_profile`), `deploy.sh` applique
+**en dernier** `rpc_privileges.sql` : il révoque le grant `PUBLIC` par défaut sur
+toutes les fonctions, GRANT les fonctions publiques à `anon, authenticated`, et
+révoque `ns_create_session` (helper interne) de `anon/authenticated`. C'est
+l'étape de **RPC privilege hardening**.
+
+### Déploiement
+
+```bash
+export SUPABASE_ACCESS_TOKEN='<token>'
+export SUPABASE_PROJECT_REF='kjgzfxviopkpykkowdbj'
+bash backend/supabase/scripts/deploy.sh
+```
+
+`deploy.sh` exécute `[1/4] Preflight`, `[2/4] Migrations`, `[3/4] RPC + privileges`,
+`[4/4] Verification`, puis imprime « completed successfully » **uniquement** en
+cas de succès complet. Les secrets ne sont jamais affichés. En CI, le workflow
+`.github/workflows/supabase-deploy.yml` fournit les deux secrets et appelle le
+même script.
 
 ## 5. RPC (API publique, anon + authenticated)
 
-- `ns_register(uuid, text, text, text)` — créer un compte (SHA-256 transport hash).
-- `ns_login(uuid, text)` — connexion (vérifie le hash bcrypt).
+- `ns_register(text, text, text)` — créer un compte username+password (SHA-256 transport hash, M32).
+- `ns_login(text, text)` — connexion username+password (vérifie le hash bcrypt).
 - `ns_logout(text)` — révoquer une session (`p_token`).
 - `ns_validate_session(text)` — valider un token → `user_id` ou NULL (`p_token`).
 - `ns_sync_pull(text)` / `ns_sync_push(text, json, json, json)` — sync **token-authentifiée**.

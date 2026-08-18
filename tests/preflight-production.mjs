@@ -17,7 +17,7 @@
  *   6. Secret scan (service-role keys, DB passwords, access tokens) — only
  *      reports PASS/FAIL + location, NEVER the matched value.
  *   7. SQL hardening (SECURITY DEFINER, search_path, helper revocation).
- *   8. Deployment scripts (set -euo pipefail, required-env checks).
+ *   8. Deployment scripts (set -E?euo pipefail, required-env checks).
  *
  * Exit code 0 = PASS; 1 = FAIL. Prints PASS/FAIL per check.
  */
@@ -151,8 +151,10 @@ console.log('== 6. Secret scan (values never printed) ==');
   for (const d of scannedDirs) {
     if (existsSync(join(ROOT, d))) files.push(...walkFiles(join(ROOT, d)));
   }
-  // Skip the test/preflight files themselves (they intentionally reference patterns in code).
-  const skip = /tests\/(preflight|m4[0-9]|m3[0-9]|m2[0-9]|m1[0-9])/;
+  // Skip the test/preflight files themselves (they intentionally reference patterns in code),
+  // and the committed __supabase_bootstrap.js which deliberately carries the PUBLIC anon key
+  // (a build/deploy artifact, not a private credential). Values are never printed.
+  const skip = /tests\/(preflight|m4[0-9]|m3[0-9]|m2[0-9]|m1[0-9])|__supabase_bootstrap\.js$/;
   for (const f of files) {
     if (skip.test(f)) continue;
     let src;
@@ -242,7 +244,7 @@ console.log('== 8. Deployment scripts ==');
 {
   for (const s of ['deploy.sh', 'apply-sql.sh']) {
     const src = readFileSync(join(SCRIPTS, s), 'utf8');
-    ok(/set -euo pipefail/.test(src), s + ' uses set -euo pipefail');
+    ok(/set -E?euo pipefail/.test(src), s + ' uses set -E?euo pipefail');
     ok(/SUPABASE_ACCESS_TOKEN/.test(src), s + ' requires SUPABASE_ACCESS_TOKEN');
     ok(/SUPABASE_PROJECT_REF/.test(src), s + ' requires SUPABASE_PROJECT_REF');
     ok(/exit 1/.test(src), s + ' fails with non-zero on error');
