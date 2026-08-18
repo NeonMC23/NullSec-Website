@@ -142,3 +142,4 @@ Ces RPC documentent l'API cible ; ils ne sont PAS implémentés/déployés.
 - Config frontend : `Config.getConfigStatus()` (CONFIGURED / NOT_CONFIGURED / INVALID_CONFIGURATION).
 - ApiClient : timeout 12s, normalisation d\'erreurs, aucune fuite DB.
 - ActivityService : état DUPLICATE + SUCCESS/OFFLINE/NOT_AUTHENTICATED/UNAVAILABLE/INVALID.
+
