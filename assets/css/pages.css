@@ -1291,5 +1291,13 @@
   text-transform: uppercase;
   color: var(--text-dim, #9aa3b2);
 }
-.profile-account-username { font-size: 1.6rem; margin: 4px 0; }
+.profile-account-username {
+  font-size: 1.6rem;
+  margin: 4px 0;
+  /* M59: allow long usernames (max 32 chars) to wrap instead of overflowing the
+     account card on narrow screens. */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
 .profile-auth-state { font-size: 0.82rem; color: var(--text-dim, #9aa3b2); margin-top: 6px; }
