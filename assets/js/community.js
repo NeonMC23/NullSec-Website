@@ -363,8 +363,16 @@
       }));
       return;
     }
-    const st = CountryService.getState();
-    const countryName = st.countryName;
+    // M60: read the authoritative selected country from the repository (which is
+    // server-rehydrated via sync), NOT from CountryService. CountryService's
+    // internal selectedCode is only populated through the Account page's
+    // select() flow, so on the Community page it is always null — which meant
+    // an authenticated user with a selected country never saw it reflected here.
+    const code = (window.CountryRepository && CountryRepository.getCountry)
+      ? CountryRepository.getCountry() : null;
+    const ref = code && window.CountryMetrics && CountryMetrics.getCountry
+      ? CountryMetrics.getCountry(code) : null;
+    const countryName = ref ? ref.name : null;
     if (countryName) {
       container.appendChild(Utils.el('p', {
         class: 'community-participation ok',
@@ -432,6 +440,22 @@
     renderMap();
     renderCommunityAction();
     renderPrivacyNote();
+    // M60: session restoration is async, so the auth-dependent participation
+    // panel must re-render once restoration resolves, on any later auth change,
+    // and when a sync pull completes (so the server-rehydrated country name
+    // appears). Without this, an authenticated user saw the stale guest
+    // message ("Sign in to contribute") and never their selected country.
+    if (window.Auth && Auth.onAuthChange) {
+      Auth.onAuthChange(renderParticipation);
+    }
+    if (window.Session && Session.ensureRestored) {
+      Session.ensureRestored().then(renderParticipation);
+    }
+    if (window.Sync && Sync.onStatusChange) {
+      Sync.onStatusChange(function (st) {
+        if (st === 'synced') renderParticipation();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {

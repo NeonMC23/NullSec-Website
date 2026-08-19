@@ -9,13 +9,21 @@
 
   /** Highlight the current page link in the nav. */
   function highlightActiveLink() {
-    const path = window.location.pathname.replace(/\/$/, '') || '/index.html';
+    // M60: canonicalise the current path so the homepage (/ or /index.html)
+    // and a trailing-slash page map to the same value.
+    let path = window.location.pathname.replace(/\/$/, '');
+    if (path === '' || path === '/index.html') path = '/';
     const links = document.querySelectorAll('.navbar-links a, .mobile-menu a');
     links.forEach((link) => {
       const href = link.getAttribute('href');
       if (!href) return;
       // Normalise both paths for comparison
-      const linkPath = href.replace(/\/$/, '');
+      let linkPath = href.replace(/\/$/, '');
+      // Home link ('./', '/', './index.html') → canonical '/'
+      if (linkPath === '' || linkPath === '.' || linkPath === './' ||
+          linkPath === '/' || linkPath === './index.html' || linkPath === 'index.html') {
+        linkPath = '/';
+      }
       if (path === linkPath || path.endsWith(linkPath)) {
         link.classList.add('active');
         link.setAttribute('aria-current', 'page');
