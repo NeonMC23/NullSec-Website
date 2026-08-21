@@ -81,6 +81,16 @@ BEGIN
 
   -- Update the corresponding aggregate table.
   IF p_activity_type = 'mission_completed' THEN
+    -- M61: also bump mission_activity so the Community dashboard's
+    -- "Missions completed" aggregate (v_country_metrics.mission_activity) is
+    -- populated. The UI does not pass a per-mission id to this RPC, so we
+    -- aggregate under a single generic mission bucket per country; the
+    -- dashboard sums per-country totals, so the mission_id is not displayed.
+    INSERT INTO public.mission_activity (mission_id, country_code, completed_count, last_activity_at, updated_at)
+    VALUES ('_general', v_country, v_amount, now(), now())
+    ON CONFLICT (country_code, mission_id)
+    DO UPDATE SET completed_count = public.mission_activity.completed_count + v_amount,
+                  last_activity_at = now(), updated_at = now();
     INSERT INTO public.country_activity (country_code, completed_count, updated_at)
     VALUES (v_country, v_amount, now())
     ON CONFLICT (country_code)

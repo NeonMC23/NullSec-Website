@@ -13,7 +13,9 @@
     // and a trailing-slash page map to the same value.
     let path = window.location.pathname.replace(/\/$/, '');
     if (path === '' || path === '/index.html') path = '/';
-    const links = document.querySelectorAll('.navbar-links a, .mobile-menu a');
+    // M61: exclude the Sign out action (which shares the Account href) so it is
+    // never marked as the active destination page.
+    const links = document.querySelectorAll('.navbar-links a:not(.nav-signout), .mobile-menu a:not(.nav-signout)');
     links.forEach((link) => {
       const href = link.getAttribute('href');
       if (!href) return;
@@ -85,26 +87,43 @@
       reconcileSessionNav();
       window.location.href = 'profile.html';
     };
+    // M61: build the "Sign out" control. It is an account ACTION, so it is kept
+    // visually separate from the primary site-destination links (see the
+    // .navbar-actions .nav-signout styling) instead of reading as another
+    // content page in the main navigation bar.
+    function makeSignOut() {
+      const link = document.createElement('a');
+      link.className = 'nav-signout';
+      link.setAttribute('href', 'profile.html');
+      link.textContent = 'Sign out';
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        signOut();
+      });
+      return link;
+    }
     function reconcileSessionNav() {
       // Always remove existing sign-out controls so a logout/expiry never leaves
       // a stale "Sign out" on the page.
       document.querySelectorAll('.nav-signout').forEach(function (el) { el.remove(); });
       if (!authed) return;
-      ['.navbar-links', '.mobile-menu'].forEach(function (sel) {
-        const container = document.querySelector(sel);
-        if (!container) return;
-        const accountLink = container.querySelector('a[href="profile.html"]');
-        if (!accountLink) return;
-        const link = document.createElement('a');
-        link.className = 'nav-signout';
-        link.setAttribute('href', 'profile.html');
-        link.textContent = 'Sign out';
-        link.addEventListener('click', function (e) {
-          e.preventDefault();
-          signOut();
-        });
-        accountLink.parentNode.insertBefore(link, accountLink.nextSibling);
-      });
+      // Desktop: Sign out lives in the actions area (search / theme / discord),
+      // not among the primary destination links.
+      const actions = document.querySelector('.navbar-actions');
+      if (actions) {
+        const link = makeSignOut();
+        const hamburger = actions.querySelector('.hamburger');
+        if (hamburger) actions.insertBefore(link, hamburger);
+        else actions.appendChild(link);
+      }
+      // Mobile: Sign out lives in the mobile menu, after the Account link.
+      const menu = document.querySelector('.mobile-menu');
+      if (menu) {
+        const accountLink = menu.querySelector('a[href="profile.html"]');
+        const link = makeSignOut();
+        if (accountLink) accountLink.parentNode.insertBefore(link, accountLink.nextSibling);
+        else menu.appendChild(link);
+      }
     }
     reconcileSessionNav();
   }
